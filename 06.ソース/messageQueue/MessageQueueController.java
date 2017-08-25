@@ -1,0 +1,30 @@
+package messageQueue;
+
+import net.sf.json.JSONObject;
+/**
+ * MQの制御のためのインターフェース.
+ * @author hatsugai
+ *
+ */
+public interface MessageQueueController {
+	/**
+	 * メッセージを送信します
+	 * @param gameInfo 試合に関わる情報が入っています（JSONObject方式です)
+	 */
+	public void sendMessage(JSONObject gameInfo);
+	/**
+	 * メッセージを受信します
+	 * @return 受信したメッセージです（JSONObject方式です)
+	 */
+	public JSONObject receiveMessage();
+	/**
+	 * 受信用Queueを作成します
+	 * @param IPAdress 自身のマシンのIPアドレスです
+	 */
+	public void createQueue(String IPAdress);
+	/**
+	 * 受信用Queueを破棄します
+	 */
+	public void quitQueue();
+
+}
