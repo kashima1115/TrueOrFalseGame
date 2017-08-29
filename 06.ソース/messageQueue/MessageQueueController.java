@@ -26,5 +26,11 @@ public interface MessageQueueController {
 	 * 受信用Queueを破棄します
 	 */
 	public void quitQueue();
+	/**
+	 * サーバーがメッセージをクライアントに送信
+	 * @param gameInfo 試合に関わる情報が入っています（JSONObject方式です)
+	 * @param IPAdress メッセージの送信先IPアドレス
+	 */
+	public void sendMessage(JSONObject gameInfo,String IPAdress);
 
 }
