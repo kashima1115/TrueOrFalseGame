@@ -12,7 +12,7 @@ import brain.BrainBean;
  *
  */
 
-public class AccessBrain {
+public class AccessBrain{
 	/**
 	 * ロジックの情報を取得するためにBrainにアクセスするメソッドです
 	 * @return ロジック情報が格納されたBeanです
