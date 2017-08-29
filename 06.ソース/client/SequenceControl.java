@@ -2,10 +2,10 @@ package client;
 
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import brain.BrainBean;
 import net.sf.json.JSONObject;
 /**
  * クライアント機能の動作をコントロールするクラスです.
@@ -17,17 +17,18 @@ public class SequenceControl{
 	 * 試合開始時の動作です
 	 */
 	public static void startGame(){
-		//ロジック情報を取得
+		//ロジック情報を取得(bean)
 		AccessBrain ab = new AccessBrain();
-		ab.getLogicInfo();
+		List<BrainBean> logList = ab.getLogicInfo();
 
 		//起動しているマシンのIPアドレスを特定する
-		String IPAdress ="/123.123.1.123";//値は仮の値です。実際にはマシンのIPアドレスが入ります。
+		String IPAdress ="/123.123.1.123";//値は適当に書いた値です。後でマシンのIPアドレスが入ります。
 		IPAdress = myIP();
 
-		//JSONに変換
+		//JSONに変換するためインスタンス化
 		ConvertJSON cj = new ConvertJSON();
-		JSONObject jo = cj.convertToJSONF(IPAdress);
+		//JSONに変換。(ロジックの情報は既にlogListに入っておりConvertJSONでまとめて変換します)
+		JSONObject jo = cj.convertToJSONF(logList,IPAdress);
 
 		//ActiveMQを通してサーバープログラムに送信する
 		messageQueue.ActiveMQMessaging amq = new messageQueue.ActiveMQMessaging();
@@ -71,13 +72,12 @@ public class SequenceControl{
 			obj = amq.receiveMessage();
 			//JSONから変換
 			ConvertJSON cj = new ConvertJSON();
-			cj.convertFromJSON(obj);
+			List<BattleInfoBean> bib =cj.convertFromJSON(obj);
 			//変数eventの宣言
 			String event = "blank";
 			//brainに送るための変数を宣言
 			String[][]location = null;
-			//BattleInfoBeanインスタンス化
-			List<BattleInfoBean> bib = new ArrayList<BattleInfoBean>();
+			//event情報だけbeanから取り出す
 			for(BattleInfoBean binfob:bib){
 				event = binfob.getEvent();
 			}
@@ -86,6 +86,7 @@ public class SequenceControl{
 			//例外条件分岐
 			if(event.equals("error")){
 				for(BattleInfoBean binfob:bib){
+					//エラーメッセージを表示する
 					System.out.println(binfob.getError());
 				}
 				break;
@@ -99,9 +100,9 @@ public class SequenceControl{
 			}
 			//盤面情報をbrainに渡して指し手情報を取得する
 			AccessBrain ab = new AccessBrain();
-			ab.getLocation(location);
+			List<BattleInfoBean> bibList = ab.getLocation(location);
 			//JSONに変換
-			JSONObject jo = cj.convertToJSONS();
+			JSONObject jo = cj.convertToJSONS(bibList);
 			//ActiveMQを通してサーバープログラムに送信する
 			amq.sendMessage(jo);
 		}

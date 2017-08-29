@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import brain.Brain;
+import brain.BrainBean;
 
 /**
  * Brainにアクセスするクラスです.
@@ -14,17 +15,20 @@ import brain.Brain;
 public class AccessBrain {
 	/**
 	 * ロジックの情報を取得するためにBrainにアクセスするメソッドです
+	 * @return ロジック情報が格納されたBeanです
 	 */
-	public void getLogicInfo(){
+	public List<BrainBean> getLogicInfo(){
 		Brain bra = new Brain();
-		bra.logicInfo();
+		List<BrainBean> logList = bra.logicInfo();
+		return logList;
 	}
 
 	/**
 	 * @param loc 盤面情報です。3*3を想定しています
+	 * @return 指し手情報が格納されたBeanです
 	 */
 
-	public void getLocation(String[][] loc){
+	public List<BattleInfoBean> getLocation(String[][] loc){
 		Brain bra = new Brain();
 		//指し手情報を保管するための変数を宣言
 		String loca = bra.getLocation(loc);
@@ -34,6 +38,7 @@ public class AccessBrain {
 		bib.setxAxis(Integer.parseInt(loca.substring(0,1)));
 		bib.setyAxis(Integer.parseInt(loca.substring(1)));
 		bl.add(bib);
+		return bl;
 	}
 
 }
