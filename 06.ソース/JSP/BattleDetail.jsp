@@ -4,10 +4,6 @@
 <%@ page import="servlet.TrueOrFalseBean"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-
-
-
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Windows-31J">
@@ -18,11 +14,8 @@
 
 	<form action="../servlet/servlet.BattleResult" method="get">
 
-
-
 <!-- 	9マスそれぞれに割り当てターン数が偶数なら× -->
 <!-- 	奇数なら○にすることによって先攻後攻を判別する。 -->
-
 		<%	int a = 0;	%>
 		<%	int b = 0;	%>
 		<%	int c = 0;	%>
@@ -32,31 +25,21 @@
 		<%	int g = 0;	%>
 		<%	int h = 0;	%>
 		<%	int i = 0;	%>
-
-
 <!-- 		listには１～９までに指し手情報が格納されており -->
 <!-- 		10番目に先手のロジック情報、11番目に後攻のロジック情報が格納されている -->
 <!-- 		resultは11番目の試合情報を取得するための関数 -->
-
-
 		<%	int ten = 0;	%>
 		<%	int eleven = 0;	%>
 		<%	int nine = 0;	%>
 		<%  int result = 0; %>
 
-
-		<%
-			// 検索結果のデータリストを取得
+		<%// 検索結果のデータリストを取得
 			List<TrueOrFalseBean> list = (List<TrueOrFalseBean>) request.getAttribute("DetailList");
 			// 取得できなかった場合、メッセージ出力
 			// 取得できた場合、データを出力
 			if (list.isEmpty()) {
 				out.print("該当のデータはありません。");
-			} else {
-		%>
-
-
-
+				} else { %>
 
 		<%	for (TrueOrFalseBean bn : list) {	%>
 
@@ -66,27 +49,18 @@
 
 		<table border="1">
 			<tr>
-
 				<th>先攻（○）</th>
 				<th>勝敗</th>
-
-
 			</tr>
-
-
 			<tr>
 				<td><%=bn.getLogic_name()%> <%=bn.getLogic_writer()%> <%=bn.getLogic_ver()%></td>
 				<td><%=bn.getResult()%></td>
-
 			</tr>
-
 
 		</table>
 
 		<%	}	%>
-
 		<%	} %>
-
 
 		<%	for (TrueOrFalseBean bn : list) {	%>
 
@@ -98,39 +72,24 @@
 
 		<table border="1">
 			<tr>
-
 				<th>後攻（×）</th>
 				<th>勝敗</th>
-
-
 			</tr>
-
 			<tr>
-
-
 				<td><%=bn.getLogic_name()%> <%=bn.getLogic_writer()%> <%=bn.getLogic_ver()%></td>
 				<td><%=bn.getResult()%></td>
-
 			</tr>
-
 
 		</table>
 
 		<% } %>
-
-
-
-
 		<%	} %>
-
 
 		<%	for (TrueOrFalseBean bn : list) {%>
 
 		<% nine++; %>
 
-
 		<% if(nine <= 9){ %>
-
 
 		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 0) { %>
 		<%	if (bn.getTurn() % 2 != 0) {
@@ -232,8 +191,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 				<td>
 					<%
@@ -243,8 +201,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 				<td>
 					<%
@@ -254,8 +211,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 			<tr>
 			<tr>
@@ -267,8 +223,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 				<td>
 					<%
@@ -278,8 +233,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 				<td>
 					<%
@@ -289,8 +243,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 			<tr>
 			<tr>
@@ -302,8 +255,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 				<td>
 					<%
@@ -313,8 +265,7 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						} %>
 				</td>
 				<td>
 					<%
@@ -324,16 +275,13 @@
 					%> × <%
 						} else {
 					%> － <%
-						}
-					%>
+						}	%>
 				</td>
 			<tr>
 		</table>
 
 <br/>
 <br/>
-
-
 
 		<%	for (TrueOrFalseBean bn : list) {	%>
 
@@ -345,38 +293,29 @@
 		<table border="1">
 			<tr>
 
-
 				<th>試合日</th>
 				<th>試合開始時間</th>
 				<th>試合終了時間</th>
 
 			</tr>
-
 			<tr>
-
-
 
 				<td><%=bn.getYear()%>年<%=bn.getMonth()%>月<%=bn.getDay()%>日</td>
 				<td><%=bn.getStart_hour()%>時<%=bn.getStart_min()%>分<%=bn.getStart_sec()%>秒</td>
 				<td><%=bn.getEnd_hour()%>時<%=bn.getEnd_min()%>分<%=bn.getEnd_sec()%>秒</td>
-			</tr>
 
+			</tr>
 
 		</table>
 
 		<% } %>
-
-
-
 
 		<%	} %>
 
 <br/>
 <br/>
 
-
-
-		<input type="submit" value="試合結果一覧" />
+		<input type="submit" value="試合結果一覧に戻る" />
 
 	</form>
 </body>

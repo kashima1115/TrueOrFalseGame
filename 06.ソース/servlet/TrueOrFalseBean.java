@@ -12,12 +12,6 @@ import java.io.Serializable;
 */
 
 public class TrueOrFalseBean implements Serializable {
-
-
-
-
-
-
 	private int logic_id;
 	private String PFlogic_name;
 	private String PFlogic_writer;
@@ -41,8 +35,6 @@ public class TrueOrFalseBean implements Serializable {
 	private int location_y;
 	private int turn;
 	private int radio;
-
-
 
 	public int getLogic_id() {
 		return logic_id;
@@ -182,8 +174,5 @@ public class TrueOrFalseBean implements Serializable {
 	public void setPFlogic_ver(String pFlogic_ver) {
 		PFlogic_ver = pFlogic_ver;
 	}
-
-
-
 
 }

@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  */
 
-
-
 public class BattleResult extends HttpServlet {
 
     /**
@@ -29,12 +27,8 @@ public class BattleResult extends HttpServlet {
     * データベースへの検索処理
     */
 
-
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-
-
 
         try{
         	BattleResultDBAccess brd = new BattleResultDBAccess();
@@ -44,11 +38,8 @@ public class BattleResult extends HttpServlet {
             // listをrequestにセット
             request.setAttribute("list", list);
 
-
         }catch(Exception e){
             e.printStackTrace();
-
-
         }
 
         /** 次のJSPに遷移 */

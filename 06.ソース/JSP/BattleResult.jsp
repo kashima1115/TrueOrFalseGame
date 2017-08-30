@@ -18,21 +18,19 @@
        // 取得できた場合、データを出力
        if(list.isEmpty()) {
            out.print("該当のデータはありません。");
-       }else{
-    %>
+       }else{   %>
 
     <table border="1">
       <tr>
       	<th>選択</th>
         <th>試合ID</th>
-        <th>先攻</th>
+        <th>先攻対戦者情報</th>
         <th>勝敗</th>
-        <th>後攻</th>
+        <th>後攻対戦者情報</th>
         <th>勝敗</th>
         <th>試合日</th>
 
       </tr>
-
 
 <!-- iが奇数の際に先攻ロジック情報を呼び出し -->
 <!-- 偶数のときに後攻のロジック情報を呼び出すことで一つの表にまとめる -->
@@ -67,10 +65,14 @@
 	  <% } %>
     </table>
 
-
     <% } %>
 
-    <input type="submit" value="詳細情報" />
+    <input type="submit"  value="選択した試合の詳細を見る" />
+
+    </form>
+    <form action="../servlet/servlet.BattleResult" method="get">
+
+    <input type="submit"  value="更新" />
 
     </form>
   </body>

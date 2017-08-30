@@ -1,12 +1,14 @@
 package servlet;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 
 /**
@@ -17,9 +19,7 @@ import java.util.ResourceBundle;
 * @version 1.0
 */
 
-
 public class BattleResultDBAccess {
-
 
 	/**
 	 * @return
@@ -33,33 +33,23 @@ public class BattleResultDBAccess {
 	 *
 	 */
 
-
 	protected List<TrueOrFalseBean> TrueOrFalse() throws Exception {
 
-		// データベースへの検索処理*****************************************************/
-		Connection con = null;
-		Statement stmt = null;
-		ResultSet rs = null;
+        // データベースへの検索処理**************************************************/
+		// datasourceを使用
+	     Context context = new InitialContext();
+	     DataSource ds = (DataSource)context.lookup(
+	         "java:comp/env/jdbc/library");
+	     Connection con = ds.getConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
 
-		List<TrueOrFalseBean> list = new ArrayList<TrueOrFalseBean>();
+        List<TrueOrFalseBean> list = new ArrayList<TrueOrFalseBean>();
 
-		// プロファイル(パラメータ)読込み定義
-		// プロパティファイルバンドル
-		ResourceBundle bundle = ResourceBundle.getBundle("config");
+
 
 		try {
 
-			// パラメータ取得
-			String driver = bundle.getString("driverClassName");
-			String url = bundle.getString("url");
-			String user = bundle.getString("username");
-			String password = bundle.getString("password");
-
-			// JDBCドライバロード
-			Class.forName(driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(url, user, password);
 
 			// ステートメント生成
 			stmt = con.createStatement();
@@ -71,17 +61,12 @@ public class BattleResultDBAccess {
 					 + " where turn = 1 and battle_result.logic_id = location.logic_id or turn = 2"
 					 + " and battle_result.logic_id = location.logic_id order by battle_id desc, turn" ;
 
-
 			// SQL実行
 			rs = stmt.executeQuery(sqlstr);
 
-
-
-
+			//先攻のロジック情報と後攻のロジック情報を違うbeanに格納し数を合わせるためダミーを作成する。
 			// 取得データをListにセット
 			while (rs.next()) {
-
-
 
 				TrueOrFalseBean bn = new TrueOrFalseBean();
 				bn.setBattle_id(rs.getInt(1));
@@ -91,25 +76,18 @@ public class BattleResultDBAccess {
 					bn.setPFlogic_name(rs.getString(2));
 					bn.setPFlogic_writer(rs.getString(3));
 					bn.setPFlogic_ver(rs.getString(4));
-
 					bn.setLogic_name("ダミー");
 					bn.setLogic_writer("ダミー");
 					bn.setLogic_ver("ダミー");
 
-
-
 				}else{
-
 
 				bn.setLogic_name(rs.getString(2));
 				bn.setLogic_writer(rs.getString(3));
 				bn.setLogic_ver(rs.getString(4));
-
-
 				bn.setPFlogic_name("ダミー");
 				bn.setPFlogic_writer("ダミー");
 				bn.setPFlogic_ver("ダミー");
-
 
 				}
 
@@ -119,14 +97,12 @@ public class BattleResultDBAccess {
 				bn.setMonth(battleDaySpl[1]);
 				bn.setDay(battleDaySpl[2]);
 				bn.setTurn(rs.getInt(7));
-
 				list.add(bn);
 			}
 
 		} catch (Exception e) {
 			// 例外をthrow
 			throw e;
-
 		} finally {
 
 			if (rs != null) {
