@@ -1,8 +1,6 @@
 package client;
 
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
+import java.net.InetAddress;
 import java.util.List;
 
 import brain.BrainBean;
@@ -45,16 +43,22 @@ public class SequenceControl{
 	public static String myIP(){
 		//起動しているマシンのIPアドレスを特定する
 				String IPAdress ="/123.123.1.123";
+//				try{
+//					Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+//					while(interfaces.hasMoreElements()){
+//						NetworkInterface mypc = interfaces.nextElement();
+//						List<InterfaceAddress> addresses = mypc.getInterfaceAddresses();
+//						for(InterfaceAddress address:addresses){
+//							//IPアドレスだけを取得（そのままだと先頭にスラッシュが付いてしまうので切り取る
+//							IPAdress = address.getAddress().toString().substring(1);
+//						}
+//					}
+//				}catch(Exception e){
+//					e.printStackTrace();
+//				}
 				try{
-					Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-					while(interfaces.hasMoreElements()){
-						NetworkInterface mypc = interfaces.nextElement();
-						List<InterfaceAddress> addresses = mypc.getInterfaceAddresses();
-						for(InterfaceAddress address:addresses){
-							//IPアドレスだけを取得（そのままだと先頭にスラッシュが付いてしまうので切り取る
-							IPAdress = address.getAddress().toString().substring(1);
-						}
-					}
+					InetAddress host = InetAddress.getLocalHost();
+					IPAdress = host.getHostAddress();
 				}catch(Exception e){
 					e.printStackTrace();
 				}

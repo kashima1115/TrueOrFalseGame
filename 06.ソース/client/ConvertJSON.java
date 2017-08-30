@@ -23,8 +23,9 @@ public class ConvertJSON {
 		for(BrainBean brb:logList){
 			obj.put("logicName", brb.getLogicName());
 			obj.put("logicVersion", brb.getLogicVersion());
-			obj.put("writer", brb.getWriter());
-			obj.put("IPAdress", IPAdress);
+			obj.put("logicWriter", brb.getWriter());
+			obj.put("address", IPAdress);
+			obj.put("event", "ready");
 		}
 			return obj;
 	}
@@ -59,6 +60,7 @@ public class ConvertJSON {
 		for(BattleInfoBean bib:bibn){
 			obj.put("xAxis", bib.getxAxis());
 			obj.put("yAxis", bib.getyAxis());
+			obj.put("event", "TurnEnd");
 		}
 		return obj;
 	}
