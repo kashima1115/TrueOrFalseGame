@@ -10,7 +10,7 @@ import net.sf.json.JSONObject;
  *
  */
 public class TurnAdmin {
-	private int turn;
+	private static int turn;
 	private final int FIRST_PLAYER;
 	private final int SECOND_PLAYER;
 	private final String INFORM_EVENT;
@@ -44,12 +44,12 @@ public class TurnAdmin {
 	 * @return 次手番のクライアントのIPアドレス
 	 */
 	public String judgeTurn(List<LogicInfoBean> logicList){
-		this.turn++;
+		TurnAdmin.turn++;
 		String nextPlayerAdd="";
 
-		if(this.turn%2==FIRST_PLAYER){
+		if(TurnAdmin.turn%2==FIRST_PLAYER){
 			nextPlayerAdd=logicList.get(FIRST_PLAYER).getAddress();
-		}else if(this.turn%2==SECOND_PLAYER){
+		}else if(TurnAdmin.turn%2==SECOND_PLAYER){
 			nextPlayerAdd=logicList.get(SECOND_PLAYER).getAddress();
 		}
 
@@ -63,14 +63,19 @@ public class TurnAdmin {
 	 * @return クライアントに送信するJSONObject
 	 */
 	public JSONObject informTurn(String[][] location){
-		JSONObject info=new JSONObject();
 		JSONObject gameInfo=new JSONObject();
 
 		gameInfo.accumulate("event", INFORM_EVENT);
 		gameInfo.accumulate("location", location);
 
-		info.accumulate("gameInfo", gameInfo);
+		return gameInfo;
+	}
 
-		return info;
+	/**
+	 * 試合の経過ターン数を返すメソッド
+	 * @return 経過ターン数
+	 */
+	public int getTurn(){
+		return TurnAdmin.turn;
 	}
 }

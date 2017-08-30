@@ -14,11 +14,12 @@ import java.util.ResourceBundle;
  *
  */
 public class DbInsert {
-	ResourceBundle bundle;
-	String driver;
-	String url;
-	String user;
-	String password;
+	private final ResourceBundle bundle;
+	private final String driver;
+	private final String url;
+	private final String user;
+	private final String password;
+	private Connection con;
 
 	/**
 	 * 設定ファイルから取得する値の初期化
@@ -45,7 +46,7 @@ public class DbInsert {
 	 */
 	public void logicInsert(List<LogicInfoBean> logicList) throws Exception {
 		// データベースへの検索処理*****************************************************/
-		Connection con = null;
+		Connection con = this.con;
 		PreparedStatement pStateLook=null;
 		PreparedStatement pState = null;
 		ResultSet rset=null;
@@ -60,12 +61,6 @@ public class DbInsert {
 		final int HAVE_RECORD=0;
 
 		try{
-
-			// JDBCドライバロード
-			Class.forName(this.driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(this.url, this.user, this.password);
 
 			//オートコミット解除
 			con.setAutoCommit(false);
@@ -147,10 +142,6 @@ public class DbInsert {
 			throw e;
 		}finally{
 			//クローズ処理
-			if(con!=null){
-				con.close();
-			}
-
 			if(pState!=null){
 			pState.close();
 			}
@@ -171,17 +162,11 @@ public class DbInsert {
 	 */
 	public void locationInsert(LocationInfoBean lcib) throws Exception{
 		// データベースへの検索処理*****************************************************/
-		Connection con = null;
+		Connection con = this.con;
 		PreparedStatement pState = null;
 
 
 		try{
-
-			// JDBCドライバロード
-			Class.forName(this.driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(this.url, this.user, this.password);
 
 			//オートコミット解除
 			con.setAutoCommit(false);
@@ -223,10 +208,6 @@ public class DbInsert {
 		}finally{
 
 			//クローズ処理
-			if(con!=null){
-				con.close();
-			}
-
 			if(pState!=null){
 				pState.close();
 			}
@@ -244,25 +225,19 @@ public class DbInsert {
 	 *
 	 */
 	public void resultInsert(int battleId,String startTime,String endTime,String result,
-			int logicId) throws Exception{
+			int logicId,String startDate) throws Exception{
 		// データベースへの検索処理*****************************************************/
-		Connection con = null;
+		Connection con = this.con;
 		PreparedStatement pState = null;
 
 
 		try{
-			// JDBCドライバロード
-			Class.forName(this.driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(this.url,this. user, this.password);
-
 			//オートコミット解除
 			con.setAutoCommit(false);
 
 			//sql文（対戦結果登録）
 			String iSql="insert into battle_result value "+
-						"(?,?,?,current_date(),?,?)";
+						"(?,?,?,?,?,?)";
 
 			//プリコンパイル
 			pState=con.prepareStatement(iSql);
@@ -271,8 +246,9 @@ public class DbInsert {
 			pState.setInt(1,battleId);
 			pState.setInt(2, logicId);
 			pState.setString(3, result);
-			pState.setString(4, startTime);
-			pState.setString(5,endTime);
+			pState.setString(4, startDate);
+			pState.setString(5, startTime);
+			pState.setString(6,endTime);
 
 			//sql実行
 			pState.executeUpdate();
@@ -291,10 +267,6 @@ public class DbInsert {
 			throw e;
 		}finally{
 			//クローズ処理
-			if(con!=null){
-				con.close();
-			}
-
 			if(pState!=null){
 				pState.close();
 			}
@@ -309,7 +281,7 @@ public class DbInsert {
 	 */
 	public int getLogicId(LogicInfoBean lb) throws Exception{
 		// データベースへの検索処理*****************************************************/
-		Connection con = null;
+		Connection con = this.con;
 		PreparedStatement pState = null;
 		ResultSet rset=null;
 
@@ -317,12 +289,6 @@ public class DbInsert {
 		int logicId=0;
 
 		try{
-			// JDBCドライバロード
-			Class.forName(this.driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(this.url,this. user, this.password);
-
 
 			//sql文（ロジックIDの取得）
 			String sSql="select logic_id from logic "+
@@ -351,10 +317,6 @@ public class DbInsert {
 			throw e;
 		}finally{
 			//クローズ処理
-			if(con!=null){
-				con.close();
-			}
-
 			if(pState!=null){
 				pState.close();
 			}
@@ -374,18 +336,12 @@ public class DbInsert {
 	 */
 	public int getFormerId() throws Exception{
 		// データベースへの検索処理*****************************************************/
-		Connection con = null;
+		Connection con = this.con;
 		Statement state = null;
 		ResultSet rset=null;
 		int battleId=0;
 
 		try{
-			// JDBCドライバロード
-			Class.forName(driver);
-
-			// データベース接続
-			con = DriverManager.getConnection(url, user, password);
-
 			//sql文（直近試合ID取得)
 			String sSql="select max(battle_id) from battle_result";
 
@@ -407,10 +363,6 @@ public class DbInsert {
 		}finally{
 
 			//クローズ処理
-			if(con!=null){
-				con.close();
-			}
-
 			if(state!=null){
 				state.close();
 			}
@@ -422,4 +374,46 @@ public class DbInsert {
 		}
 		return battleId;
 	}
+
+	/**
+	 *
+	 * @throws Exception
+	 */
+	public void  connect() throws Exception{
+		Connection con = null;
+		try{
+
+			// JDBCドライバロード
+			Class.forName(this.driver);
+
+			// データベース接続
+			con = DriverManager.getConnection(this.url, this.user, this.password);
+
+			//フィールド変数にアクセス
+			this.con=con;
+
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+
+	}
+
+	/**
+	 *
+	 * @throws Exception
+	 */
+	public void disconnect() throws Exception{
+		try{
+			if(this.con!=null){
+				this.con.close();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+
+	}
+
+
 }

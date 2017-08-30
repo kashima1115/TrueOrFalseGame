@@ -6,23 +6,23 @@ package server;
  *
  */
 public class BattleIdAdmin {
-	private int battleId;
+
 /**
  *
  * @return 採番した試合ID
  * @throws Exception
  */
-	public int getBattleID() throws Exception{
-
+	public static int getBattleID() throws Exception{
+		int battleId=0;
 		try{
 			//DBアクセスクラスをインスタンス化
 			DbInsert dbi=new DbInsert();
 
 			//直近試合IDを取得
-			this.battleId=dbi.getFormerId();
+			battleId=dbi.getFormerId();
 
 			//採番
-			this.battleId++;
+			battleId++;
 
 		}catch(Exception e){
 			e.printStackTrace();

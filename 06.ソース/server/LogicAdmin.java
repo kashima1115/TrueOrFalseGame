@@ -19,7 +19,6 @@ private Map<String,Integer> addRefIdMap;
 	 */
 	public void logicSet(JSONObject gameInfo){
 
-		JSONObject clientMessage=gameInfo.getJSONObject("gameInfo");
 
 		if(ServerTry.readyCount==1){
 			this.logicList=new ArrayList<LogicInfoBean>();
@@ -27,10 +26,10 @@ private Map<String,Integer> addRefIdMap;
 
 		//Beanに各ロジック情報をセット
 		LogicInfoBean lib=new LogicInfoBean();
-		lib.setLogicName(clientMessage.getString("logicName"));
-		lib.setCreator(clientMessage.getString("creator"));
-		lib.setVersion(clientMessage.getString("version"));
-		lib.setAddress(clientMessage.getString("address"));
+		lib.setLogicName(gameInfo.getString("logicName"));
+		lib.setCreator(gameInfo.getString("creator"));
+		lib.setVersion(gameInfo.getString("version"));
+		lib.setAddress(gameInfo.getString("address"));
 
 		//ListにBeanを追加
 		this.logicList.add(lib);

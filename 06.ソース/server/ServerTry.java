@@ -1,8 +1,6 @@
 package server;
 
-import java.util.List;
-
-import net.sf.json.JSONObject;
+import java.net.InetAddress;
 
 /**各クラスの試運転クラス
  *完成時までには削除する
@@ -13,37 +11,37 @@ public class ServerTry {
 	public static int readyCount=0;
 
 	public static void main(String[] args) throws Exception {
-		JSONObject  gameInfo=null;
-		JSONObject clientMessage=null;
-		LogicAdmin la=new LogicAdmin();
-		for(int i=0;i<2;i++){
-
-			readyCount++;
-
-			gameInfo=new JSONObject();
-			clientMessage=new JSONObject();
-
-			clientMessage.put("logicName", "a");
-			clientMessage.put("creator", "b");
-			clientMessage.put("version", "c");
-			clientMessage.put("address", "0.1");
-
-			gameInfo.put("gameInfo", clientMessage);
-
-			la.logicSet(gameInfo);
-
-		}
-
-
-
-		List<LogicInfoBean> logicList=la.getLogicList();
-
-		for(LogicInfoBean lb:logicList){
-			System.out.println(lb.getLogicName());
-			System.out.println(lb.getCreator());
-			System.out.println(lb.getVersion());
-			System.out.println(lb.getAddress());
-		}
+//		JSONObject  gameInfo=null;
+//		JSONObject clientMessage=null;
+//		LogicAdmin la=new LogicAdmin();
+//		for(int i=0;i<2;i++){
+//
+//			readyCount++;
+//
+//			gameInfo=new JSONObject();
+//			clientMessage=new JSONObject();
+//
+//			clientMessage.put("logicName", "a");
+//			clientMessage.put("creator", "b");
+//			clientMessage.put("version", "c");
+//			clientMessage.put("address", "0.1");
+//
+//			gameInfo.put("gameInfo", clientMessage);
+//
+//			la.logicSet(gameInfo);
+//
+//		}
+//
+//
+//
+//		List<LogicInfoBean> logicList=la.getLogicList();
+//
+//		for(LogicInfoBean lb:logicList){
+//			System.out.println(lb.getLogicName());
+//			System.out.println(lb.getCreator());
+//			System.out.println(lb.getVersion());
+//			System.out.println(lb.getAddress());
+//		}
 //
 //		DbInsert di=new DbInsert();
 //		try{
@@ -81,6 +79,12 @@ public class ServerTry {
 //		TurnAdmin ta=new TurnAdmin();
 //
 //		System.out.println(ta.informTurn(location).toString());
+
+		InetAddress ia=InetAddress.getLocalHost();
+
+		String ip = ia.getHostAddress();
+
+		System.out.println(ip);
 
 	}
 

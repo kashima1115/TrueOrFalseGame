@@ -191,4 +191,27 @@ public class JudgeMatch {
 		return judgeBattle;
 
 	}
+
+	/**
+	 * 勝敗通知オブジェクト作成
+	 */
+	public JSONObject informResult(String result){
+		final String WIN="win";
+		final String LOSE="lose";
+		final String DRAW="draw";
+
+		//JSONObject作成
+		JSONObject gameInfo=new JSONObject();
+
+		//勝敗結果別にイベント情報を生成・JSONObjectにセット
+		if(result.equals(WIN)){
+			gameInfo.accumulate("event", WIN);
+		}else if(result.equals(DRAW)){
+			gameInfo.accumulate("event", DRAW);
+		}else if(result.equals(LOSE)){
+			gameInfo.accumulate("event", LOSE);
+		}
+
+		return gameInfo;
+	}
 }
