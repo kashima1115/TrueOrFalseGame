@@ -27,6 +27,12 @@ public class BattleAdmin {
 	private final String TURN_END;
 	private List<LogicInfoBean> logicList;
 
+	//ゲーム勝敗関係
+	private final String WIN;
+	private final String LOSE;
+	private final String CONTINUE;
+	private final String DRAW;
+
 	/**
 	 * コンストラクタ
 	 */
@@ -38,6 +44,10 @@ public class BattleAdmin {
 		READY="ready";
 		TURN_END="TurnEnd";
 		logicList=null;
+		WIN="win";
+		LOSE="lose";
+		CONTINUE="continue";
+		DRAW="draw";
 	}
 	/**
 	 * 試合全体を管理するメソッド
@@ -186,12 +196,12 @@ public class BattleAdmin {
 						result=jm.battleJudge(location);
 
 						//試合終了と継戦で条件分岐
-						if(result.equals("win")||result.equals("draw")){
+						if(result.equals(this.WIN)||result.equals(this.DRAW)){
 
 							this.endTime=playEndTime;
 
 							break;
-						}else if(result.equals("contiune")){
+						}else if(result.equals(this.CONTINUE)){
 							//次手番のクライアントのIPアドレスを取得
 							turnAdd=ta.judgeTurn(logicList);
 						}
@@ -244,24 +254,24 @@ public class BattleAdmin {
 
 					}else{
 						//もう片方のプレイヤーの試合結果を登録
-						if(result.equals("win")){
+						if(result.equals(this.WIN)){
 
 							dbi.resultInsert(battleId, this.startTime, this.endTime,
-									"lose", addRefIdMap.get(lb.getAddress()),this.startDate);
+									this.LOSE, addRefIdMap.get(lb.getAddress()),this.startDate);
 
 							//勝敗通知オブジェクト作成
-							JSONObject gameInfo=jm.informResult("lose");
+							JSONObject gameInfo=jm.informResult(this.LOSE);
 
 							//通知オブジェクト送信
 							samqm.sendMessage(gameInfo,lb.getAddress());
 
-						}else if(result.equals("draw")){
+						}else if(result.equals(this.DRAW)){
 
 							dbi.resultInsert(battleId, this.startTime, this.endTime,
-									"draw", addRefIdMap.get(lb.getAddress()),this.startDate);
+									this.DRAW, addRefIdMap.get(lb.getAddress()),this.startDate);
 
 							//勝敗通知オブジェクト作成
-							JSONObject gameInfo=jm.informResult("draw");
+							JSONObject gameInfo=jm.informResult(this.DRAW);
 
 							//通知オブジェクト送信
 							samqm.sendMessage(gameInfo,lb.getAddress());
@@ -275,7 +285,7 @@ public class BattleAdmin {
 
 						//ターンプレイヤーの試合結果を登録
 						dbi.resultInsert(battleId, this.startTime, this.endTime,
-								"lose", addRefIdMap.get(lb.getAddress()),this.startDate);
+								this.LOSE, addRefIdMap.get(lb.getAddress()),this.startDate);
 
 						//エラー通知クラスのインスタンス化
 						InformError ie=new InformError();
@@ -289,10 +299,10 @@ public class BattleAdmin {
 					}else{
 						//もう片方のプレイヤーの試合結果を登録
 						dbi.resultInsert(battleId, this.startTime, this.endTime,
-								"win", addRefIdMap.get(lb.getAddress()),this.startDate);
+								this.WIN, addRefIdMap.get(lb.getAddress()),this.startDate);
 
 						//勝敗通知オブジェクト生成
-						JSONObject gameInfo=jm.informResult("win");
+						JSONObject gameInfo=jm.informResult(this.WIN);
 
 						//勝敗通知オブジェクト送信
 						samqm.sendMessage(gameInfo, lb.getAddress());
