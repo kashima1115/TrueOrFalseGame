@@ -1,0 +1,27 @@
+package server;
+/**
+ * サーバー機能を実行するクラス
+ * @author kanayama
+ *
+ */
+public class Main {
+	/**
+	 * サーバー機能を実行するメソッド
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		//試合管理クラスをインスタンス化
+		BattleAdmin ba=new BattleAdmin();
+
+		try{
+			//試合管理メソッドを呼び出し
+			ba.gameStart();
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+}
