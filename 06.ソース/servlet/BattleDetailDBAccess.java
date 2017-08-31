@@ -1,8 +1,8 @@
 package servlet;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,40 +35,45 @@ public class BattleDetailDBAccess {
 	 *
 	 */
 
-    protected List<TrueOrFalseBean> TrueOrFalse(String id) throws Exception {
+
+
+
+
+
+
+    protected List<LocationBean> LocationBean(String id) throws Exception {
+
 
         // データベースへの検索処理**************************************************/
-		// datasourceを使用
-	     Context context = new InitialContext();
-	     DataSource ds = (DataSource)context.lookup(
-	         "java:comp/env/jdbc/library");
-	     Connection con = ds.getConnection();
-        Statement stmt = null;
+    	// datasourceを使用
+         Context context = new InitialContext();
+         DataSource ds = (DataSource)context.lookup(
+             "java:comp/env/jdbc/library");
+         Connection con = ds.getConnection();
+
+        PreparedStatement stmt = null;
         ResultSet rs = null;
-        Statement smt = null;
-        ResultSet rst = null;
-        List<TrueOrFalseBean> list = new ArrayList<TrueOrFalseBean>();
 
-
+        List<LocationBean> list = new ArrayList<LocationBean>();
 
 		try {
 
 
-            // ステートメント生成
-            stmt = con.createStatement();
-
             // SQL文生成
-            String sqlstr ="SELECT * FROM location where battle_id = " + id + "";
+            String sqlstr ="SELECT * FROM location where battle_id = ?";
 
+            stmt = con.prepareStatement(sqlstr);
+
+            stmt.setString(1, id);
 
             // SQL実行
-            rs =stmt.executeQuery(sqlstr);
+            rs =stmt.executeQuery();
 
             int i = 1;
 
             // 取得データをListにセット
             while(rs.next()) {
-            	TrueOrFalseBean bn = new TrueOrFalseBean();
+            	LocationBean bn = new LocationBean();
                 bn.setLocation_x(rs.getInt(4));
                 bn.setLocation_y(rs.getInt(5));
                 bn.setTurn(rs.getInt(6));
@@ -79,9 +84,11 @@ public class BattleDetailDBAccess {
 
             }
 
+            //9手以内に試合が終わった場合も必ずリストに9個データが入るよう調整
+
             for(int q = i ; q <= 9; q++){
 
-            	TrueOrFalseBean bn = new TrueOrFalseBean();
+            	LocationBean bn = new LocationBean();
             	bn.setLocation_x(3);
             	bn.setLocation_y(3);
 
@@ -89,24 +96,66 @@ public class BattleDetailDBAccess {
 
             }
 
-            // ステートメント生成
-            smt = con.createStatement();
+
+
+        }catch(Exception e){
+            // 例外をthrow
+            throw e;
+        } finally {
+
+
+            if(rs != null) {
+                rs.close();
+            }
+            if(stmt != null) {
+                stmt.close();
+            }
+            if(con != null) {
+                con.close();
+            }
+        }
+        return list;
+    }
+
+    protected List<BattleDetailBean> BattleDetailBean(String id) throws Exception {
+
+
+        // データベースへの検索処理**************************************************/
+    	// datasourceを使用
+         Context context = new InitialContext();
+         DataSource ds = (DataSource)context.lookup(
+             "java:comp/env/jdbc/library");
+         Connection con = ds.getConnection();
+
+        PreparedStatement smt = null;
+        ResultSet rst = null;
+
+        List<BattleDetailBean> list2 = new ArrayList<BattleDetailBean>();
+
+        try{
 
             // SQL文生成
             String sqlstr2 = "SELECT battle_result.battle_id, logic_name, logic_writer, "
             		+ "logic_ver, result, date, start_time, end_time, turn"
             		+ " FROM logic INNER JOIN battle_result ON logic.logic_id = battle_result.logic_id"
             		+ " INNER JOIN location ON battle_result.battle_id = location.battle_id "
-            		+ " where battle_result.battle_id = " + id + " and battle_result.logic_id = location.logic_id and turn = 1 "
-            		+ " or battle_result.battle_id = " + id + " and battle_result.logic_id = location.logic_id and turn = 2"
+            		+ " where battle_result.battle_id = ? and battle_result.logic_id ="
+            		+ " location.logic_id and turn = 1 "
+            		+ " or battle_result.battle_id = ? and battle_result.logic_id ="
+            		+ " location.logic_id and turn = 2"
             		+ " order by turn";
 
+            smt = con.prepareStatement(sqlstr2);
+
+            smt.setString(1, id);
+            smt.setString(2, id);
+
             // SQL実行
-            rst =smt.executeQuery(sqlstr2);
+            rst =smt.executeQuery();
 
 			// 取得データをListにセット
 			while (rst.next()) {
-				TrueOrFalseBean bn2 = new TrueOrFalseBean();
+				BattleDetailBean bn2 = new BattleDetailBean();
 				bn2.setBattle_id(rst.getInt(1));
 				bn2.setLogic_name(rst.getString(2));
 				bn2.setLogic_writer(rst.getString(3));
@@ -125,7 +174,7 @@ public class BattleDetailDBAccess {
 				bn2.setEnd_min(endTime[1]);
 				bn2.setEnd_sec(endTime[2]);
 
-				list.add(bn2);
+				list2.add(bn2);
 			}
 
         }catch(Exception e){
@@ -140,17 +189,11 @@ public class BattleDetailDBAccess {
                 smt.close();
             }
 
-            if(rs != null) {
-                rs.close();
-            }
-            if(stmt != null) {
-                stmt.close();
-            }
             if(con != null) {
                 con.close();
             }
         }
-        return list;
+        return list2;
     }
 }
 

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=Windows-31J"
     pageEncoding="Windows-31J"%>
 <%@ page import="java.util.*" %>
-<%@ page import="servlet.TrueOrFalseBean" %>
+<%@ page import="servlet.BattleResultBean" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
@@ -13,7 +13,7 @@
 
     <form action="../servlet/servlet.BattleDetail" method="post">
     <% // 検索結果のデータリストを取得
-       List<TrueOrFalseBean> list = (List<TrueOrFalseBean>)request.getAttribute("list");
+       List<BattleResultBean> list = (List<BattleResultBean>)request.getAttribute("list");
        // 取得できなかった場合、メッセージ出力
        // 取得できた場合、データを出力
        if(list.isEmpty()) {
@@ -37,7 +37,7 @@
 
 <% int i = 0; %>
 
-      <% for(TrueOrFalseBean bn : list) { %>
+      <% for(BattleResultBean bn : list) { %>
 
 <% i++; %>
 

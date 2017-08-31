@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=Windows-31J"
 	pageEncoding="Windows-31J"%>
 <%@ page import="java.util.*"%>
-<%@ page import="servlet.TrueOrFalseBean"%>
+<%@ page import="servlet.LocationBean"%>
+<%@ page import="servlet.BattleDetailBean"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
@@ -25,27 +26,27 @@
 		<%	int g = 0;	%>
 		<%	int h = 0;	%>
 		<%	int i = 0;	%>
-<!-- 		listÇ…ÇÕÇPÅ`ÇXÇ‹Ç≈Ç…éwÇµéËèÓïÒÇ™äiî[Ç≥ÇÍÇƒÇ®ÇË -->
-<!-- 		10î‘ñ⁄Ç…êÊéËÇÃÉçÉWÉbÉNèÓïÒÅA11î‘ñ⁄Ç…å„çUÇÃÉçÉWÉbÉNèÓïÒÇ™äiî[Ç≥ÇÍÇƒÇ¢ÇÈ -->
-<!-- 		resultÇÕ11î‘ñ⁄ÇÃééçáèÓïÒÇéÊìæÇ∑ÇÈÇΩÇﬂÇÃä÷êî -->
-		<%	int ten = 0;	%>
-		<%	int eleven = 0;	%>
+<!-- 		listÇ…ÇÕÇPÅ`ÇXÇ‹Ç≈Ç…éwÇµéËèÓïÒÇ™äiî[Ç≥ÇÍÇƒÇ¢ÇÈ -->
+<!-- 		list2ÇÃfirstÇ…ÇÕêÊçUÅAsecondÇ…ÇÕå„çUÇÃèÓïÒÇ™äiî[Ç≥ÇÍÇƒÇ¢ÇÈ -->
+<!-- 		resultÇÕééçáèÓïÒÇéÊìæÇ∑ÇÈÇΩÇﬂÇÃä÷êî -->
+		<%	int first = 0;	%>
+		<%	int second = 0;	%>
 		<%	int nine = 0;	%>
 		<%  int result = 0; %>
 
 		<%// åüçıåãâ ÇÃÉfÅ[É^ÉäÉXÉgÇéÊìæ
-			List<TrueOrFalseBean> list = (List<TrueOrFalseBean>) request.getAttribute("DetailList");
+			List<BattleDetailBean> list2 = (List<BattleDetailBean>) request.getAttribute("DetailList");
 			// éÊìæÇ≈Ç´Ç»Ç©Ç¡ÇΩèÍçáÅAÉÅÉbÉZÅ[ÉWèoóÕ
 			// éÊìæÇ≈Ç´ÇΩèÍçáÅAÉfÅ[É^ÇèoóÕ
-			if (list.isEmpty()) {
+			if (list2.isEmpty()) {
 				out.print("äYìñÇÃÉfÅ[É^ÇÕÇ†ÇËÇ‹ÇπÇÒÅB");
 				} else { %>
 
-		<%	for (TrueOrFalseBean bn : list) {	%>
+		<%	for (BattleDetailBean bn : list2) {	%>
 
-		<%	ten++;	%>
+		<%	first++;	%>
 
-		<%	if (ten == 10) {	%>
+		<%	if (first == 1) {	%>
 
 		<table border="1">
 			<tr>
@@ -62,11 +63,11 @@
 		<%	}	%>
 		<%	} %>
 
-		<%	for (TrueOrFalseBean bn : list) {	%>
+		<%	for (BattleDetailBean bn : list2) {	%>
 
-		<% eleven++; %>
+		<% second++; %>
 
-		<%	if (eleven == 11) {	%>
+		<%	if (second == 2) {	%>
 
 		<br /> <br /> Å|Å|Å|Å|Å|Å|Å|Å|Å|Å|Å|VSÅ|Å|Å|Å|Å|Å|Å|Å|Å|Å|Å| <br /> <br />
 
@@ -84,8 +85,19 @@
 
 		<% } %>
 		<%	} %>
+<%	} %>
 
-		<%	for (TrueOrFalseBean bn : list) {%>
+
+		<%// åüçıåãâ ÇÃÉfÅ[É^ÉäÉXÉgÇéÊìæ
+			List<LocationBean> list = (List<LocationBean>) request.getAttribute("LocationList");
+			// éÊìæÇ≈Ç´Ç»Ç©Ç¡ÇΩèÍçáÅAÉÅÉbÉZÅ[ÉWèoóÕ
+			// éÊìæÇ≈Ç´ÇΩèÍçáÅAÉfÅ[É^ÇèoóÕ
+			if (list.isEmpty()) {
+				out.print("äYìñÇÃÉfÅ[É^ÇÕÇ†ÇËÇ‹ÇπÇÒÅB");
+				} else { %>
+
+
+		<%	for (LocationBean bn : list) {%>
 
 		<% nine++; %>
 
@@ -283,11 +295,11 @@
 <br/>
 <br/>
 
-		<%	for (TrueOrFalseBean bn : list) {	%>
+		<%	for (BattleDetailBean bn : list2) {	%>
 
 		<% result++; %>
 
-		<%	if (result == 11) {	%>
+		<%	if (result == 2) {	%>
 
 
 		<table border="1">

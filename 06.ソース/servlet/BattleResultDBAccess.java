@@ -1,12 +1,11 @@
 package servlet;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -33,26 +32,21 @@ public class BattleResultDBAccess {
 	 *
 	 */
 
-	protected List<TrueOrFalseBean> TrueOrFalse() throws Exception {
+	protected List<BattleResultBean> BattleResultBean() throws Exception {
 
         // データベースへの検索処理**************************************************/
 		// datasourceを使用
-	     Context context = new InitialContext();
-	     DataSource ds = (DataSource)context.lookup(
+		InitialContext context = new InitialContext();
+	    DataSource ds = (DataSource)context.lookup(
 	         "java:comp/env/jdbc/library");
-	     Connection con = ds.getConnection();
-        Statement stmt = null;
+	    Connection con = ds.getConnection();
+
+	    PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        List<TrueOrFalseBean> list = new ArrayList<TrueOrFalseBean>();
-
-
+        List<BattleResultBean> list = new ArrayList<BattleResultBean>();
 
 		try {
-
-
-			// ステートメント生成
-			stmt = con.createStatement();
 
 			// SQL文生成
 			String sqlstr = "SELECT battle_result.battle_id, logic_name, logic_writer, logic_ver, result, date, turn"
@@ -61,14 +55,18 @@ public class BattleResultDBAccess {
 					 + " where turn = 1 and battle_result.logic_id = location.logic_id or turn = 2"
 					 + " and battle_result.logic_id = location.logic_id order by battle_id desc, turn" ;
 
+
+			// ステートメント生成
+			stmt = con.prepareStatement(sqlstr);
+
 			// SQL実行
-			rs = stmt.executeQuery(sqlstr);
+			rs = stmt.executeQuery();
 
 			//先攻のロジック情報と後攻のロジック情報を違うbeanに格納し数を合わせるためダミーを作成する。
 			// 取得データをListにセット
 			while (rs.next()) {
 
-				TrueOrFalseBean bn = new TrueOrFalseBean();
+				BattleResultBean bn = new BattleResultBean();
 				bn.setBattle_id(rs.getInt(1));
 
 				if(rs.getInt(7) == 1){

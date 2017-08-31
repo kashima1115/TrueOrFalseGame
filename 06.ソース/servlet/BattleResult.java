@@ -33,7 +33,7 @@ public class BattleResult extends HttpServlet {
         try{
         	BattleResultDBAccess brd = new BattleResultDBAccess();
 
-            List<TrueOrFalseBean> list = brd.TrueOrFalse();
+            List<BattleResultBean> list = brd.BattleResultBean();
 
             // listをrequestにセット
             request.setAttribute("list", list);

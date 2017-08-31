@@ -34,10 +34,13 @@ public class BattleDetail extends HttpServlet {
         try{
         	BattleDetailDBAccess bdd = new BattleDetailDBAccess();
 
-            List<TrueOrFalseBean> list = bdd.TrueOrFalse(battleID);
+            List<LocationBean> list = bdd.LocationBean(battleID);
+            List<BattleDetailBean> list2 = bdd.BattleDetailBean(battleID);
 
             // listをrequestにセット
-            request.setAttribute("DetailList", list);
+            request.setAttribute("LocationList", list);
+            request.setAttribute("DetailList", list2);
+
 
         }catch(Exception e){
             e.printStackTrace();
