@@ -9,18 +9,25 @@ import brain.BrainBean;
 /**
  * Brainにアクセスするクラスです.
  * @author hatsugai
- *
  */
 
 public class AccessBrain{
+	private Brain bra = null;
+
+	public void createBrain(){
+		if(bra == null){
+			bra = new Brain();
+		}
+	}
 	/**
 	 * ロジックの情報を取得するためにBrainにアクセスするメソッドです
 	 * @return ロジック情報が格納されたBeanです
 	 */
-	public List<BrainBean> getLogicInfo(){
-		Brain bra = new Brain();
-		List<BrainBean> logList = bra.logicInfo();
-		return logList;
+	public BrainBean getLogicInfo(){
+		//Brain bra = new Brain();
+		createBrain();
+		BrainBean bb = bra.logicInfo();
+		return bb;
 	}
 
 	/**
@@ -29,7 +36,8 @@ public class AccessBrain{
 	 */
 
 	public List<BattleInfoBean> getLocation(String[][] loc){
-		Brain bra = new Brain();
+		//Brain bra = new Brain();
+		createBrain();
 		//指し手情報を保管するための変数を宣言
 		String loca = bra.getLocation(loc);
 		//BattleInfoBeanに指し手情報を格納

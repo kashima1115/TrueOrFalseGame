@@ -18,15 +18,14 @@ public class ConvertJSON {
 	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します
 	 * @return ロジック情報を格納したJSONObjectです
 	 */
-	public JSONObject convertToJSONF(List<BrainBean> logList,String IPAdress){
+	public JSONObject convertToJSONF(BrainBean logic,String IPAdress){
 		JSONObject obj = new JSONObject();
-		for(BrainBean brb:logList){
-			obj.put("logicName", brb.getLogicName());
-			obj.put("logicVersion", brb.getLogicVersion());
-			obj.put("logicWriter", brb.getWriter());
+			obj.put("logicName", logic.getLogicName());
+			obj.put("logicVersion", logic.getLogicVersion());
+			obj.put("logicWriter", logic.getWriter());
 			obj.put("address", IPAdress);
 			obj.put("event", "ready");
-		}
+
 			return obj;
 	}
 	/**

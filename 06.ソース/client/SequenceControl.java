@@ -1,6 +1,7 @@
 package client;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import brain.BrainBean;
@@ -17,7 +18,7 @@ public class SequenceControl{
 	public static void startGame(){
 		//ロジック情報を取得(bean)
 		AccessBrain ab = new AccessBrain();
-		List<BrainBean> logList = ab.getLogicInfo();
+		BrainBean logic = ab.getLogicInfo();
 
 		//起動しているマシンのIPアドレスを特定する
 		String IPAdress ="/123.123.1.123";//値は適当に書いた値です。後でマシンのIPアドレスが入ります。
@@ -25,8 +26,8 @@ public class SequenceControl{
 
 		//JSONに変換するためインスタンス化
 		ConvertJSON cj = new ConvertJSON();
-		//JSONに変換。(ロジックの情報は既にlogListに入っておりConvertJSONでまとめて変換します)
-		JSONObject jo = cj.convertToJSONF(logList,IPAdress);
+		//JSONに変換。(ロジックの情報は既にlogicに入っておりConvertJSONでまとめて変換します)
+		JSONObject jo = cj.convertToJSONF(logic,IPAdress);
 
 		//ActiveMQを通してサーバープログラムに送信する
 		messageQueue.ActiveMQMessaging amq = new messageQueue.ActiveMQMessaging();
@@ -59,7 +60,7 @@ public class SequenceControl{
 				try{
 					InetAddress host = InetAddress.getLocalHost();
 					IPAdress = host.getHostAddress();
-				}catch(Exception e){
+				}catch(UnknownHostException e){
 					e.printStackTrace();
 				}
 		return IPAdress;

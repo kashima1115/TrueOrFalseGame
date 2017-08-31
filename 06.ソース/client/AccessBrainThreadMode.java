@@ -22,11 +22,11 @@ public class AccessBrainThreadMode{
 	 * ロジック情報を取得
 	 * @return Beanで返します
 	 */
-	public List<BrainBean> getLogicInfo(){
+	public BrainBean getLogicInfo(){
 		ExecutorService exec = Executors.newSingleThreadExecutor();
-		Future<List<BrainBean>> future = exec.submit(new LogicInfo());
+		Future<BrainBean> future = exec.submit(new LogicInfo());
 		try{
-			List<BrainBean> bb;
+			BrainBean bb;
 			//ここでタイムアウトの時間を設定しています。
 			bb = future.get(60, TimeUnit.SECONDS);
 			return bb;
@@ -71,12 +71,12 @@ public class AccessBrainThreadMode{
 
 }
 
-class LogicInfo implements Callable<List<BrainBean>>{
+class LogicInfo implements Callable<BrainBean>{
 	@Override
-	public List<BrainBean> call() throws Exception{
+	public BrainBean call() throws Exception{
 		Brain bra = new Brain();
-		List<BrainBean> logList = bra.logicInfo();
-		return logList;
+		BrainBean bb = bra.logicInfo();
+		return bb;
 	}
 }
 

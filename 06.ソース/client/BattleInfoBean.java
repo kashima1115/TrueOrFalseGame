@@ -22,11 +22,11 @@ public class BattleInfoBean implements Serializable{
 	 */
 	private String[][] location;
 	/**
-	 * 指し手の縦座標を格納します。0~2までを想定しています
+	 * 指し手の横座標(列)を格納します。0~2までを想定しています
 	 */
 	private int xAxis;
 	/**
-	 * 指し手の横座標を格納します。0~2までを想定しています
+	 * 指し手の縦座標(行)を格納します。0~2までを想定しています
 	 */
 	private int yAxis;
 
