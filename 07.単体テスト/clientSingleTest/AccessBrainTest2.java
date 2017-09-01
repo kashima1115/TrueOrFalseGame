@@ -2,6 +2,8 @@ package clientSingleTest;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +14,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import brain.BrainBean;
-import brain.BrainControl;
 import client.AccessBrain;
 import client.BattleInfoBean;
 
 /**
- * AccessBrainのテストコードです。座標入力は手作業です。
+ * AccessBrainのテストコードです。座標入力は自動です。
  * @author hatsugai
  *
  */
 
-public class AccessBrainTest1 {
+public class AccessBrainTest2 {
+
+	//コンソール入力用
+	private InputStrings in = new InputStrings();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -34,10 +38,12 @@ public class AccessBrainTest1 {
 
 	@Before
 	public void setUp() throws Exception {
+		System.setIn(in);
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		System.setIn(null);
 	}
 
 	@Test
@@ -58,9 +64,18 @@ public class AccessBrainTest1 {
 
 	@Test
 	public void testGetLocation() {
+		//xAxisに入れる予定の変数
+		String xax = "1";
+		//yAxisに入れる予定の変数
+		String yax = "2";
+		//コンソールに入力する処理
+		in.inputln(xax);
+		in.inputln(yax);
+		//getLocationを実行させるための準備
 		List<BattleInfoBean> bib = new ArrayList<BattleInfoBean>();
 		String[][] loc;
 		loc = new String[3][3];
+		//locには全部"-"を入れる
 		for(int aa = 0;aa<3;aa++){
 			for(int bb = 0;bb<3;bb++){
 				loc[aa][bb]="-";
@@ -69,28 +84,33 @@ public class AccessBrainTest1 {
 		//getLocation実行（引数に盤面情報を渡す）
 		bib = new AccessBrain().getLocation(loc);
 		for(BattleInfoBean binb:bib){
-			//最初にコンソールに入れた値
-			System.out.println("xAxis is " + binb.getxAxis());
-			//次にコンソールに入れた値
-			System.out.println("yAxis is " + binb.getyAxis());
+			//xAxis
+			assertEquals(Integer.parseInt(xax),binb.getxAxis());
+			System.out.println("xAxis―OK!");
+			//yAxis
+			assertEquals(Integer.parseInt(yax),binb.getyAxis());
+			System.out.println("yAxis―OK!");
 		}
-		System.out.println("getLocation―OK!");
+		System.out.println("盤面情報―OK!");
 	}
 
-	private class TestBrain implements BrainControl{
+}
+//コンソール入力用
+class InputStrings extends InputStream{
+	private StringBuilder buffer = new StringBuilder();
+	private static String crlf = System.getProperty("line.separator");//改行
 
-		@Override
-		public BrainBean logicInfo() {
-			// TODO 自動生成されたメソッド・スタブ
-			return null;
-		}
-
-		@Override
-		public String getLocation(String[][] location) {
-			// TODO 自動生成されたメソッド・スタブ
-			return null;
-		}
-
+	public void inputln(String str){
+		buffer.append(str).append(crlf);
 	}
 
+	@Override
+	public int read() throws IOException{
+		if(buffer.length() == 0){
+			return -1;
+		}
+		int result = buffer.charAt(0);
+		buffer.deleteCharAt(0);
+		return result;
+	}
 }

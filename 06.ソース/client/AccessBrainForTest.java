@@ -3,26 +3,28 @@ package client;
 import java.util.ArrayList;
 import java.util.List;
 
-import brain.Brain;
 import brain.BrainBean;
+import clientSingleTest.AccessBrainTest3.Brain;
 
 /**
  * Brainにアクセスするクラスです.
  * @author hatsugai
  */
 
-public class AccessBrain{
+public class AccessBrainForTest{
 	private Brain bra = null;
 
-	public void createBrain(){
-		if(bra == null){
-			bra = new Brain();
-		}
-	}
+//	public void createBrain(){
+//		if(bra == null){
+//			bra = new Brain();
+//		}
+//	}
+
 	/**
 	 * ロジックの情報を取得するためにBrainにアクセスするメソッドです
 	 * @return ロジック情報が格納されたBeanです
 	 */
+
 	public BrainBean getLogicInfo(){
 		BrainBean bb = bra.logicInfo();
 		return bb;
@@ -45,4 +47,8 @@ public class AccessBrain{
 		return bl;
 	}
 
+	public void setBrainForTest(Brain bra){
+		this.bra=bra;
+	}
 }
+

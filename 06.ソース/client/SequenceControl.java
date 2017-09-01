@@ -18,6 +18,7 @@ public class SequenceControl{
 	public static void startGame(){
 		//ロジック情報を取得(bean)
 		AccessBrain ab = new AccessBrain();
+		ab.createBrain();
 		BrainBean logic = ab.getLogicInfo();
 
 		//起動しているマシンのIPアドレスを特定する
