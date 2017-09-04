@@ -3,7 +3,6 @@ package server;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import messageQueue.ServerActiveMQMessaging;
@@ -25,7 +24,8 @@ public class BattleAdmin {
 	//受信するイベント情報
 	private final String READY;
 	private final String TURN_END;
-	private List<LogicInfoBean> logicList;
+	private Map<String,LogicInfoBean> logicMap;
+	private ClientAddressBean cab;
 
 	//ゲーム勝敗関係
 	private final String WIN;
@@ -43,7 +43,8 @@ public class BattleAdmin {
 		startDate=null;
 		READY="ready";
 		TURN_END="TurnEnd";
-		logicList=null;
+		logicMap=null;
+		cab=null;
 		WIN="win";
 		LOSE="lose";
 		CONTINUE="continue";
@@ -60,7 +61,14 @@ public class BattleAdmin {
 		//情報登録クラスのオブジェクトを格納
 		DbInsert dbi=null;
 
+
 		try{
+			//DBアクセスクラスをインスタンス化
+			dbi=new DbInsert();
+
+			//コネクションを生成
+			dbi.connect();
+
 			//メッセージングクラスをインスタンス化
 			 samqm=new ServerActiveMQMessaging();
 
@@ -96,22 +104,26 @@ public class BattleAdmin {
 				}
 			}
 
-			//ロジック情報を格納したリストを取得
-			List<LogicInfoBean> logicList=la.getLogicList();
+			//ロジック情報を格納したMapを取得
+			this.logicMap=la.getLogicMap();
 
-			this.logicList=logicList;
+			//クライアントアドレスを格納したBeanを取得
+			this.cab=la.getClientAddressBean();
 
-			//DBアクセスクラスをインスタンス化
-			dbi=new DbInsert();
-
-			//コネクションを生成
-			dbi.connect();
+			//最初に受信したロジック情報のBeanを取得
+			LogicInfoBean lib=this.logicMap.get(this.cab.getFirstAddress());
 
 			//DBにロジック情報を登録
-			dbi.logicInsert(logicList);
+			dbi.logicInsert(lib);
+
+			//2番目に受信したロジック情報のBeanを取得
+			lib=this.logicMap.get(this.cab.getSecondAddress());
+
+			//DBにロジック情報を登録
+			dbi.logicInsert(lib);
 
 			//ロジック情報（IPアドレス）とロジックIDを紐付け・取得
-			Map<String,Integer> addRefIdMap=la.attachId();
+			Map<String,Integer> addRefIdMap=la.attachId(dbi);
 
 			//同名ロジック判定
 			boolean sameJudge=la.sameJudge();
@@ -124,10 +136,10 @@ public class BattleAdmin {
 			int battleId=BattleIdAdmin.getBattleID(dbi);
 
 			//手番管理クラスのインスタンス化
-			TurnAdmin ta=new TurnAdmin();
+			TurnAdmin ta=new TurnAdmin(this.cab);
 
 			//先攻・後攻決定処理
-			String turnAdd=ta.decideFirst(logicList);
+			String turnAdd=ta.decideFirst();
 
 			//盤面保持・更新クラスのインスタンス化
 			LocationAdmin lca=new LocationAdmin();
@@ -139,7 +151,7 @@ public class BattleAdmin {
 			JudgeMatch jm=new JudgeMatch();
 
 			//試合判定結果格納用変数の用意
-			String result=null;
+			String result=this.CONTINUE;
 
 			//以下試合中の処理
 			while(true){
@@ -172,6 +184,7 @@ public class BattleAdmin {
 				if(turn==1){
 					SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy/MM/dd");
 					this.startDate=sdfDate.format(startDate);
+					this.startTime=playEndTime;
 				}
 
 				//指し手情報を受け取ったかで分岐
@@ -203,7 +216,7 @@ public class BattleAdmin {
 							break;
 						}else if(result.equals(this.CONTINUE)){
 							//次手番のクライアントのIPアドレスを取得
-							turnAdd=ta.judgeTurn(logicList);
+							turnAdd=ta.judgeTurn();
 						}
 					}else if(judge==false){
 
@@ -228,87 +241,90 @@ public class BattleAdmin {
 
 						//通知オブジェクト送信
 						samqm.sendMessage(gameInfoErr,ErrIPAddress);
-					}
+					}else{
 
+					}
 				}
 			}
+
+			//先攻クライアントに勝敗通知するオブジェクトを格納する変数
+			JSONObject firstPlayerGameInfo=null;
+
+			//後攻クライアントに勝敗通知するオブジェクトを格納する変数
+			JSONObject secondPlayerGameInfo=null;
 
 			//試合結果DB登録作業
-			for(LogicInfoBean lb:this.logicList){
+			//正常な試合終了か、反則による試合終了によるものか分岐
+			//正常な試合終了
+			if(!result.equals(this.CONTINUE)){
 
-				//正常な試合終了か、反則による試合終了によるものか分岐
-				if(result!=null){
+				//先攻が勝利した場合
+				if(turnAdd.equals(this.cab.getFirstAddress())){
 
-					//直近のターンプレイヤーであるか否かで条件分岐
-					if(lb.getAddress().equals(turnAdd)){
+					//先攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,
+							result,addRefIdMap.get(this.cab.getFirstAddress()),this.startDate);
 
-						//ターンプレイヤーの試合結果を登録
-						dbi.resultInsert(battleId, this.startTime, this.endTime,
-								result,addRefIdMap.get(lb.getAddress()),this.startDate);
+					//先攻クライアントに渡す勝敗通知オブジェクトを作成
+					firstPlayerGameInfo=jm.informResult(result);
 
-						//勝敗通知オブジェクト作成
-						JSONObject gameInfo=jm.informResult(result);
+					//後攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,this.LOSE,
+							addRefIdMap.get(this.cab.getSecondAddress()), this.startDate);
 
-						//通知オブジェクト送信
-						samqm.sendMessage(gameInfo,lb.getAddress());
+					//後攻クライアントに渡す勝敗通知オブジェクトを作成
+					secondPlayerGameInfo=jm.informResult(this.LOSE);
 
-					}else{
-						//もう片方のプレイヤーの試合結果を登録
-						if(result.equals(this.WIN)){
+					//後攻が勝利した場合
+				}else if(turnAdd.equals(this.cab.getSecondAddress())){
 
-							dbi.resultInsert(battleId, this.startTime, this.endTime,
-									this.LOSE, addRefIdMap.get(lb.getAddress()),this.startDate);
+					//先攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,
+							this.LOSE,addRefIdMap.get(this.cab.getFirstAddress()),this.startDate);
 
-							//勝敗通知オブジェクト作成
-							JSONObject gameInfo=jm.informResult(this.LOSE);
+					//先攻クライアントに渡す勝敗通知オブジェクトを作成
+					firstPlayerGameInfo=jm.informResult(this.LOSE);
 
-							//通知オブジェクト送信
-							samqm.sendMessage(gameInfo,lb.getAddress());
+					//後攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,result,
+							addRefIdMap.get(this.cab.getSecondAddress()), this.startDate);
 
-						}else if(result.equals(this.DRAW)){
+					//後攻クライアントに渡す勝敗通知オブジェクトを作成
+					secondPlayerGameInfo=jm.informResult(result);
 
-							dbi.resultInsert(battleId, this.startTime, this.endTime,
-									this.DRAW, addRefIdMap.get(lb.getAddress()),this.startDate);
+					//引き分けの場合
+				}else if(result.equals(this.DRAW)){
 
-							//勝敗通知オブジェクト作成
-							JSONObject gameInfo=jm.informResult(this.DRAW);
+					//先攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,
+							result,addRefIdMap.get(this.cab.getFirstAddress()),this.startDate);
 
-							//通知オブジェクト送信
-							samqm.sendMessage(gameInfo,lb.getAddress());
+					//先攻クライアントに渡す勝敗通知オブジェクトを作成
+					firstPlayerGameInfo=jm.informResult(result);
 
-						}
-					}
+					//後攻の試合結果を登録
+					dbi.resultInsert(battleId, this.startTime, this.endTime,result,
+							addRefIdMap.get(this.cab.getSecondAddress()), this.startDate);
 
-				}else{
-					//直近のターンプレイヤーであるか否かで条件分岐
-					if(lb.getAddress().equals(turnAdd)){
+					//後攻クライアントに渡す勝敗通知オブジェクトを作成
+					secondPlayerGameInfo=jm.informResult(result);
+				}
 
-						//ターンプレイヤーの試合結果を登録
-						dbi.resultInsert(battleId, this.startTime, this.endTime,
-								this.LOSE, addRefIdMap.get(lb.getAddress()),this.startDate);
+				//異常な試合終了
+			}else{
 
-						//エラー通知クラスのインスタンス化
-						InformError ie=new InformError();
+				//先攻反則負けした場合
+				if(turnAdd.equals(this.cab.getFirstAddress())){
 
-						//エラー通知オブジェクト生成
-						JSONObject gameInfo=ie.ruleError();
+				}else if(turnAdd.equals(this.cab.getSecondAddress())){
 
-						//エラー通知オブジェクトを送信
-						samqm.sendMessage(gameInfo, lb.getAddress());
-
-					}else{
-						//もう片方のプレイヤーの試合結果を登録
-						dbi.resultInsert(battleId, this.startTime, this.endTime,
-								this.WIN, addRefIdMap.get(lb.getAddress()),this.startDate);
-
-						//勝敗通知オブジェクト生成
-						JSONObject gameInfo=jm.informResult(this.WIN);
-
-						//勝敗通知オブジェクト送信
-						samqm.sendMessage(gameInfo, lb.getAddress());
-					}
 				}
 			}
+
+			//各クライアントに勝敗通知オブジェクトを送信
+			samqm.sendMessage(firstPlayerGameInfo,this.cab.getFirstAddress());
+
+			samqm.sendMessage(secondPlayerGameInfo, this.cab.getSecondAddress());
 
 			//同名ロジックでのアクセス時の例外処理
 		}catch(SameLogicException e){
@@ -319,13 +335,10 @@ public class BattleAdmin {
 			//エラー通知オブジェクトの取得
 			JSONObject gameInfo=ie.sameLogicError();
 
-			//ロジック情報を格納したリストを取得
-			List<LogicInfoBean> logicList=this.logicList;
+			//オブジェクト送信
+			samqm.sendMessage(gameInfo,this.cab.getFirstAddress());
 
-			//各クライアントに通知
-			for(LogicInfoBean lib:logicList){
-				samqm.sendMessage(gameInfo, lib.getAddress());
-			}
+			samqm.sendMessage(gameInfo, this.cab.getSecondAddress());
 
 			throw e;
 

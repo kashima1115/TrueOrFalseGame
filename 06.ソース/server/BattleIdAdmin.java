@@ -1,5 +1,7 @@
 package server;
 
+import java.sql.SQLException;
+
 /**
  * 試合ID採番・取得
  * @author kanayama
@@ -12,7 +14,7 @@ public class BattleIdAdmin {
  * @return 採番した試合ID
  * @throws Exception
  */
-	public static int getBattleID(DbInsert dbi) throws Exception{
+	public static int getBattleID(DbInsert dbi) throws SQLException{
 		int battleId=0;
 		try{
 
@@ -22,7 +24,7 @@ public class BattleIdAdmin {
 			//採番
 			battleId++;
 
-		}catch(Exception e){
+		}catch(SQLException e){
 			e.printStackTrace();
 			throw e;
 		}

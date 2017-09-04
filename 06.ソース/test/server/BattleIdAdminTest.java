@@ -42,7 +42,6 @@ public class BattleIdAdminTest {
 
 	@Test
 	public void testGetBattleId() throws Exception {
-
 		//試合ID取得
 		int battleId=BattleIdAdmin.getBattleID(BattleIdAdminTest.dbi);
 

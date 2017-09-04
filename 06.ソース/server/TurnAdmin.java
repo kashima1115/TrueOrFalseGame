@@ -1,7 +1,5 @@
 package server;
 
-import java.util.List;
-
 import net.sf.json.JSONObject;
 
 /**
@@ -14,17 +12,19 @@ public class TurnAdmin {
 	private final int FIRST_PLAYER;
 	private final int SECOND_PLAYER;
 	private final String INFORM_EVENT;
+	private ClientAddressBean cab;
 
 	/**
 	 * コンストラクタ
 	 * ターン管理、クライアント区別、イベント情報通達定数を初期化
 	 * @return なし
 	 */
-	TurnAdmin(){
+	TurnAdmin(ClientAddressBean cab){
 		turn=1;
 		FIRST_PLAYER=0;
 		SECOND_PLAYER=1;
 		INFORM_EVENT="YourTurn";
+		this.cab=cab;
 	}
 
 	/**
@@ -32,10 +32,10 @@ public class TurnAdmin {
 	 * @param logicList ロジック情報を含むBean
 	 * @return 先手のクライアントのIPアドレス
 	 */
-	public String decideFirst(List<LogicInfoBean> logicList){
+	public String decideFirst(){
 
 		//先に受信したメッセージを送信したクライアントが先攻
-		return logicList.get(FIRST_PLAYER).getAddress();
+		return this.cab.getFirstAddress();
 	}
 
 	/**
@@ -43,14 +43,14 @@ public class TurnAdmin {
 	 * @param logicList ロジック情報を含むBean
 	 * @return 次手番のクライアントのIPアドレス
 	 */
-	public String judgeTurn(List<LogicInfoBean> logicList){
+	public String judgeTurn(){
 		TurnAdmin.turn++;
 		String nextPlayerAdd="";
 
 		if(TurnAdmin.turn%2==FIRST_PLAYER){
-			nextPlayerAdd=logicList.get(FIRST_PLAYER).getAddress();
+			nextPlayerAdd=this.cab.getFirstAddress();
 		}else if(TurnAdmin.turn%2==SECOND_PLAYER){
-			nextPlayerAdd=logicList.get(SECOND_PLAYER).getAddress();
+			nextPlayerAdd=this.cab.getSecondAddress();
 		}
 
 		//次手番のプレイヤーのIPアドレスを返す

@@ -8,7 +8,6 @@ import java.net.InetAddress;
  *
  */
 public class ServerTry {
-	public static int readyCount=0;
 
 	public static void main(String[] args) throws Exception {
 //		JSONObject  gameInfo=null;

@@ -5,9 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**DBアクセスクラス
@@ -15,67 +12,51 @@ import java.util.ResourceBundle;
  *
  */
 public class DbInsert {
-	private final ResourceBundle bundle;
-	private final String driver;
-	private final String url;
-	private final String user;
-	private final String password;
-	private  Connection con;
-	private PreparedStatement logicPstate;
-	private PreparedStatement logicPstateLook;
-	private PreparedStatement locationPstate;
-	private PreparedStatement resultPstate;
-	private PreparedStatement logicIdPstate;
-	private final String logicLookSql;
-	private final String logicInsertSql;
-	private final String locationInsertSql;
-	private final String resultInsertSql;
-	private final String logicIdGetSql;
+	// プロファイル(パラメータ)読込み定義
+	// プロパティファイルバンドル
+	private final ResourceBundle bundle=ResourceBundle.getBundle("config");
 
+	// パラメータ取得
+	private final String driver=this.bundle.getString("driverClassName");
+	private final String url=this.bundle.getString("url");
+	private final String user=this.bundle.getString("username");
+	private final String password= this.bundle.getString("password");
 
-	/**
-	 * 設定ファイルから取得する値の初期化
-	 * @return なし
-	 */
-	DbInsert(){
-		// プロファイル(パラメータ)読込み定義
-		// プロパティファイルバンドル
-		this.bundle=ResourceBundle.getBundle("config");
+	//プリペアドステートメント関連の変数
+	private  Connection con=null;
+	private PreparedStatement logicPstate=null;
+	private PreparedStatement logicPstateLook=null;
+	private PreparedStatement locationPstate=null;
+	private PreparedStatement resultPstate=null;
+	private PreparedStatement logicIdPstate=null;
+	private PreparedStatement formerIdPstate=null;
 
-		// パラメータ取得
-		this.driver=this.bundle.getString("driverClassName");
-		this.url=this.bundle.getString("url");
-		this.user=this.bundle.getString("username");
-		this.password= this.bundle.getString("password");
+	//sql文
+	//DBにクライアントのロジック情報が登録されているか否かを検索
+	private final static String logicLookSql="select count(*) from logic "+
+			"where logic_name=? and logic_writer=? and logic_ver=?";
 
-		//プリペアドステートメント関連
-		this.con=null;
-		this.locationPstate=null;
-		this.logicPstateLook=null;
-		this.locationPstate=null;
-		this.resultPstate=null;
-		this.logicIdPstate=null;
+	//DBにロジック情報を登録
+	private final static String logicInsertSql="insert into logic "+
+			"(logic_name,logic_writer,logic_ver) "+
+			"values (?,?,?)";
 
-		//sql文
-		this.logicLookSql="select count(*) from logic "+
-				"where logic_name=? and logic_writer=? and logic_ver=?";
+	//DBに指し手情報を登録
+	private final static String locationInsertSql="insert into location "+
+			"(battle_id,logic_id,location_x,location_y,turn,play_start,play_end) value "+
+			"(?,?,?,?,?,?,?)";
 
-		this.logicInsertSql="insert into logic "+
-				"(logic_name,logic_writer,logic_ver) "+
-				"values (?,?,?)";
+	//DBに試合結果を登録
+	private final static String resultInsertSql="insert into battle_result value "+
+			"(?,?,?,?,?,?)";
 
-		this.locationInsertSql="insert into location "+
-				"(battle_id,logic_id,location_x,location_y,turn,play_start,play_end) value "+
-				"(?,?,?,?,?,?,?)";
+	//各ロジックのIDを取得
+	private final static String logicIdGetSql="select logic_id from logic "+
+			"where logic_name=? and logic_writer=? and logic_ver=?";
 
-		this.resultInsertSql="insert into battle_result value "+
-				"(?,?,?,?,?,?)";
+	//直近試合IDを検索
+	private final static String formerIdGetSql="select max(battle_id) from battle_result";
 
-		this.logicIdGetSql="select logic_id from logic "+
-				"where logic_name=? and logic_writer=? and logic_ver=?";
-
-
-	}
 
 
 	/**
@@ -84,112 +65,67 @@ public class DbInsert {
 	 *  @throws Exception
 	 *  @return なし
 	 */
-	public void logicInsert(List<LogicInfoBean> logicList) throws Exception {
+	public void logicInsert(LogicInfoBean lib) throws SQLException {
 		// データベースへの検索処理*****************************************************/
-		Connection con = this.con;
-		PreparedStatement pStateLook=this.logicPstateLook;
-		PreparedStatement pState = this.logicPstate;
 		ResultSet rset=null;
 
-		//DB内に受信値と同じレコードが存在するか否かを表す値を格納
-		List<Integer> exist=new ArrayList<Integer>();
 		//DBにレコードの存在なし
 		final int NOT_HAVE=0;
-		//DBにレコードが存在しないロジックの数
-		int nhCount=0;
-		//DBに登録する必要があるロジック数
-		final int HAVE_RECORD=0;
 
 		try{
 
 			//オートコミット解除
-			con.setAutoCommit(false);
+			this.con.setAutoCommit(false);
 
 			//1度もプリコンパイルされていないならば、プリコンパイルを行う
-			if(pStateLook==null){
-				this.logicPstateLook=con.prepareStatement(this.logicLookSql);
-				pStateLook=this.logicPstateLook;
+			if(this.logicPstateLook==null){
+				this.logicPstateLook=this.con.prepareStatement(DbInsert.logicLookSql);
 			}
 
+			//プリペアドステートメントの？の値をセット
+			this.logicPstateLook.setString(1, lib.getLogicName());
+			this.logicPstateLook.setString(2, lib.getCreator());
+			this.logicPstateLook.setString(3, lib.getVersion());
 
-			//受信値取得・DB内探査
-			for(LogicInfoBean lb:logicList){
-				pStateLook.setString(1, lb.getLogicName());
-				pStateLook.setString(2, lb.getCreator());
-				pStateLook.setString(3, lb.getVersion());
+			//sql文実行
+			rset=this.logicPstateLook.executeQuery();
 
-				//sql文実行
-				rset=pStateLook.executeQuery();
-
-				//レコードに登録なしのロジックをカウント
-				int have=0;
-				while(rset.next()){
-					have=rset.getInt("count(*)");
-				}
-
-
-				if(have==NOT_HAVE){
-					nhCount++;
-				}
-				exist.add(have);
+			//レコードに登録されているか確認
+			int have=0;
+			while(rset.next()){
+				have=rset.getInt("count(*)");
 			}
 
-			//受信したロジック情報が全て登録済みの場合、メソッドの処理終了
-			if(nhCount==HAVE_RECORD){
+			//レコードに登録されていれば、以下の登録処理を行わない
+			if(have!=NOT_HAVE){
 				return;
 			}
 
 			//1度もプリコンパイルされてなければ、プリコンパイルを行う
-			if(pState==null){
-				this.logicPstate=con.prepareStatement(this.logicInsertSql);
-				pState=this.logicIdPstate;
+			if(this.logicPstate==null){
+				this.logicPstate=this.con.prepareStatement(DbInsert.logicInsertSql);
 			}
 
+			//プリペアドステートメントの？の値をセット
+			this.logicPstate.setString(1, lib.getLogicName());
+			this.logicPstate.setString(2, lib.getCreator());
+			this.logicPstate.setString(3, lib.getVersion());
 
-			//受信値取得・登録
-			for(int i=0;i<logicList.size();i++){
-				if(exist.get(i)!=NOT_HAVE){
-					continue;
-				}
-				LogicInfoBean lib=logicList.get(i);
-				pState.setString(1, lib.getLogicName());
-				pState.setString(2, lib.getCreator());
-				pState.setString(3, lib.getVersion());
-				pState.executeUpdate();
-
-				if(i<logicList.size()-1){
-					if(lib.getLogicName().equals(logicList.get(i+1).getLogicName())){
-						if(lib.getCreator().equals(logicList.get(i+1).getCreator())){
-							if(lib.getVersion().equals(logicList.get(i+1).getVersion())){
-								break;
-							}
-						}
-					}
-				}
-			}
+			//sql実行
+			this.logicPstate.executeUpdate();
 
 			//コミット
-			con.commit();
+			this.con.commit();
 
-		}catch(Exception e){
+		}catch(SQLException e){
 			e.printStackTrace();
 			//例外発生時ロールバック
-			if(con!=null){
-				con.rollback();
+			if(this.con!=null){
+				this.con.rollback();
 			}
 			throw e;
 		}finally{
 			//クローズ処理
-
-
-			if(pState!=null){
-			pState.close();
-			}
-
-			if(pStateLook!=null){
-				pStateLook.close();
-			}
-
 			if(rset!=null){
 				rset.close();
 			}
@@ -200,56 +136,43 @@ public class DbInsert {
 	 * @param lcib 指し手情報のBean
 	 * @throws Exception
 	 */
-	public void locationInsert(LocationInfoBean lcib) throws Exception{
+	public void locationInsert(LocationInfoBean lcib) throws SQLException{
 		// データベースへの検索処理*****************************************************/
-		Connection con = this.con;
-		PreparedStatement pState = this.locationPstate;
-
-
 		try{
 
 			//オートコミット解除
-			con.setAutoCommit(false);
+			this.con.setAutoCommit(false);
 
 
 			//1度もプリコンパイルされていなければ、プリコンパイル
-			if(pState==null){
-				this.locationPstate=con.prepareStatement(this.locationInsertSql);
-				pState=this.locationPstate;
+			if(this.locationPstate==null){
+				this.locationPstate=this.con.prepareStatement(DbInsert.locationInsertSql);
 			}
 
 			//登録値の入力
-			pState.setInt(1, lcib.getBattleId());
-			pState.setInt(2, lcib.getLogicId());
-			pState.setInt(3, lcib.getLocationX());
-			pState.setInt(4, lcib.getLocationY());
-			pState.setInt(5, lcib.getTurn());
-			pState.setString(6, lcib.getPlayStart());
-			pState.setString(7, lcib.getPlayEnd());
+			this.locationPstate.setInt(1, lcib.getBattleId());
+			this.locationPstate.setInt(2, lcib.getLogicId());
+			this.locationPstate.setInt(3, lcib.getLocationX());
+			this.locationPstate.setInt(4, lcib.getLocationY());
+			this.locationPstate.setInt(5, lcib.getTurn());
+			this.locationPstate.setString(6, lcib.getPlayStart());
+			this.locationPstate.setString(7, lcib.getPlayEnd());
 
 			//sql実行
-			pState.executeUpdate();
+			this.locationPstate.executeUpdate();
 
 			//コミット
-			con.commit();
+			this.con.commit();
 
 
 		}catch(Exception e){
 			e.printStackTrace();
 
 			//例外発生時ロールバック
-			if(con!=null){
-				con.rollback();
+			if(this.con!=null){
+				this.con.rollback();
 			}
-
 			throw e;
-		}finally{
-
-			//クローズ処理
-
-			if(pState!=null){
-				pState.close();
-			}
 		}
 	}
 
@@ -266,51 +189,40 @@ public class DbInsert {
 	public void resultInsert(int battleId,String startTime,String endTime,String result,
 			int logicId,String startDate) throws SQLException{
 		// データベースへの検索処理*****************************************************/
-		Connection con = this.con;
-		PreparedStatement pState = this.resultPstate;
-
 
 		try{
 			//オートコミット解除
-			con.setAutoCommit(false);
+			this.con.setAutoCommit(false);
 
 			//1度もプリコンパイルされていないのなら、プリコンパイル
-			if(pState==null){
-				this.resultPstate=con.prepareStatement(this.resultInsertSql);
-				pState=this.resultPstate;
+			if(this.resultPstate==null){
+				this.resultPstate=this.con.prepareStatement(DbInsert.resultInsertSql);
 			}
 
 			//値の入力
-			pState.setInt(1,battleId);
-			pState.setInt(2, logicId);
-			pState.setString(3, result);
-			pState.setString(4, startDate);
-			pState.setString(5, startTime);
-			pState.setString(6,endTime);
+			this.resultPstate.setInt(1,battleId);
+			this.resultPstate.setInt(2, logicId);
+			this.resultPstate.setString(3, result);
+			this.resultPstate.setString(4, startDate);
+			this.resultPstate.setString(5, startTime);
+			this.resultPstate.setString(6,endTime);
 
 			//sql実行
-			pState.executeUpdate();
+			this.resultPstate.executeUpdate();
 
 			//コミット
-			con.commit();
+			this.con.commit();
 
 		}catch(SQLException e){
 			e.printStackTrace();
 
 			//例外発生時ロールバック
-			if(con!=null){
-				con.rollback();
+			if(this.con!=null){
+				this.con.rollback();
 			}
 
 			throw e;
-		}finally{
-			//クローズ処理
-
-			if(pState!=null){
-				pState.close();
-			}
 		}
-
 	}
 
 	/**
@@ -320,8 +232,6 @@ public class DbInsert {
 	 */
 	public int getLogicId(LogicInfoBean lb) throws SQLException{
 		// データベースへの検索処理*****************************************************/
-		Connection con = this.con;
-		PreparedStatement pState = this.logicIdPstate;
 		ResultSet rset=null;
 
 		//返り値用変数
@@ -330,18 +240,17 @@ public class DbInsert {
 		try{
 
 			//1度もプリコンパイルが為されていないのなら、プリコンパイル
-			if(pState==null){
-				this.logicIdPstate=con.prepareStatement(this.logicIdGetSql);
-				pState=this.logicIdPstate;
+			if(this.logicIdPstate==null){
+				this.logicIdPstate=this.con.prepareStatement(DbInsert.logicIdGetSql);
 			}
 
 			//検索条件のセット
-			pState.setString(1, lb.getLogicName());
-			pState.setString(2, lb.getCreator());
-			pState.setString(3, lb.getVersion());
+			this.logicIdPstate.setString(1, lb.getLogicName());
+			this.logicIdPstate.setString(2, lb.getCreator());
+			this.logicIdPstate.setString(3, lb.getVersion());
 
 			//sql実行
-			rset=pState.executeQuery();
+			rset=this.logicIdPstate.executeQuery();
 
 
 
@@ -355,12 +264,6 @@ public class DbInsert {
 			throw e;
 		}finally{
 			//クローズ処理
-
-
-			if(pState!=null){
-				pState.close();
-			}
-
 			if(rset!=null){
 				rset.close();
 			}
@@ -376,20 +279,17 @@ public class DbInsert {
 	 */
 	public int getFormerId() throws SQLException{
 		// データベースへの検索処理*****************************************************/
-		Connection con = this.con;
-		Statement state = null;
 		ResultSet rset=null;
 		int battleId=0;
 
 		try{
-			//sql文（直近試合ID取得)
-			String sSql="select max(battle_id) from battle_result";
+			if(this.formerIdPstate==null){
+				this.formerIdPstate=this.con.prepareStatement(DbInsert.formerIdGetSql);
+			}
 
-			//ステートメント生成
-			state=con.createStatement();
 
 			//sql実行
-			rset=state.executeQuery(sSql);
+			rset=this.formerIdPstate.executeQuery();
 
 			//直近試合ID取得
 			while(rset.next()){
@@ -403,11 +303,6 @@ public class DbInsert {
 		}finally{
 
 			//クローズ処理
-
-			if(state!=null){
-				state.close();
-			}
-
 			if(rset!=null){
 				rset.close();
 			}
@@ -421,17 +316,14 @@ public class DbInsert {
 	 * @throws Exception
 	 */
 	public void  connect() throws SQLException,ClassNotFoundException{
-		Connection con = null;
 		try{
 
 			// JDBCドライバロード
 			Class.forName(this.driver);
 
 			// データベース接続
-			con = DriverManager.getConnection(this.url, this.user, this.password);
+			this.con = DriverManager.getConnection(this.url, this.user, this.password);
 
-			//フィールド変数にアクセス
-			this.con=con;
 
 		}catch(SQLException e){
 
@@ -446,13 +338,37 @@ public class DbInsert {
 	}
 
 	/**
-	 *
-	 * @throws Exception
+	 *各種クローズ処理を行う
+	 * @throws SQLException
 	 */
 	public void disconnect() throws SQLException{
 		try{
 			if(this.con!=null){
 				this.con.close();
+			}
+
+			if(this.logicPstate!=null){
+				this.logicPstate.close();
+			}
+
+			if(this.logicPstate!=null){
+				this.logicPstateLook.close();
+			}
+
+			if(this.locationPstate!=null){
+				this.locationPstate.close();
+			}
+
+			if(this.resultPstate!=null){
+				this.resultPstate.close();
+			}
+
+			if(this.logicIdPstate!=null){
+				this.logicIdPstate.close();
+			}
+
+			if(this.formerIdPstate!=null){
+				this.formerIdPstate.close();
 			}
 		}catch(SQLException e){
 			e.printStackTrace();

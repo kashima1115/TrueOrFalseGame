@@ -1,7 +1,7 @@
 package server;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.json.JSONObject;
@@ -10,36 +10,52 @@ import net.sf.json.JSONObject;
  *@author kanayama
  */
 public class LogicAdmin {
-private List<LogicInfoBean> logicList;
+private Map<String,LogicInfoBean> logicMap;
 private Map<String,Integer> addRefIdMap;
+private ClientAddressBean cab;
+private int readyCount=0;
 
-	/**ロジック情報保持（リスト化）メソッド
+	/**ロジック情報保持（Map化）メソッド
 	 * @param gameInfo クライアントから受信ロジック情報を含むオブジェクト
 	 * @return なし
 	 */
 	public void logicSet(JSONObject gameInfo){
 
+		this.readyCount++;
 
-		if(ServerTry.readyCount==1){
-			this.logicList=new ArrayList<LogicInfoBean>();
+		//初回に呼び出されたときのみインスタンス化
+		if(this.readyCount==1){
+			this.logicMap=new HashMap<String,LogicInfoBean>();
+			this.cab=new ClientAddressBean();
 		}
 
-		//Beanに各ロジック情報をセット
+		//ロジック情報Beanに各ロジック情報をセット
 		LogicInfoBean lib=new LogicInfoBean();
 		lib.setLogicName(gameInfo.getString("logicName"));
 		lib.setCreator(gameInfo.getString("creator"));
 		lib.setVersion(gameInfo.getString("version"));
-		lib.setAddress(gameInfo.getString("address"));
 
-		//ListにBeanを追加
-		this.logicList.add(lib);
+		//MapにBeanを追加
+		this.logicMap.put(gameInfo.getString("address"),lib);
+
+		//クライアントアドレスを保管するBeanにセット
+		if(this.readyCount==1){
+			this.cab.setFirstAddress(gameInfo.getString("address"));
+		}else if(this.readyCount==2){
+			this.cab.setSecondAddress(gameInfo.getString("address"));
+		}
 
 	}
-	/**試合管理クラスがロジック情報リストを取得
+	/**試合管理クラスがロジック情報Mapを取得
 	 * @return logicList ロジック情報を含むBean
 	 */
-	public List<LogicInfoBean> getLogicList(){
-		return this.logicList;
+	public Map<String,LogicInfoBean> getLogicMap(){
+		return this.logicMap;
+	}
+
+
+	public ClientAddressBean getClientAddressBean(){
+		return this.cab;
 	}
 
 	/**
@@ -47,21 +63,22 @@ private Map<String,Integer> addRefIdMap;
 	 * @return キー…IPアドレス 値…logicIdのMap
 	 * @throws Exception
 	 */
-	public Map<String,Integer> attachId() throws Exception{
+	public Map<String,Integer> attachId(DbInsert dbi) throws SQLException{
 		try{
-			for(LogicInfoBean lb:this.logicList){
-				//DBアクセスクラスをインスタンス化
-				DbInsert dbi=new DbInsert();
 
-				//ロジックID取得
-				int logicId=dbi.getLogicId(lb);
+			//IPアドレスとロジックIDのMap作成
+			this.addRefIdMap=new HashMap<String,Integer>();
 
-				//IPアドレスとロジックIDを紐付け
-				this.addRefIdMap.put(lb.getAddress(), logicId);
+			//ロジックIDをDBから取得
+			int logicId=dbi.getLogicId(this.logicMap.get(this.cab.getFirstAddress()));
 
-			}
+			this.addRefIdMap.put(this.cab.getFirstAddress(), logicId);
 
-		}catch(Exception e){
+			logicId=dbi.getLogicId(this.logicMap.get(this.cab.getSecondAddress()));
+
+			this.addRefIdMap.put(this.cab.getSecondAddress(), logicId);
+
+		}catch(SQLException e){
 			e.printStackTrace();
 			throw e;
 		}
@@ -72,20 +89,9 @@ private Map<String,Integer> addRefIdMap;
 	 *  @return 同名ロジックの場合false、それ以外の場合trueを返す
 	 */
 	public boolean sameJudge(){
-		int compareId=0;
-		int sameCount=0;
-
-		//同名ロジックがあった場合カウントする
-		for(LogicInfoBean lb:this.logicList){
-			int getId=this.addRefIdMap.get(lb.getAddress());
-			if(getId==compareId){
-				sameCount++;
-			}
-			compareId=getId;
-		}
 
 		//同名ロジック判定
-		if(sameCount>0){
+		if(this.addRefIdMap.get(this.cab.getFirstAddress())==this.addRefIdMap.get(this.cab.getSecondAddress())){
 			return false;
 		}
 
