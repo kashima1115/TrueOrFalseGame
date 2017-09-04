@@ -24,13 +24,13 @@ import client.BattleInfoBean;
 
 public class AccessBrainTest3 {
 
-	public String logicName = "braintest1";
+	//brain用変数
+	public String logicName = "braintests";
 	public String logicVersion = "0.2";
-	public String writer = "someone";
-	public String a = "1";
-	public String b = "1";
-	public String sum = a+b;
-	Brain bra = new Brain();
+	public String writer = "some";
+	public String xa = "1";
+	public String yb = "2";
+	TestBrain bra = new TestBrain();
 	AccessBrainForTest ab = new AccessBrainForTest();
 
 	@BeforeClass
@@ -53,15 +53,15 @@ public class AccessBrainTest3 {
 	public void testGetLogicInfo() {
 		ab.setBrainForTest(bra);
 		//getLogicInfoを実行
-		BrainBean bb = ab.getLogicInfo();
+		BrainBean bab = ab.getLogicInfo();
 		//ロジック名が一致するかチェック
-		assertEquals(logicName,bb.getLogicName());
+		assertEquals(logicName,bab.getLogicName());
 		System.out.println("ロジック名 "+logicName+"―OK!");
 		//ロジックバージョンが一致するかチェック
-		assertEquals(logicVersion,bb.getLogicVersion());
+		assertEquals(logicVersion,bab.getLogicVersion());
 		System.out.println("ロジックバージョン "+logicVersion+"―OK!");
 		//作者が一致するかチェック
-		assertEquals(writer,bb.getWriter());
+		assertEquals(writer,bab.getWriter());
 		System.out.println("作者 "+writer+"―OK!");
 		System.out.println("getLogicInfo―OK!");
 		System.out.println("---------------------------------------------------------");
@@ -81,10 +81,10 @@ public class AccessBrainTest3 {
 		//getLocation実行（引数に盤面情報を渡す）
 		bib = ab.getLocation(loc);
 		for(BattleInfoBean binb:bib){
-			assertEquals(Integer.parseInt(a),binb.getxAxis());
+			assertEquals(Integer.parseInt(xa),binb.getxAxis());
 			//最初にコンソールに入れた値
 			System.out.println("xAxis is " + binb.getxAxis() + "―OK!");
-			assertEquals(Integer.parseInt(b),binb.getyAxis());
+			assertEquals(Integer.parseInt(yb),binb.getyAxis());
 			//次にコンソールに入れた値
 			System.out.println("yAxis is " + binb.getyAxis() + "―OK!");
 		}
@@ -92,7 +92,7 @@ public class AccessBrainTest3 {
 		System.out.println("---------------------------------------------------------");
 	}
 
-	public class Brain implements BrainControl{
+	public class TestBrain implements BrainControl{
 
 		@Override
 		public BrainBean logicInfo() {
@@ -105,8 +105,8 @@ public class AccessBrainTest3 {
 
 		@Override
 		public String getLocation(String[][] location) {
-			String a = sum;
-			return a;
+			String loc = xa+yb;
+			return loc;
 		}
 
 	}

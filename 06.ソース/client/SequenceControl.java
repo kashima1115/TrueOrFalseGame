@@ -22,7 +22,7 @@ public class SequenceControl{
 		BrainBean logic = ab.getLogicInfo();
 
 		//起動しているマシンのIPアドレスを特定する
-		String IPAdress ="/123.123.1.123";//値は適当に書いた値です。後でマシンのIPアドレスが入ります。
+		String IPAdress ="123.123.1.123";//値は適当に書いた値です。後でマシンのIPアドレスが入ります。
 		IPAdress = myIP();
 
 		//JSONに変換するためインスタンス化

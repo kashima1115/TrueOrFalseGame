@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import brain.BrainBean;
-import clientSingleTest.AccessBrainTest3.Brain;
+import clientSingleTest.AccessBrainTest3.TestBrain;
 
 /**
- * Brainにアクセスするクラスです.
+ * Brainにアクセスするクラスのテストです.
  * @author hatsugai
  */
 
 public class AccessBrainForTest{
-	private Brain bra = null;
+	private TestBrain bra = null;
 
 //	public void createBrain(){
 //		if(bra == null){
@@ -47,7 +47,7 @@ public class AccessBrainForTest{
 		return bl;
 	}
 
-	public void setBrainForTest(Brain bra){
+	public void setBrainForTest(TestBrain bra){
 		this.bra=bra;
 	}
 }

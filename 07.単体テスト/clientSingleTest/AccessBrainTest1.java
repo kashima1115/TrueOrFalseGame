@@ -43,6 +43,7 @@ public class AccessBrainTest1 {
 	@Test
 	public void testGetLogicInfo() {
 		AccessBrain ab = new AccessBrain();
+		ab.createBrain();
 		//getLogicInfoを実行
 		BrainBean bb = ab.getLogicInfo();
 		//ロジック名が一致するかチェック
@@ -67,7 +68,9 @@ public class AccessBrainTest1 {
 			}
 		}
 		//getLocation実行（引数に盤面情報を渡す）
-		bib = new AccessBrain().getLocation(loc);
+		AccessBrain ab = new AccessBrain();
+		ab.createBrain();
+		bib = ab.getLocation(loc);
 		for(BattleInfoBean binb:bib){
 			//最初にコンソールに入れた値
 			System.out.println("xAxis is " + binb.getxAxis());
