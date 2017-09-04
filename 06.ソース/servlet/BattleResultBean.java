@@ -25,12 +25,6 @@ public class BattleResultBean implements Serializable {
 	private String month;
 	private String day;
 	private int turn;
-
-
-
-
-
-
 	public int getBattle_id() {
 		return battle_id;
 	}

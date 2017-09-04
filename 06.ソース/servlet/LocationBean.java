@@ -17,8 +17,6 @@ public class LocationBean implements Serializable {
 	private int location_y;
 	private int turn;
 
-
-
 	public int getLocation_x() {
 		return location_x;
 	}

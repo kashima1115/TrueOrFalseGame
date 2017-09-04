@@ -33,19 +33,15 @@ public class BattleDetail extends HttpServlet {
         // データベースへの検索処理*****************************************************/
         try{
         	BattleDetailDBAccess bdd = new BattleDetailDBAccess();
-
             List<LocationBean> list = bdd.LocationBean(battleID);
             List<BattleDetailBean> list2 = bdd.BattleDetailBean(battleID);
-
             // listをrequestにセット
             request.setAttribute("LocationList", list);
             request.setAttribute("DetailList", list2);
 
-
         }catch(Exception e){
             e.printStackTrace();
         }
-
         // 次のJSPに遷移
         RequestDispatcher rd = request.getRequestDispatcher("/JSP/BattleDetail.jsp");
         rd.forward(request, response);

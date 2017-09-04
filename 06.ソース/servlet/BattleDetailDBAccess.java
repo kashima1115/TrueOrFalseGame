@@ -17,9 +17,7 @@ import javax.sql.DataSource;
 * @author arahari
 * @version 1.0
 */
-
 public class BattleDetailDBAccess {
-
 	/**
 	 * @param id
 	 * ラジオボタンで選択された試合ID
@@ -32,40 +30,26 @@ public class BattleDetailDBAccess {
 	 *
 	 * @throws Exception
 	 * 取得に問題があった場合に起こり得る例外
-	 *
 	 */
-
-
-
-
-
-
-
+	Context context;
+	DataSource ds;
+	Connection con;
+	PreparedStatement stmt;
+	ResultSet rs;
     protected List<LocationBean> LocationBean(String id) throws Exception {
-
 
         // データベースへの検索処理**************************************************/
     	// datasourceを使用
-         Context context = new InitialContext();
-         DataSource ds = (DataSource)context.lookup(
-             "java:comp/env/jdbc/library");
-         Connection con = ds.getConnection();
-
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
+    	context = new InitialContext();
+    	ds = (DataSource)context.lookup("java:comp/env/jdbc/library");
+    	con = ds.getConnection();
         List<LocationBean> list = new ArrayList<LocationBean>();
 
 		try {
-
-
-            // SQL文生成
+           // SQL文生成
             String sqlstr ="SELECT * FROM location where battle_id = ?";
-
             stmt = con.prepareStatement(sqlstr);
-
             stmt.setString(1, id);
-
             // SQL実行
             rs =stmt.executeQuery();
 
@@ -77,41 +61,26 @@ public class BattleDetailDBAccess {
                 bn.setLocation_x(rs.getInt(4));
                 bn.setLocation_y(rs.getInt(5));
                 bn.setTurn(rs.getInt(6));
-
                 list.add(bn);
-
                 i++;
-
             }
-
             //9手以内に試合が終わった場合も必ずリストに9個データが入るよう調整
-
             for(int q = i ; q <= 9; q++){
-
             	LocationBean bn = new LocationBean();
             	bn.setLocation_x(3);
             	bn.setLocation_y(3);
-
             	list.add(bn);
-
             }
-
-
 
         }catch(Exception e){
             // 例外をthrow
             throw e;
         } finally {
-
-
             if(rs != null) {
                 rs.close();
             }
             if(stmt != null) {
                 stmt.close();
-            }
-            if(con != null) {
-                con.close();
             }
         }
         return list;
@@ -119,21 +88,9 @@ public class BattleDetailDBAccess {
 
     protected List<BattleDetailBean> BattleDetailBean(String id) throws Exception {
 
-
-        // データベースへの検索処理**************************************************/
-    	// datasourceを使用
-         Context context = new InitialContext();
-         DataSource ds = (DataSource)context.lookup(
-             "java:comp/env/jdbc/library");
-         Connection con = ds.getConnection();
-
-        PreparedStatement smt = null;
-        ResultSet rst = null;
-
         List<BattleDetailBean> list2 = new ArrayList<BattleDetailBean>();
 
         try{
-
             // SQL文生成
             String sqlstr2 = "SELECT battle_result.battle_id, logic_name, logic_writer, "
             		+ "logic_ver, result, date, start_time, end_time, turn"
@@ -144,51 +101,44 @@ public class BattleDetailDBAccess {
             		+ " or battle_result.battle_id = ? and battle_result.logic_id ="
             		+ " location.logic_id and turn = 2"
             		+ " order by turn";
-
-            smt = con.prepareStatement(sqlstr2);
-
-            smt.setString(1, id);
-            smt.setString(2, id);
-
+            stmt = con.prepareStatement(sqlstr2);
+            stmt.setString(1, id);
+            stmt.setString(2, id);
             // SQL実行
-            rst =smt.executeQuery();
+            rs =stmt.executeQuery();
 
 			// 取得データをListにセット
-			while (rst.next()) {
+			while (rs.next()) {
 				BattleDetailBean bn2 = new BattleDetailBean();
-				bn2.setBattle_id(rst.getInt(1));
-				bn2.setLogic_name(rst.getString(2));
-				bn2.setLogic_writer(rst.getString(3));
-				bn2.setLogic_ver(rst.getString(4));
-				bn2.setResult(rst.getString(5));
-				String[] battleDaySpl = rst.getString(6).split("-");
+				bn2.setBattle_id(rs.getInt(1));
+				bn2.setLogic_name(rs.getString(2));
+				bn2.setLogic_writer(rs.getString(3));
+				bn2.setLogic_ver(rs.getString(4));
+				bn2.setResult(rs.getString(5));
+				String[] battleDaySpl = rs.getString(6).split("-");
 				bn2.setYear(battleDaySpl[0]);
 				bn2.setMonth(battleDaySpl[1]);
 				bn2.setDay(battleDaySpl[2]);
-				String[] startTime = rst.getString(7).split(":");
+				String[] startTime = rs.getString(7).split(":");
 				bn2.setStart_hour(startTime[0]);
 				bn2.setStart_min(startTime[1]);
 				bn2.setStart_sec(startTime[2]);
-				String[] endTime = rst.getString(8).split(":");
+				String[] endTime = rs.getString(8).split(":");
 				bn2.setEnd_hour(endTime[0]);
 				bn2.setEnd_min(endTime[1]);
 				bn2.setEnd_sec(endTime[2]);
-
 				list2.add(bn2);
 			}
-
         }catch(Exception e){
             // 例外をthrow
             throw e;
         } finally {
-
-            if(rst != null) {
-                rst.close();
+            if(rs != null) {
+            	rs.close();
             }
-            if(smt != null) {
-                smt.close();
+            if(stmt != null) {
+            	stmt.close();
             }
-
             if(con != null) {
                 con.close();
             }
@@ -196,5 +146,3 @@ public class BattleDetailDBAccess {
         return list2;
     }
 }
-
-

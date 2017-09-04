@@ -13,7 +13,6 @@ import java.io.Serializable;
 
 public class BattleDetailBean implements Serializable {
 
-
 	private String logic_name;
 	private String logic_writer;
 	private String logic_ver;

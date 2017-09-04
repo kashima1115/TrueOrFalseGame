@@ -9,8 +9,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Windows-31J">
 <title>詳細指し手情報</title>
+
 </head>
 <body>
+
 	<h1>試合結果詳細</h1>
 
 	<form action="../servlet/servlet.BattleResult" method="get">
@@ -194,7 +196,10 @@
 		<br /> <br />
 
 最終盤面結果
-		<table border="1">
+
+		<table border="1" >
+
+
 			<tr>
 				<td>
 					<%	if (a == 1) {
@@ -290,6 +295,7 @@
 						}	%>
 				</td>
 			<tr>
+
 		</table>
 
 <br/>

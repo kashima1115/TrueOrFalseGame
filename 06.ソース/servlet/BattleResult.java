@@ -19,25 +19,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 public class BattleResult extends HttpServlet {
-
     /**
     *
     * 試合結果取得メソッド
     *
     * データベースへの検索処理
     */
-
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try{
         	BattleResultDBAccess brd = new BattleResultDBAccess();
-
             List<BattleResultBean> list = brd.BattleResultBean();
-
             // listをrequestにセット
             request.setAttribute("list", list);
-
         }catch(Exception e){
             e.printStackTrace();
         }
