@@ -2,9 +2,6 @@ package clientSingleTest;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -12,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import brain.BrainBean;
-import brain.BrainControl;
 import client.AccessBrain;
 import client.BattleInfoBean;
 
@@ -47,7 +43,7 @@ public class AccessBrainTest1 {
 		//getLogicInfoを実行
 		BrainBean bb = ab.getLogicInfo();
 		//ロジック名が一致するかチェック
-		assertEquals("handPower",bb.getLogicName());
+		assertEquals("manual",bb.getLogicName());
 		System.out.println("ロジック名―OK!");
 		//ロジックバージョンが一致するかチェック
 		assertEquals("0.0",bb.getLogicVersion());
@@ -59,7 +55,7 @@ public class AccessBrainTest1 {
 
 	@Test
 	public void testGetLocation() {
-		List<BattleInfoBean> bib = new ArrayList<BattleInfoBean>();
+		BattleInfoBean bib = new BattleInfoBean();
 		String[][] loc;
 		loc = new String[3][3];
 		for(int aa = 0;aa<3;aa++){
@@ -71,29 +67,27 @@ public class AccessBrainTest1 {
 		AccessBrain ab = new AccessBrain();
 		ab.createBrain();
 		bib = ab.getLocation(loc);
-		for(BattleInfoBean binb:bib){
 			//最初にコンソールに入れた値
-			System.out.println("xAxis is " + binb.getxAxis());
+			System.out.println("xAxis is " + bib.getxAxis());
 			//次にコンソールに入れた値
-			System.out.println("yAxis is " + binb.getyAxis());
-		}
+			System.out.println("yAxis is " + bib.getyAxis());
 		System.out.println("getLocation―OK!");
 	}
 
-	private class TestBrain implements BrainControl{
-
-		@Override
-		public BrainBean logicInfo() {
-			// TODO 自動生成されたメソッド・スタブ
-			return null;
-		}
-
-		@Override
-		public String getLocation(String[][] location) {
-			// TODO 自動生成されたメソッド・スタブ
-			return null;
-		}
-
-	}
+//	private class TestBrain implements BrainControl{
+//
+//		@Override
+//		public BrainBean logicInfo() {
+//			// TODO 自動生成されたメソッド・スタブ
+//			return null;
+//		}
+//
+//		@Override
+//		public String getLocation(String[][] location) {
+//			// TODO 自動生成されたメソッド・スタブ
+//			return null;
+//		}
+//
+//	}
 
 }

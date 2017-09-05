@@ -1,8 +1,5 @@
 package client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brain.BrainBean;
 import net.sf.json.JSONObject;
 
@@ -13,27 +10,26 @@ import net.sf.json.JSONObject;
  */
 
 public class ConvertJSON {
+	JSONObject obj;
 	/**
 	 * ロジック情報をJSONObjectに変換します
 	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します
 	 * @return ロジック情報を格納したJSONObjectです
 	 */
 	public JSONObject convertToJSONF(BrainBean logic,String IPAdress){
-		JSONObject obj = new JSONObject();
-			obj.put("logicName", logic.getLogicName());
-			obj.put("logicVersion", logic.getLogicVersion());
-			obj.put("logicWriter", logic.getWriter());
-			obj.put("address", IPAdress);
-			obj.put("event", "ready");
+		obj.put("logicName", logic.getLogicName());
+		obj.put("logicVersion", logic.getLogicVersion());
+		obj.put("logicWriter", logic.getWriter());
+		obj.put("address", IPAdress);
+		obj.put("event", "ready");
 
-			return obj;
+		return obj;
 	}
 	/**
 	 * JSONObjectからデータを取り出してBattleInfoBeanに格納します
 	 * @param rcvmsg サーバーから送られてきたJSONObjectです
 	 */
-	public List<BattleInfoBean> convertFromJSON(JSONObject rcvmsg){
-		List<BattleInfoBean> bl = new ArrayList<BattleInfoBean>();
+	public BattleInfoBean convertFromJSON(JSONObject rcvmsg){
 		BattleInfoBean bib = new BattleInfoBean();
 		//エラー条件や終了条件がメッセージ中に含まれていた場合にeventにその旨を格納します。
 		if(rcvmsg.containsKey("error[]")){
@@ -46,21 +42,18 @@ public class ConvertJSON {
 			bib.setEvent(rcvmsg.getString("event"));
 			bib.setLocation((String[][])rcvmsg.get("location"));
 		}
-		bl.add(bib);
-		return bl;
+		return bib;
 	}
 	/**
 	 * 指し手情報をJSONObjectに変換します
 	 * @return 指し手情報を格納したJSONObjectです
 	 */
-	public JSONObject convertToJSONS(List<BattleInfoBean> bibn){
-		JSONObject obj = new JSONObject();
+	public JSONObject convertToJSONS(BattleInfoBean bib){
 		//指し手情報をBattleInfoBeanから取り出して格納します。
-		for(BattleInfoBean bib:bibn){
-			obj.put("xAxis", bib.getxAxis());
-			obj.put("yAxis", bib.getyAxis());
-			obj.put("event", "TurnEnd");
-		}
+		obj.put("xAxis", bib.getxAxis());
+		obj.put("yAxis", bib.getyAxis());
+		obj.put("event", "TurnEnd");
+
 		return obj;
 	}
 

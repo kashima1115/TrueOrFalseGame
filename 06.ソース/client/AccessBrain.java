@@ -1,8 +1,5 @@
 package client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import brain.Brain;
 import brain.BrainBean;
 
@@ -14,6 +11,9 @@ import brain.BrainBean;
 public class AccessBrain{
 	private Brain bra = null;
 
+	/**
+	 * Brainをインスタンス化します.AccessBrain使用時に実行してください.
+	 */
 	public void createBrain(){
 		if(bra == null){
 			bra = new Brain();
@@ -33,16 +33,14 @@ public class AccessBrain{
 	 * @return 指し手情報が格納されたBeanです
 	 */
 
-	public List<BattleInfoBean> getLocation(String[][] loc){
+	public BattleInfoBean getLocation(String[][] loc){
 		//指し手情報を保管するための変数を宣言
 		String loca = bra.getLocation(loc);
 		//BattleInfoBeanに指し手情報を格納
-		List<BattleInfoBean> bl = new ArrayList<BattleInfoBean>();
 		BattleInfoBean bib = new BattleInfoBean();
 		bib.setxAxis(Integer.parseInt(loca.substring(0,1)));
 		bib.setyAxis(Integer.parseInt(loca.substring(1)));
-		bl.add(bib);
-		return bl;
+		return bib;
 	}
 
 }

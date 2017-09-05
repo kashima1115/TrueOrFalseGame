@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -53,7 +51,7 @@ public class AccessBrainTest2 {
 		//getLogicInfoを実行
 		BrainBean bb = ab.getLogicInfo();
 		//ロジック名が一致するかチェック
-		assertEquals("handPower",bb.getLogicName());
+		assertEquals("manual",bb.getLogicName());
 		System.out.println("ロジック名―OK!");
 		//ロジックバージョンが一致するかチェック
 		assertEquals("0.0",bb.getLogicVersion());
@@ -73,7 +71,7 @@ public class AccessBrainTest2 {
 		in.inputln(xax);
 		in.inputln(yax);
 		//getLocationを実行させるための準備
-		List<BattleInfoBean> bib = new ArrayList<BattleInfoBean>();
+		BattleInfoBean bib = new BattleInfoBean();
 		String[][] loc;
 		loc = new String[3][3];
 		//locには全部"-"を入れる
@@ -85,15 +83,13 @@ public class AccessBrainTest2 {
 		//getLocation実行（引数に盤面情報を渡す）
 		new AccessBrain().createBrain();
 		bib = new AccessBrain().getLocation(loc);
-		for(BattleInfoBean binb:bib){
-			//xAxis
-			assertEquals(Integer.parseInt(xax),binb.getxAxis());
-			System.out.println("xAxis―OK!");
-			//yAxis
-			assertEquals(Integer.parseInt(yax),binb.getyAxis());
-			System.out.println("yAxis―OK!");
-		}
-		System.out.println("盤面情報―OK!");
+		//xAxis
+		assertEquals(Integer.parseInt(xax),bib.getxAxis());
+		System.out.println("xAxis―OK!");
+		//yAxis
+		assertEquals(Integer.parseInt(yax),bib.getyAxis());
+		System.out.println("yAxis―OK!");
+		System.out.println("getLocation―OK!");
 	}
 
 }

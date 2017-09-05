@@ -2,9 +2,6 @@ package clientSingleTest;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -70,7 +67,7 @@ public class AccessBrainTest3 {
 	@Test
 	public void testGetLocation() {
 		ab.setBrainForTest(bra);
-		List<BattleInfoBean> bib = new ArrayList<BattleInfoBean>();
+		BattleInfoBean bib = new BattleInfoBean();
 		String[][] loc;
 		loc = new String[3][3];
 		for(int aa = 0;aa<3;aa++){
@@ -80,14 +77,13 @@ public class AccessBrainTest3 {
 		}
 		//getLocation実行（引数に盤面情報を渡す）
 		bib = ab.getLocation(loc);
-		for(BattleInfoBean binb:bib){
-			assertEquals(Integer.parseInt(xa),binb.getxAxis());
-			//最初にコンソールに入れた値
-			System.out.println("xAxis is " + binb.getxAxis() + "―OK!");
-			assertEquals(Integer.parseInt(yb),binb.getyAxis());
-			//次にコンソールに入れた値
-			System.out.println("yAxis is " + binb.getyAxis() + "―OK!");
-		}
+		assertEquals(Integer.parseInt(xa),bib.getxAxis());
+		//最初にコンソールに入れた値
+		System.out.println("xAxis is " + bib.getxAxis() + "―OK!");
+		assertEquals(Integer.parseInt(yb),bib.getyAxis());
+		//次にコンソールに入れた値
+		System.out.println("yAxis is " + bib.getyAxis() + "―OK!");
+
 		System.out.println("getLocation―OK!");
 		System.out.println("---------------------------------------------------------");
 	}
