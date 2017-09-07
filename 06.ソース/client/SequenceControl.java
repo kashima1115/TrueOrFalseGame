@@ -45,7 +45,7 @@ public class SequenceControl{
 
 	public static String myIP(){
 		//起動しているマシンのIPアドレスを特定する
-				String IPAdress ="/123.123.1.123";
+				String IPAdress ="123.123.1.123";
 //				try{
 //					Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 //					while(interfaces.hasMoreElements()){
@@ -72,14 +72,14 @@ public class SequenceControl{
 	 * 自分のターンごとに状況に応じた処理を行います
 	 */
 	public static void myTurn(){
-		//変数の宣言
+		//変数eventの宣言
 		String event = "blank";
 		for(int turn=0;turn<5;turn++){
+			//サーバーからのメッセージを受け取る
 			bib =receive();
 
 			//event情報だけbeanから取り出す
 			event = bib.getEvent();
-
 			//event情報をとりあえず表示する
 			System.out.println(event);
 
@@ -93,29 +93,22 @@ public class SequenceControl{
 				break;
 			//差し手選択
 			}else if(event.equals("YourTurn")){
+				//brainに送るための盤面情報の変数locationを宣言
+				String[][]location = null;
+				//BattleInfoBeanから盤面情報を取得する
+				location = bib.getLocation();
+				//Brainから指し手情報を取得する
+				bib = getLocation(location);
+				//サーバーに送信する
 				send(bib);
+			//eventに何も入っていない場合（その他）
+			}else{
+				break;
 			}
 		}
 
 		//例外・終了条件時の受信用Queueの処理
 		amq.quitQueue();
-	}
-
-	/**
-	 * サーバーにメッセージを送信します
-	 * @param bib 盤面情報を格納したBattleInfoBeanです
-	 */
-	public static void send(BattleInfoBean bib){
-		//brainに送るための変数を宣言
-		String[][]location = null;
-		//BattleInfoBeanから盤面情報を取得する
-		location = bib.getLocation();
-		//盤面情報をbrainに渡して指し手情報を取得する
-		bib = ab.getLocation(location);
-		//JSONに変換
-		JSONObject jo2 = cj.convertToJSONS(bib);
-		//ActiveMQを通してサーバープログラムに送信する
-		amq.sendMessage(jo2);
 	}
 
 	/**
@@ -128,5 +121,27 @@ public class SequenceControl{
 		//JSONから変換
 		bib =cj.convertFromJSON(obj2);
 		return bib;
+	}
+
+	/**
+	 * 盤面情報を渡して指し手の情報を渡します
+	 * @param location 盤面情報を格納した二次元配列のStringです
+	 * @return 指し手の情報が入ったBattleInfoBeanです
+	 */
+	public static BattleInfoBean getLocation(String[][] location){
+		//盤面情報をbrainに渡して指し手情報を取得する
+		bib = ab.getLocation(location);
+		return bib;
+	}
+
+	/**
+	 * サーバーにメッセージを送信します
+	 * @param bib 盤面情報を格納したBattleInfoBeanです
+	 */
+	public static void send(BattleInfoBean bib){
+		//JSONに変換
+		JSONObject jo2 = cj.convertToJSONS(bib);
+		//ActiveMQを通してサーバープログラムに送信する
+		amq.sendMessage(jo2);
 	}
 }

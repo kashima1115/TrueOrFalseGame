@@ -1,7 +1,7 @@
 package client;
 
 import brain.BrainBean;
-import clientSingleTest.AccessBrainTest3.TestBrain;
+import client.AccessBrainTest3.TestBrain;
 
 /**
  * Brainにアクセスするクラスのテストです.
