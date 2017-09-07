@@ -48,7 +48,7 @@ public class DbInsert {
 
 	//DBに試合結果を登録
 	private final static String resultInsertSql="insert into battle_result value "+
-			"(?,?,?,?,?,?)";
+			"(?,?,?,?,?,?,?)";
 
 	//各ロジックのIDを取得
 	private final static String logicIdGetSql="select logic_id from logic "+
@@ -188,7 +188,7 @@ public class DbInsert {
 	 *
 	 */
 	public void resultInsert(int battleId,String startTime,String endTime,String result,
-			int logicId,String startDate) throws SQLException{
+			int logicId,String startDate,String firstSecond) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 
 		try{
