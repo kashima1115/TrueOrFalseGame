@@ -15,6 +15,7 @@ public class InformError {
 	private final String OVERSUBSCRIBED;
 	private final String SAME_LOGIC;
 	private final String NOT_BLANK;
+	private final String NOT_EXPECT_EVENT;
 
 	//エラー数のカウント
 	private int errorAmount;
@@ -23,10 +24,11 @@ public class InformError {
 	 * コンストラクタ
 	 */
 	InformError(){
-		error=new String[3];
+		error=new String[4];
 		OVERSUBSCRIBED="oversubscribed";
 		SAME_LOGIC="sameLogic";
 		NOT_BLANK="notBlank";
+		NOT_EXPECT_EVENT="notExpectEvent";
 		errorAmount=0;
 	}
 
@@ -80,6 +82,23 @@ public class InformError {
 
 		//配列にエラーメッセージを格納
 		this.error[this.errorAmount]=NOT_BLANK;
+
+		//配列をJSONObjectに格納
+		gameInfo.accumulate("error[]", error);
+
+		//エラー数を増加させる
+		this.errorAmount++;
+
+		return gameInfo;
+	}
+
+	public JSONObject notExpectEventError(){
+
+		//JSONObject生成
+		JSONObject gameInfo=new JSONObject();
+
+		//配列にエラーメッセージを格納
+		this.error[this.errorAmount]=NOT_EXPECT_EVENT;
 
 		//配列をJSONObjectに格納
 		gameInfo.accumulate("error[]", error);

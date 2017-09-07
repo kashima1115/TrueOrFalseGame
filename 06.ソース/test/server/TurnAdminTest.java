@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class TurnAdminTest {
 	private Map<String,LogicInfoBean> logicMap;
-	private ClientAddressBean cab;
+	private ClientLogicBean clb;
 
 
 	@BeforeClass
@@ -30,7 +30,7 @@ public class TurnAdminTest {
 		this.logicMap=new HashMap<String,LogicInfoBean>();
 
 		//クライアントアドレス保持Beanをインスタンス化
-		this.cab=new ClientAddressBean();
+		this.clb=new ClientLogicBean();
 
 		for(int i=0;i<2;i++){
 			LogicInfoBean lib=new LogicInfoBean();
@@ -45,9 +45,9 @@ public class TurnAdminTest {
 
 			//クライアントアドレス保持Beanにアドレスをセット
 			if(i==0){
-				this.cab.setFirstAddress(Integer.toString(i));
+				this.clb.setFirstLogic(Integer.toString(i));
 			}else if(i==1){
-				this.cab.setSecondAddress(Integer.toString(i));
+				this.clb.setSecondLogic(Integer.toString(i));
 			}
 		}
 
@@ -61,7 +61,7 @@ public class TurnAdminTest {
 	@Test
 	public void decideFirstTest() {
 		//手番管理クラスをインスタンス化
-		TurnAdmin ta=new TurnAdmin(cab);
+		TurnAdmin ta=new TurnAdmin(clb);
 
 		//先攻手番クライアントのアドレスを取得(早いもの順）
 		String turnAdd=ta.decideFirst();
@@ -73,7 +73,7 @@ public class TurnAdminTest {
 	@Test
 	public void judgeTurnTest() {
 		//手番管理クラスをインスタンス化
-		TurnAdmin ta=new TurnAdmin(cab);
+		TurnAdmin ta=new TurnAdmin(clb);
 
 		//次手番クライアントアドレス格納用アドレス
 		String nextAdd=null;

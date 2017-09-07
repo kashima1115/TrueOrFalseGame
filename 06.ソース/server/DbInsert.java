@@ -62,7 +62,7 @@ public class DbInsert {
 	/**
 	 *  ロジック情報DB登録メソッド
 	 *  @param logicList ロジック情報リスト
-	 *  @throws Exception
+	 *  @throws SQLException
 	 *  @return なし
 	 */
 	public void logicInsert(LogicInfoBean lib) throws SQLException {
@@ -119,6 +119,7 @@ public class DbInsert {
 
 		}catch(SQLException e){
 			e.printStackTrace();
+
 			//例外発生時ロールバック
 			if(this.con!=null){
 				this.con.rollback();
@@ -134,7 +135,7 @@ public class DbInsert {
 
 	/**指し手情報登録メソッド
 	 * @param lcib 指し手情報のBean
-	 * @throws Exception
+	 * @throws SQLException
 	 */
 	public void locationInsert(LocationInfoBean lcib) throws SQLException{
 		// データベースへの検索処理*****************************************************/

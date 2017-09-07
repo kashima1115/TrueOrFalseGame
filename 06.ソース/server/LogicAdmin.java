@@ -12,7 +12,7 @@ import net.sf.json.JSONObject;
 public class LogicAdmin {
 private Map<String,LogicInfoBean> logicMap;
 private Map<String,Integer> addRefIdMap;
-private ClientAddressBean cab;
+private ClientLogicBean clb;
 private int readyCount=0;
 
 	/**ロジック情報保持（Map化）メソッド
@@ -26,7 +26,7 @@ private int readyCount=0;
 		//初回に呼び出されたときのみインスタンス化
 		if(this.readyCount==1){
 			this.logicMap=new HashMap<String,LogicInfoBean>();
-			this.cab=new ClientAddressBean();
+			this.clb=new ClientLogicBean();
 		}
 
 		//ロジック情報Beanに各ロジック情報をセット
@@ -34,15 +34,19 @@ private int readyCount=0;
 		lib.setLogicName(gameInfo.getString("logicName"));
 		lib.setCreator(gameInfo.getString("creator"));
 		lib.setVersion(gameInfo.getString("version"));
+		lib.setAddress(gameInfo.getString("address"));
 
 		//MapにBeanを追加
-		this.logicMap.put(gameInfo.getString("address"),lib);
+		this.logicMap.put(gameInfo.getString("logicName")+gameInfo.getString("creator")+
+				gameInfo.getString("version"),lib);
 
 		//クライアントアドレスを保管するBeanにセット
 		if(this.readyCount==1){
-			this.cab.setFirstAddress(gameInfo.getString("address"));
+			this.clb.setFirstLogic(gameInfo.getString("logicName")+gameInfo.getString("creator")+
+					gameInfo.getString("version"));
 		}else if(this.readyCount==2){
-			this.cab.setSecondAddress(gameInfo.getString("address"));
+			this.clb.setSecondLogic(gameInfo.getString("logicName")+gameInfo.getString("creator")+
+					gameInfo.getString("version"));
 		}
 
 	}
@@ -54,8 +58,22 @@ private int readyCount=0;
 	}
 
 
-	public ClientAddressBean getClientAddressBean(){
-		return this.cab;
+	public ClientLogicBean getClientAddressBean(){
+		return this.clb;
+	}
+
+	public boolean fillClient(){
+		//readyCountが1以下ならばtrue、2以上ならばfalseを返す
+
+				boolean enoughClient=true;
+
+				if(readyCount<=1){
+					enoughClient=false;
+				}else if(readyCount>1){
+					enoughClient=true;
+				}
+
+				return enoughClient;
 	}
 
 	/**
@@ -70,13 +88,13 @@ private int readyCount=0;
 			this.addRefIdMap=new HashMap<String,Integer>();
 
 			//ロジックIDをDBから取得
-			int logicId=dbi.getLogicId(this.logicMap.get(this.cab.getFirstAddress()));
+			int logicId=dbi.getLogicId(this.logicMap.get(this.clb.getFirstLogic()));
 
-			this.addRefIdMap.put(this.cab.getFirstAddress(), logicId);
+			this.addRefIdMap.put(this.clb.getFirstLogic(), logicId);
 
-			logicId=dbi.getLogicId(this.logicMap.get(this.cab.getSecondAddress()));
+			logicId=dbi.getLogicId(this.logicMap.get(this.clb.getSecondLogic()));
 
-			this.addRefIdMap.put(this.cab.getSecondAddress(), logicId);
+			this.addRefIdMap.put(this.clb.getSecondLogic(), logicId);
 
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -91,7 +109,7 @@ private int readyCount=0;
 	public boolean sameJudge(){
 
 		//同名ロジック判定
-		if(this.addRefIdMap.get(this.cab.getFirstAddress())==this.addRefIdMap.get(this.cab.getSecondAddress())){
+		if(this.addRefIdMap.get(this.clb.getFirstLogic())==this.addRefIdMap.get(this.clb.getSecondLogic())){
 			return false;
 		}
 

@@ -12,19 +12,19 @@ public class TurnAdmin {
 	private final int FIRST_PLAYER;
 	private final int SECOND_PLAYER;
 	private final String INFORM_EVENT;
-	private ClientAddressBean cab;
+	private ClientLogicBean clb;
 
 	/**
 	 * コンストラクタ
 	 * ターン管理、クライアント区別、イベント情報通達定数を初期化
 	 * @return なし
 	 */
-	TurnAdmin(ClientAddressBean cab){
+	TurnAdmin(ClientLogicBean clb){
 		turn=1;
 		FIRST_PLAYER=0;
 		SECOND_PLAYER=1;
 		INFORM_EVENT="YourTurn";
-		this.cab=cab;
+		this.clb=clb;
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class TurnAdmin {
 	public String decideFirst(){
 
 		//先に受信したメッセージを送信したクライアントが先攻
-		return this.cab.getFirstAddress();
+		return this.clb.getFirstLogic();
 	}
 
 	/**
@@ -48,9 +48,9 @@ public class TurnAdmin {
 		String nextPlayerAdd="";
 
 		if(TurnAdmin.turn%2==FIRST_PLAYER){
-			nextPlayerAdd=this.cab.getFirstAddress();
+			nextPlayerAdd=this.clb.getFirstLogic();
 		}else if(TurnAdmin.turn%2==SECOND_PLAYER){
-			nextPlayerAdd=this.cab.getSecondAddress();
+			nextPlayerAdd=this.clb.getSecondLogic();
 		}
 
 		//次手番のプレイヤーのIPアドレスを返す
