@@ -24,7 +24,7 @@ public class BattleResultBean implements Serializable {
 	private String year;
 	private String month;
 	private String day;
-	private int turn;
+	private String first_second;
 	public int getBattle_id() {
 		return battle_id;
 	}
@@ -91,13 +91,11 @@ public class BattleResultBean implements Serializable {
 	public void setDay(String day) {
 		this.day = day;
 	}
-	public int getTurn() {
-		return turn;
+	public String getFirst_second() {
+		return first_second;
 	}
-	public void setTurn(int turn) {
-		this.turn = turn;
+	public void setFirst_second(String first_second) {
+		this.first_second = first_second;
 	}
-
-
 
 }

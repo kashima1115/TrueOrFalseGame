@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 
 /**
-*
 * ゲーム情報格納Bean
 *
 * @author arahari

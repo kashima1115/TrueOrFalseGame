@@ -29,14 +29,13 @@ public class BattleResult extends HttpServlet {
             throws ServletException, IOException {
 
         try{
-        	BattleResultDBAccess brd = new BattleResultDBAccess();
-            List<BattleResultBean> list = brd.BattleResultBean();
+        	BattleResultDBAccess BRD = new BattleResultDBAccess();
+            List<BattleResultBean> resultList = BRD.BattleResultBean();
             // listをrequestにセット
-            request.setAttribute("list", list);
+            request.setAttribute("ResultList", resultList);
         }catch(Exception e){
             e.printStackTrace();
         }
-
         /** 次のJSPに遷移 */
         RequestDispatcher rd = request.getRequestDispatcher("/JSP/BattleResult.jsp");
         rd.forward(request, response);

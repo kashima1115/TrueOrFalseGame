@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
-*
 * 試合詳細取得サーブレット
 *
 * @author arahari
@@ -20,9 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 public class BattleDetail extends HttpServlet {
 
     /**
-    *
     * 試合詳細取得メソッド
-    *
     * データベースへの検索処理
     */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -33,11 +30,11 @@ public class BattleDetail extends HttpServlet {
         // データベースへの検索処理*****************************************************/
         try{
         	BattleDetailDBAccess bdd = new BattleDetailDBAccess();
-            List<LocationBean> list = bdd.LocationBean(battleID);
-            List<BattleDetailBean> list2 = bdd.BattleDetailBean(battleID);
+            List<LocationBean> locationList = bdd.LocationBean(battleID);
+            List<BattleDetailBean> detailList = bdd.BattleDetailBean(battleID);
             // listをrequestにセット
-            request.setAttribute("LocationList", list);
-            request.setAttribute("DetailList", list2);
+            request.setAttribute("LocationList", locationList);
+            request.setAttribute("DetailList", detailList);
 
         }catch(Exception e){
             e.printStackTrace();

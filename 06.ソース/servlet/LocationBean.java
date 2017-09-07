@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 
 /**
-*
 * ゲーム情報格納Bean
 *
 * @author arahari
@@ -16,6 +15,9 @@ public class LocationBean implements Serializable {
 	private int location_x;
 	private int location_y;
 	private int turn;
+	private String location;
+
+
 
 	public int getLocation_x() {
 		return location_x;
@@ -35,5 +37,12 @@ public class LocationBean implements Serializable {
 	public void setTurn(int turn) {
 		this.turn = turn;
 	}
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
 
 }

@@ -9,12 +9,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Windows-31J">
 <title>詳細指し手情報</title>
-
 </head>
 <body>
-
 	<h1>試合結果詳細</h1>
-
 	<form action="../servlet/servlet.BattleResult" method="get">
 
 <!-- 	9マスそれぞれに割り当てターン数が偶数なら× -->
@@ -35,21 +32,16 @@
 		<%	int second = 0;	%>
 		<%	int nine = 0;	%>
 		<%  int result = 0; %>
-
 		<%// 検索結果のデータリストを取得
-			List<BattleDetailBean> list2 = (List<BattleDetailBean>) request.getAttribute("DetailList");
+			List<BattleDetailBean> detailList = (List<BattleDetailBean>) request.getAttribute("DetailList");
 			// 取得できなかった場合、メッセージ出力
 			// 取得できた場合、データを出力
-			if (list2.isEmpty()) {
+			if (detailList.isEmpty()) {
 				out.print("該当のデータはありません。");
 				} else { %>
-
-		<%	for (BattleDetailBean bn : list2) {	%>
-
+		<%	for (BattleDetailBean bn : detailList) {	%>
 		<%	first++;	%>
-
 		<%	if (first == 1) {	%>
-
 		<table border="1">
 			<tr>
 				<th>先攻（○）</th>
@@ -59,20 +51,13 @@
 				<td><%=bn.getLogic_name()%> <%=bn.getLogic_writer()%> <%=bn.getLogic_ver()%></td>
 				<td><%=bn.getResult()%></td>
 			</tr>
-
 		</table>
-
 		<%	}	%>
 		<%	} %>
-
-		<%	for (BattleDetailBean bn : list2) {	%>
-
+		<%	for (BattleDetailBean bn : detailList) {	%>
 		<% second++; %>
-
 		<%	if (second == 2) {	%>
-
 		<br /> <br /> －－－－－－－－－－－VS－－－－－－－－－－－ <br /> <br />
-
 		<table border="1">
 			<tr>
 				<th>後攻（×）</th>
@@ -82,29 +67,21 @@
 				<td><%=bn.getLogic_name()%> <%=bn.getLogic_writer()%> <%=bn.getLogic_ver()%></td>
 				<td><%=bn.getResult()%></td>
 			</tr>
-
 		</table>
-
 		<% } %>
 		<%	} %>
 <%	} %>
-
-
 		<%// 検索結果のデータリストを取得
-			List<LocationBean> list = (List<LocationBean>) request.getAttribute("LocationList");
+			List<LocationBean> locationList = (List<LocationBean>) request.getAttribute("LocationList");
 			// 取得できなかった場合、メッセージ出力
 			// 取得できた場合、データを出力
-			if (list.isEmpty()) {
+			if (locationList.isEmpty()) {
 				out.print("該当のデータはありません。");
 				} else { %>
 
-
-		<%	for (LocationBean bn : list) {%>
-
+		<%	for (LocationBean bn : locationList) {%>
 		<% nine++; %>
-
 		<% if(nine <= 9){ %>
-
 		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 0) { %>
 		<%	if (bn.getTurn() % 2 != 0) {
 							a++;
@@ -185,21 +162,12 @@
 							i--;
 						}
 					}	%>
-
-
 		<% } %>
-
 		<%	}	%>
-
 		<%	}	%>
-
 		<br /> <br />
-
 最終盤面結果
-
 		<table border="1" >
-
-
 			<tr>
 				<td>
 					<%	if (a == 1) {
@@ -295,46 +263,25 @@
 						}	%>
 				</td>
 			<tr>
-
-		</table>
-
-<br/>
-<br/>
-
-		<%	for (BattleDetailBean bn : list2) {	%>
-
+		</table><br/><br/>
+		<%	for (BattleDetailBean bn : detailList) {	%>
 		<% result++; %>
-
 		<%	if (result == 2) {	%>
-
-
 		<table border="1">
 			<tr>
-
 				<th>試合日</th>
 				<th>試合開始時間</th>
 				<th>試合終了時間</th>
-
 			</tr>
 			<tr>
-
 				<td><%=bn.getYear()%>年<%=bn.getMonth()%>月<%=bn.getDay()%>日</td>
 				<td><%=bn.getStart_hour()%>時<%=bn.getStart_min()%>分<%=bn.getStart_sec()%>秒</td>
 				<td><%=bn.getEnd_hour()%>時<%=bn.getEnd_min()%>分<%=bn.getEnd_sec()%>秒</td>
-
 			</tr>
-
 		</table>
-
 		<% } %>
-
-		<%	} %>
-
-<br/>
-<br/>
-
+		<%	} %><br/><br/>
 		<input type="submit" value="試合結果一覧に戻る" />
-
 	</form>
 </body>
 </html>

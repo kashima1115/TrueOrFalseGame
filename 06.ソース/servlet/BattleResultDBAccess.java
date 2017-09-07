@@ -42,49 +42,52 @@ public class BattleResultDBAccess {
 		this.context = new InitialContext();
 	    ds = (DataSource)context.lookup("java:comp/env/jdbc/library");
 	    con = ds.getConnection();
-        List<BattleResultBean> list = new ArrayList<BattleResultBean>();
+        List<BattleResultBean> resultList = new ArrayList<BattleResultBean>();
 
 		try {
 			// SQL文生成
-			String sqlstr = "SELECT battle_result.battle_id, logic_name, logic_writer, logic_ver, result, date, turn"
-					 + " FROM (logic INNER JOIN battle_result ON logic.logic_id = battle_result.logic_id)"
-					 + " INNER JOIN location ON battle_result.battle_id = location.battle_id"
-					 + " where turn = 1 and battle_result.logic_id = location.logic_id or turn = 2"
-					 + " and battle_result.logic_id = location.logic_id order by battle_id desc, turn" ;
+			String resultSQL = "SELECT battle_result.battle_id, logic_name, logic_writer, logic_ver,"
+					+ " result, date, first_second FROM (logic INNER JOIN battle_result ON"
+					+ " logic.logic_id = battle_result.logic_id) order by battle_id desc, first_second" ;
 
 			// ステートメント生成
-			stmt = con.prepareStatement(sqlstr);
+			stmt = con.prepareStatement(resultSQL);
 			// SQL実行
 			rs = stmt.executeQuery();
 			//先攻のロジック情報と後攻のロジック情報を違うbeanに格納し数を合わせるためダミーを作成する。
 			// 取得データをListにセット
 			while (rs.next()) {
 
-				BattleResultBean bn = new BattleResultBean();
-				bn.setBattle_id(rs.getInt(1));
+				BattleResultBean resultBn = new BattleResultBean();
+				resultBn.setBattle_id(rs.getInt(1));
 
-				if(rs.getInt(7) == 1){
-					bn.setPFlogic_name(rs.getString(2));
-					bn.setPFlogic_writer(rs.getString(3));
-					bn.setPFlogic_ver(rs.getString(4));
-					bn.setLogic_name("ダミー");
-					bn.setLogic_writer("ダミー");
-					bn.setLogic_ver("ダミー");
+				if(rs.getString(7).equals("first")){
+					resultBn.setPFlogic_name(rs.getString("logic_name"));
+					resultBn.setPFlogic_writer(rs.getString("logic_writer"));
+					resultBn.setPFlogic_ver(rs.getString("logic_ver"));
+					resultBn.setLogic_name("ダミー");
+					resultBn.setLogic_writer("ダミー");
+					resultBn.setLogic_ver("ダミー");
 				}else{
-				bn.setLogic_name(rs.getString(2));
-				bn.setLogic_writer(rs.getString(3));
-				bn.setLogic_ver(rs.getString(4));
-				bn.setPFlogic_name("ダミー");
-				bn.setPFlogic_writer("ダミー");
-				bn.setPFlogic_ver("ダミー");
+					resultBn.setLogic_name(rs.getString("logic_name"));
+					resultBn.setLogic_writer(rs.getString("logic_writer"));
+					resultBn.setLogic_ver(rs.getString("logic_ver"));
+					resultBn.setPFlogic_name("ダミー");
+					resultBn.setPFlogic_writer("ダミー");
+					resultBn.setPFlogic_ver("ダミー");
 				}
-				bn.setResult(rs.getString(5));
-				String[] battleDaySpl = rs.getString(6).split("-");
-				bn.setYear(battleDaySpl[0]);
-				bn.setMonth(battleDaySpl[1]);
-				bn.setDay(battleDaySpl[2]);
-				bn.setTurn(rs.getInt(7));
-				list.add(bn);
+				resultBn.setResult(rs.getString("result"));
+
+				LogicInfoUtil liu = new LogicInfoUtil();
+
+	            LogicInfoUtil sp = liu.splitMethod(rs.getString("date"),
+	            		"ダミー:ダミー:ダミー", "ダミー:ダミー:ダミー");
+
+				resultBn.setYear(sp.year);
+				resultBn.setMonth(sp.month);
+				resultBn.setDay(sp.day);
+				resultBn.setFirst_second(rs.getString("first_second"));
+				resultList.add(resultBn);
 			}
 
 		} catch (Exception e) {
@@ -102,6 +105,6 @@ public class BattleResultDBAccess {
                 con.close();
             }
 		}
-		return list;
+		return resultList;
 	}
 }
