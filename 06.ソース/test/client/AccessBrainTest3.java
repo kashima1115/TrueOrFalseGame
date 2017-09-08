@@ -1,4 +1,4 @@
-package clientSingleTest;
+package client;
 
 import static org.junit.Assert.*;
 

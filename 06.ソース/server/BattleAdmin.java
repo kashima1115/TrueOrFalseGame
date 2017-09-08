@@ -31,6 +31,10 @@ public class BattleAdmin {
 	private final String CONTINUE;
 	private final String DRAW;
 
+	//手番関係
+	private final String FIRST;
+	private final String SECOND;
+
 	//MQとDBにアクセスするクラスのオブジェクトをを格納する変数
 	private ServerActiveMQMessaging samqm;
 	private DbInsert dbi;
@@ -43,12 +47,12 @@ public class BattleAdmin {
 		ie=new InformError();
 		READY="ready";
 		TURN_END="TurnEnd";
-		logicMap=null;
-		clb=null;
 		WIN="win";
 		LOSE="lose";
 		CONTINUE="continue";
 		DRAW="draw";
+		FIRST="first";
+		SECOND="second";
 	}
 	/**
 	 * MQとDBの接続処理を行う
@@ -307,7 +311,8 @@ public class BattleAdmin {
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),dbit.getStartDate());
+						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
 				firstPlayerGameInfo=jm.informResult(dbit.getResult());
@@ -317,7 +322,8 @@ public class BattleAdmin {
 
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),dbit.getStartDate());
+						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
 				firstPlayerGameInfo=jm.informResult(dbit.getResult());
@@ -327,7 +333,8 @@ public class BattleAdmin {
 
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),dbit.getStartDate());
+						this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
 				firstPlayerGameInfo=jm.informResult(this.LOSE);
@@ -352,9 +359,10 @@ public class BattleAdmin {
 		try{
 			//後攻が勝利した場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
-				//先攻の試合結果を登録
+				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(), dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),dbit.getStartDate());
+						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
 				secondPlayerGameInfo=jm.informResult(dbit.getResult());
@@ -362,21 +370,23 @@ public class BattleAdmin {
 				//引き分けの場合
 			}else if(dbit.getResult().equals(this.DRAW)){
 
-				//先攻の試合結果を登録
+				//後攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),dbit.getStartDate());
+						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getStartDate(),SECOND);
 
-				//先攻クライアントに渡す勝敗通知オブジェクトを作成
+				//後攻クライアントに渡す勝敗通知オブジェクトを作成
 				secondPlayerGameInfo=jm.informResult(dbit.getResult());
 
 				//敗北の場合
 			}else if(!dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 
-				//先攻の試合結果を登録
+				//後攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),dbit.getStartDate());
+						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getStartDate(),SECOND);
 
-				//先攻クライアントに渡す勝敗通知オブジェクトを作成
+				//後攻クライアントに渡す勝敗通知オブジェクトを作成
 				secondPlayerGameInfo=jm.informResult(this.LOSE);
 			}
 
@@ -401,7 +411,8 @@ public class BattleAdmin {
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 				//先攻の試合結果を登録
 					dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-							this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),dbit.getStartDate());
+							this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),
+							dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
 				firstPlayerGameInfo=this.ie.ruleError();
@@ -410,7 +421,8 @@ public class BattleAdmin {
 			}else{
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-						this.WIN,addRefIdMap.get(this.clb.getFirstLogic()),dbit.getStartDate());
+						this.WIN,addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
 				firstPlayerGameInfo=jm.informResult(this.WIN);
@@ -421,7 +433,13 @@ public class BattleAdmin {
 		return firstPlayerGameInfo;
 	}
 
-
+/**
+ * 後攻クライアントの試合結果登録と、勝敗通知オブジェクト作成（反則）
+ * @param battleId
+ * @param addRefIdMap
+ * @param dbit
+ * @return
+ */
 	private JSONObject abnormalSecondResult(int battleId,Map<String,Integer> addRefIdMap,
 			DuringBattleInfoTrade dbit){
 
@@ -431,20 +449,22 @@ public class BattleAdmin {
 		try{
 			//後攻反則負けした場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
-				//先攻の試合結果を登録
+				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),dbit.getStartDate());
+						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getStartDate(),SECOND);
 
-				//先攻クライアントに渡す勝敗通知オブジェクトを作成
+				//後攻クライアントに渡す勝敗通知オブジェクトを作成
 				secondPlayerGameInfo=this.ie.ruleError();
 
 				//相手による反則勝ちの場合
 			}else{
-				//先攻の試合結果を登録
+				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.WIN,addRefIdMap.get(this.clb.getSecondLogic()),dbit.getStartDate());
+						this.WIN,addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getStartDate(),SECOND);
 
-				//先攻クライアントに渡す勝敗通知オブジェクトを作成
+				//後攻クライアントに渡す勝敗通知オブジェクトを作成
 				secondPlayerGameInfo=jm.informResult(this.WIN);
 			}
 		}catch(SQLException e){
@@ -465,8 +485,6 @@ public class BattleAdmin {
 	private void gameLater(Map<String,Integer> logicRefIdMap,DuringBattleInfoTrade dbit,
 			JudgeMatch jm,int battleId) throws Exception{
 		try{
-
-
 			//試合終了までループを繰り返す
 			while(true){
 
@@ -525,8 +543,8 @@ public class BattleAdmin {
 			}
 
 			//勝敗通知オブジェクト送信
-			samqm.sendMessage(firstPlayerGameInfo, null);
-			samqm.sendMessage(secondPlayerGameInfo, null);
+			samqm.sendMessage(firstPlayerGameInfo, this.logicMap.get(clb.getFirstLogic()).getAddress());
+			samqm.sendMessage(secondPlayerGameInfo, this.logicMap.get(clb.getSecondLogic()).getAddress());
 
 			//同名ロジックでのアクセス時の例外処理
 		}catch(Exception e){

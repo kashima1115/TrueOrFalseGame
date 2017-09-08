@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import brain.Brain;
 import brain.BrainBean;
@@ -30,6 +31,9 @@ public class AccessBrainThreadMode{
 			//ここでタイムアウトの時間を設定しています。
 			bb = future.get(60, TimeUnit.SECONDS);
 			return bb;
+		}catch(TimeoutException e){
+			System.out.println("時間切れです。");
+			return null;
 		}catch(Exception e){
 			e.printStackTrace();
 			return null;
@@ -56,6 +60,9 @@ public class AccessBrainThreadMode{
 			//ここでタイムアウトの時間を設定しています。
 			bib= future.get(60, TimeUnit.SECONDS);
 			return bib;
+		}catch(TimeoutException e){
+			System.out.println("時間切れです");
+			return null;
 		}catch(Exception e){
 			e.printStackTrace();
 			return null;
