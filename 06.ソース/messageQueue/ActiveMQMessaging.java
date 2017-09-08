@@ -12,8 +12,10 @@ import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import client.SequenceControl;
 import net.sf.json.JSONObject;
 /**
  * ActiveMQの操作を行うクラスです.
@@ -21,13 +23,20 @@ import net.sf.json.JSONObject;
  *
  */
 public class ActiveMQMessaging implements MessageQueueController {
-
+/**
+ * ActiveMQ関連の変数です.
+ */
 	QueueConnection connection = null;
     QueueSession session = null;
     QueueReceiver receiver = null;
     QueueSender sender = null;
 
-    @Override
+/**
+ * このクラスを呼び出しているマシンのIPアドレスを格納します.
+ */
+	public static String mypcip = SequenceControl.myIP();
+
+	@Override
 	public void sendMessage(JSONObject gameInfo) {
 		try {
 			//config.propertyからサーバーのIPアドレスを取得する（事前にサーバーのIPアドレスを入れてください）
@@ -35,8 +44,7 @@ public class ActiveMQMessaging implements MessageQueueController {
     		String serverIP = config.getString("serverIPAdress");
 
 			//Connectionを作成
-            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + serverIP +
-            		":8080?wireFormat=openwire&wireFormat.tightEncodingEnabled=true&connection.sendTimeout=10");//ポート番号はとりあえず8080
+            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + serverIP +":61616");//ポート番号はとりあえず8080
             connection = factory.createQueueConnection();
             connection.start();
 
@@ -70,8 +78,7 @@ public class ActiveMQMessaging implements MessageQueueController {
 		//
 		try {
             //Connectionを作成
-            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + mypcip +
-            		":8080?wireFormat=openwire&wireFormat.tightEncodingEnabled=true&connection.sendTimeout=10");
+            QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
             connection = factory.createQueueConnection();
             connection.start();
 
@@ -99,8 +106,7 @@ public class ActiveMQMessaging implements MessageQueueController {
 		//Queueの作成
 		try {
             //Connectionを作成
-            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + mypcip +
-            		":8080?wireFormat=openwire&wireFormat.tightEncodingEnabled=true&connection.sendTimeout=10");
+            QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
             connection = factory.createQueueConnection();
             connection.start();
 
@@ -108,7 +114,7 @@ public class ActiveMQMessaging implements MessageQueueController {
             session = connection.createQueueSession(false,QueueSession.CLIENT_ACKNOWLEDGE);
             Queue queue = session.createQueue(IPAddress);//キュー名はとりあえず自分のPCのIPアドレス
             receiver = session.createReceiver(queue);
-		}catch(Exception e ){
+		}catch(JMSException e ){
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
 		}
@@ -132,9 +138,4 @@ public class ActiveMQMessaging implements MessageQueueController {
 	public void sendMessage(JSONObject gameInfo,String IPAdress){
 		return;
 	}
-/**
- * このクラスを呼び出しているマシンのIPアドレスを格納します
- */
-	public static String mypcip;
-
 }
