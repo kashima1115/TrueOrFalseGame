@@ -1,9 +1,7 @@
 package server;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -11,8 +9,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import net.sf.json.JSONObject;
+import net.sf.json.test.JSONAssert;
+
 public class TurnAdminTest {
-	private Map<String,LogicInfoBean> logicMap;
 	private ClientLogicBean clb;
 
 
@@ -26,28 +26,21 @@ public class TurnAdminTest {
 
 	@Before
 	public void setUp() throws Exception {
-		//ロジック情報Map作成
-		this.logicMap=new HashMap<String,LogicInfoBean>();
 
 		//クライアントアドレス保持Beanをインスタンス化
 		this.clb=new ClientLogicBean();
 
 		for(int i=0;i<2;i++){
-			LogicInfoBean lib=new LogicInfoBean();
-			//beanに格納
-			lib.setLogicName(Integer.toString(i));
-			lib.setCreator(Integer.toString(i));
-			lib.setVersion(Integer.toString(i));
-			lib.setAddress(Integer.toString(i));
 
-			//Listに格納
-			this.logicMap.put(Integer.toString(i),lib);
+			//Mapに格納するキー名
+			String logicMapKey=Integer.toString(i)+Integer.toString(i)+Integer.toString(i)+
+					Integer.toString(i);
 
 			//クライアントアドレス保持Beanにアドレスをセット
 			if(i==0){
-				this.clb.setFirstLogic(Integer.toString(i));
+				this.clb.setFirstLogic(logicMapKey);
 			}else if(i==1){
-				this.clb.setSecondLogic(Integer.toString(i));
+				this.clb.setSecondLogic(logicMapKey);
 			}
 		}
 
@@ -61,13 +54,13 @@ public class TurnAdminTest {
 	@Test
 	public void decideFirstTest() {
 		//手番管理クラスをインスタンス化
-		TurnAdmin ta=new TurnAdmin(clb);
+		TurnAdmin ta=new TurnAdmin(this.clb);
 
 		//先攻手番クライアントのアドレスを取得(早いもの順）
-		String turnAdd=ta.decideFirst();
+		String turnLogic=ta.decideFirst();
 
 		//比較
-		assertEquals(this.logicMap.get("0").getAddress(),turnAdd);
+		assertEquals(this.clb.getFirstLogic(),turnLogic);
 	}
 
 	@Test
@@ -76,24 +69,68 @@ public class TurnAdminTest {
 		TurnAdmin ta=new TurnAdmin(clb);
 
 		//次手番クライアントアドレス格納用アドレス
-		String nextAdd=null;
+		String nextLogic=null;
 
 		//次手番のクライアントを判定・取得
 		for(int turn=1;turn<4;turn++){
-			nextAdd=ta.judgeTurn();
+			nextLogic=ta.judgeTurn();
 		}
 
 		//比較
-		assertEquals(this.logicMap.get("1").getAddress(),nextAdd);
+		assertEquals(this.clb.getSecondLogic(),nextLogic);
 	}
 
 	@Test
 	public void informTurnTest() {
-		fail("まだ実装されていません");
+
+		//取得するイベント情報の期待値
+		final String EVENT="YourTurn";
+
+		//盤面情報の配列に格納する値
+		final String NOT_FILL="_";
+
+		//テスト用盤面情報作成
+		String[][] testLocation=new String [3][3];
+
+		for(int i=0;i<testLocation.length;i++){
+			for(int j=0;j<testLocation[i].length;j++){
+				testLocation[i][j]=NOT_FILL;
+			}
+
+			//期待されるJSONObjectの返り値
+			JSONObject expectGameInfo=new JSONObject();
+
+			expectGameInfo.accumulate("location", testLocation);
+			expectGameInfo.accumulate("event", EVENT);
+
+			//手番管理クラスをインスタンス化
+			TurnAdmin ta=new TurnAdmin(clb);
+
+			//テスト対象クラスのJSONObjectを取得
+			JSONObject actualGameInfo=ta.informTurn(testLocation);
+
+			//JSONObjectを比較
+			JSONAssert.assertEquals (expectGameInfo,actualGameInfo);
+		}
 	}
 
 	@Test
 	public void getTurnTest() {
-		fail("まだ実装されていません");
+
+		//手番管理クラスをインスタンス化
+		TurnAdmin ta=new TurnAdmin(this.clb);
+
+		//期待ターン数
+		int expectTurn=1;
+
+		while(expectTurn<4){
+
+			expectTurn++;
+
+			ta.judgeTurn();
+
+			//テスト対象のクラスと比較
+			assertThat(expectTurn,is(ta.getTurn()));
+		}
 	}
 }
