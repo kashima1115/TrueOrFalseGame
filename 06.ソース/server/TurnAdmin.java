@@ -21,8 +21,8 @@ public class TurnAdmin {
 	 */
 	TurnAdmin(ClientLogicBean clb){
 		turn=1;
-		FIRST_PLAYER=0;
-		SECOND_PLAYER=1;
+		FIRST_PLAYER=1;
+		SECOND_PLAYER=0;
 		INFORM_EVENT="YourTurn";
 		this.clb=clb;
 	}

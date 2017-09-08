@@ -624,7 +624,7 @@ public class BattleAdmin {
 		}catch(SameLogicException e){
 
 			//エラー通知オブジェクトの取得
-			JSONObject gameInfo=null;
+			JSONObject gameInfo=this.ie.sameLogicError();
 
 			//オブジェクト送信
 			samqm.sendMessage(gameInfo,this.logicMap.get(this.clb.getFirstLogic()).getAddress());

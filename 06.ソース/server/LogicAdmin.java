@@ -11,7 +11,7 @@ import net.sf.json.JSONObject;
  */
 public class LogicAdmin {
 private Map<String,LogicInfoBean> logicMap;
-private Map<String,Integer> addRefIdMap;
+private Map<String,Integer> logicRefIdMap;
 private ClientLogicBean clb;
 private int readyCount=0;
 
@@ -38,15 +38,15 @@ private int readyCount=0;
 
 		//MapにBeanを追加
 		this.logicMap.put(gameInfo.getString("logicName")+gameInfo.getString("creator")+
-				gameInfo.getString("version"),lib);
+				gameInfo.getString("version")+gameInfo.getString("address"),lib);
 
 		//クライアントアドレスを保管するBeanにセット
 		if(this.readyCount==1){
 			this.clb.setFirstLogic(gameInfo.getString("logicName")+gameInfo.getString("creator")+
-					gameInfo.getString("version"));
+					gameInfo.getString("version")+gameInfo.getString("address"));
 		}else if(this.readyCount==2){
 			this.clb.setSecondLogic(gameInfo.getString("logicName")+gameInfo.getString("creator")+
-					gameInfo.getString("version"));
+					gameInfo.getString("version")+gameInfo.getString("address"));
 		}
 
 	}
@@ -85,22 +85,22 @@ private int readyCount=0;
 		try{
 
 			//IPアドレスとロジックIDのMap作成
-			this.addRefIdMap=new HashMap<String,Integer>();
+			this.logicRefIdMap=new HashMap<String,Integer>();
 
 			//ロジックIDをDBから取得
 			int logicId=dbi.getLogicId(this.logicMap.get(this.clb.getFirstLogic()));
 
-			this.addRefIdMap.put(this.clb.getFirstLogic(), logicId);
+			this.logicRefIdMap.put(this.clb.getFirstLogic(), logicId);
 
 			logicId=dbi.getLogicId(this.logicMap.get(this.clb.getSecondLogic()));
 
-			this.addRefIdMap.put(this.clb.getSecondLogic(), logicId);
+			this.logicRefIdMap.put(this.clb.getSecondLogic(), logicId);
 
 		}catch(SQLException e){
 			e.printStackTrace();
 			throw e;
 		}
-		return this.addRefIdMap;
+		return this.logicRefIdMap;
 	}
 
 	/**同名ロジック判定を行うメソッド
@@ -109,7 +109,7 @@ private int readyCount=0;
 	public boolean sameJudge(){
 
 		//同名ロジック判定
-		if(this.addRefIdMap.get(this.clb.getFirstLogic())==this.addRefIdMap.get(this.clb.getSecondLogic())){
+		if(this.logicRefIdMap.get(this.clb.getFirstLogic())==this.logicRefIdMap.get(this.clb.getSecondLogic())){
 			return false;
 		}
 
