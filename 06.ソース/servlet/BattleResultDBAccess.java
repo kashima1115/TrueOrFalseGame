@@ -77,15 +77,10 @@ public class BattleResultDBAccess {
 					resultBn.setPFlogic_ver("ダミー");
 				}
 				resultBn.setResult(rs.getString("result"));
-
-				LogicInfoUtil liu = new LogicInfoUtil();
-
-	            LogicInfoUtil sp = liu.splitMethod(rs.getString("date"),
-	            		"ダミー:ダミー:ダミー", "ダミー:ダミー:ダミー");
-
-				resultBn.setYear(sp.year);
-				resultBn.setMonth(sp.month);
-				resultBn.setDay(sp.day);
+				String[] battleDaySpl = rs.getString("date").split("-");
+				resultBn.setYear(battleDaySpl[0]);
+				resultBn.setMonth(battleDaySpl[1]);
+				resultBn.setDay(battleDaySpl[2]);
 				resultBn.setFirst_second(rs.getString("first_second"));
 				resultList.add(resultBn);
 			}

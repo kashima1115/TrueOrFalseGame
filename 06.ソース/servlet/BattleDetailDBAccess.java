@@ -60,7 +60,6 @@ public class BattleDetailDBAccess {
             // SQL実行
             rs =stmt.executeQuery();
 
-
 //            LogicInfoUtil liu = new LogicInfoUtil();
 
             // 取得データをListにセット
@@ -110,8 +109,6 @@ public class BattleDetailDBAccess {
             stmt.setString(1, id);
             // SQL実行
             rs =stmt.executeQuery();
-//
-//            DateTime dt;
 
             LogicInfoUtil liu = new LogicInfoUtil();
 
@@ -123,29 +120,10 @@ public class BattleDetailDBAccess {
 				detailBn.setLogic_writer(rs.getString("logic_writer"));
 				detailBn.setLogic_ver(rs.getString("logic_ver"));
 				detailBn.setResult(rs.getString("result"));
-				//ハイフンやコロンでsplitし、個別にリストへ格納する
 
-//	            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
-//	            Date date = sdFormat.parse(rs.getString("date"));
-//
-//	            dt = liu.dateTime(rs.getString("date"));
-//
-//	            System.out.println(date);
-//	            System.out.println(dt);
-
-				//複数のsplitで分けられた戻り値を取得
+				//クラスの戻り値を取得
 	            LogicInfoUtil sp = liu.splitMethod(rs.getString("date"),
 	            		rs.getString("start_time"), rs.getString("end_time"));
-
-//	            System.out.println(sp.year);
-//	            System.out.println(sp.month);
-//	            System.out.println(sp.day);
-
-//				String[] battleDaySpl = rs.getString("date").split("-");
-//				detailBn.setYear(battleDaySpl[0]);
-//				detailBn.setMonth(battleDaySpl[1]);
-//				detailBn.setDay(battleDaySpl[2]);
-
 
 				detailBn.setYear(sp.year);
 				detailBn.setMonth(sp.month);

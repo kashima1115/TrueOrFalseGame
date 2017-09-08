@@ -3,8 +3,7 @@ package servlet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+import org.joda.time.LocalTime;
 public class LogicInfoUtil {
 
 	String year;
@@ -22,7 +21,6 @@ public class LogicInfoUtil {
 		return String.valueOf(x + "-" + y);
 //		return String.valueOf(x).concat("-").valueOf(y);
 	}
-
 
 	//9つのデータを作成しなくても問題ないことが判明したため保留
 	public static Map<String, LocationBean> generate(String cc){
@@ -44,39 +42,41 @@ public class LogicInfoUtil {
 
 	}
 
-	//　DateTime型に変換するメソッド（うまくいかない）
-	public  DateTime dateTime(String dt){
-
-
-		DateTime dateTime = DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(dt);
-
-		return dateTime;
-
-
-
-	}
-
 //　複数の変数を持った1つのクラスにして返す
 	public LogicInfoUtil splitMethod(String spdt, String spst, String spet) {
 
 		LogicInfoUtil liu = new LogicInfoUtil();
 
-		String[] battleDaySpl = spdt.split("-");
-		liu.year = battleDaySpl[0];
-		liu.month = battleDaySpl[1];
-		liu.day = battleDaySpl[2];
+		try{
+		//DateTime型に変換する
+		org.joda.time.LocalDate date = new org.joda.time.LocalDate(spdt);
 
-		String[] startTime = spst.split(":");
-		liu.startHour = startTime[0];
-		liu.startMin = startTime[1];
-		liu.startSec = startTime[2];
+		liu.year = String.valueOf(date.getYear());
+		liu.month = String.valueOf(date.getMonthOfYear());
+		liu.day = String.valueOf(date.getDayOfMonth());
 
-		String[] endTime = spet.split(":");
-		liu.endHour = endTime[0];
-		liu.endMin = endTime[1];
-		liu.endSec = endTime[2];
+		//DateTime型に変換する
+		LocalTime stTime = new LocalTime(spst);
+
+		liu.startHour = String.valueOf(stTime.getHourOfDay());
+		liu.startMin = String.valueOf(stTime.getMinuteOfHour());
+		liu.startSec = String.valueOf(stTime.getSecondOfMinute());
+
+		//DateTime型に変換する
+		LocalTime edTime = new LocalTime(spet);
+
+		liu.endHour = String.valueOf(edTime.getHourOfDay());
+		liu.endMin = String.valueOf(edTime.getMinuteOfHour());
+		liu.endSec = String.valueOf(edTime.getSecondOfMinute());
 
 		return liu;
+
+		}catch (Exception e){
+			System.out.println(e.getMessage());
+
+			return null;
+
+		}
 	}
 
 }
