@@ -23,11 +23,9 @@ public class JudgeMatch {
 	public boolean ruleJudge(int turn,String[][] location,JSONObject gameInfo,int battleId,
 			String playStart,String playEnd,int logicId){
 
-		JSONObject locationInfo=gameInfo.getJSONObject("gameInfo");
-
 		//指し手情報を取得
-		int locationX=locationInfo.getInt("xAxis");
-		int locationY=locationInfo.getInt("yAxis");
+		int locationX=gameInfo.getInt("xAxis");
+		int locationY=gameInfo.getInt("yAxis");
 
 		//被り判定
 		if(!location[locationX][locationY].equals("_")){
@@ -101,6 +99,7 @@ public class JudgeMatch {
 		String judgeBattle="draw";
 
 		//勝敗条件要素カウント
+		//勝利条件X=0
 		for(int y=0;y<location[LINE_X0].length;y++){
 			if(location[LINE_X0][y].equals(FIRST_PLAYER)){
 				trueLineX0++;
@@ -109,6 +108,7 @@ public class JudgeMatch {
 			}
 		}
 
+		//勝利条件X=1
 		for(int y=0;y<location[LINE_X1].length;y++){
 
 			if(location[LINE_X1][y].equals(FIRST_PLAYER)){
@@ -119,6 +119,7 @@ public class JudgeMatch {
 
 		}
 
+		//勝利条件X=2
 		for(int y=0;y<location[LINE_X2].length;y++){
 
 			if(location[LINE_X2][y].equals(FIRST_PLAYER)){
@@ -129,6 +130,7 @@ public class JudgeMatch {
 
 		}
 
+		//勝利条件Y=0～2
 		for(int x=0;x<location.length;x++){
 
 			if(location[x][LINE_Y0].equals(FIRST_PLAYER)){
@@ -150,6 +152,7 @@ public class JudgeMatch {
 			}
 		}
 
+		//勝利条件斜め
 		for(int x=0;x<location.length;x++){
 
 			for(int y=0;y<location[x].length;y++){
