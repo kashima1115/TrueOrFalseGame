@@ -54,6 +54,9 @@ public class BattleResultDBAccess {
 			stmt = con.prepareStatement(resultSQL);
 			// SQL実行
 			rs = stmt.executeQuery();
+
+			LogicInfoUtil liu = new LogicInfoUtil();
+
 			//先攻のロジック情報と後攻のロジック情報を違うbeanに格納し数を合わせるためダミーを作成する。
 			// 取得データをListにセット
 			while (rs.next()) {
@@ -76,11 +79,13 @@ public class BattleResultDBAccess {
 					resultBn.setPFlogic_writer("ダミー");
 					resultBn.setPFlogic_ver("ダミー");
 				}
-				resultBn.setResult(rs.getString("result"));
-				String[] battleDaySpl = rs.getString("date").split("-");
-				resultBn.setYear(battleDaySpl[0]);
-				resultBn.setMonth(battleDaySpl[1]);
-				resultBn.setDay(battleDaySpl[2]);
+				//クラスの戻り値を取得
+				// 引数を合わせるためダミー時間を代入
+	            LogicInfoUtil sp = liu.splitMethod(rs.getString("date"),
+	            		"00:00:00", "00:00:00");
+	            resultBn.setYear(sp.year);
+	            resultBn.setMonth(sp.month);
+	            resultBn.setDay(sp.day);
 				resultBn.setFirst_second(rs.getString("first_second"));
 				resultList.add(resultBn);
 			}
@@ -89,7 +94,6 @@ public class BattleResultDBAccess {
 			// 例外をthrow
 			throw e;
 		} finally {
-
 			if (rs != null) {
 				rs.close();
 			}

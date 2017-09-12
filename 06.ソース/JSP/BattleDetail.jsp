@@ -166,10 +166,11 @@
 		<%	}	%>
 		<%	}	%>
 		<br /> <br />
+
 ç≈èIî’ñ åãâ 
 		<table border="1" >
 			<tr>
-				<td>
+				<th width="100" height="100"><font size=100pt>
 					<%	if (a == 1) {
 					%> Åõ <%
 						} else if (a == -1) {
@@ -177,8 +178,8 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (b == 1) {
 					%> Åõ <%
@@ -187,8 +188,8 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (c == 1) {
 					%> Åõ <%
@@ -197,10 +198,10 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
+				</font></th>
 			<tr>
 			<tr>
-				<td>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (d == 1) {
 					%> Åõ <%
@@ -209,8 +210,8 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (e == 1) {
 					%> Åõ <%
@@ -219,8 +220,8 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (f == 1) {
 					%> Åõ <%
@@ -229,10 +230,10 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
+				</font></th>
 			<tr>
 			<tr>
-				<td>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (g == 1) {
 					%> Åõ <%
@@ -241,8 +242,8 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (h == 1) {
 					%> Åõ <%
@@ -251,8 +252,8 @@
 						} else {
 					%> Å| <%
 						} %>
-				</td>
-				<td>
+				</font></th>
+				<th width="100" height="100"><font size=100pt>
 					<%
 						if (i == 1) {
 					%> Åõ <%
@@ -261,7 +262,7 @@
 						} else {
 					%> Å| <%
 						}	%>
-				</td>
+				</font></th>
 			<tr>
 		</table><br/><br/>
 		<%	for (BattleDetailBean bn : detailList) {	%>

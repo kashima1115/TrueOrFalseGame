@@ -45,12 +45,7 @@ public class BattleDetailDBAccess {
     	ds = (DataSource)context.lookup("java:comp/env/jdbc/library");
     	con = ds.getConnection();
 
-//    	Map<String, LocationBean> map = new HashMap<String, LocationBean>();
-
         List<LocationBean> locationList = new ArrayList<LocationBean>();
-//        int x;
-//        int y;
-//        String cc;
 
 		try {
            // SQL文生成
@@ -60,25 +55,14 @@ public class BattleDetailDBAccess {
             // SQL実行
             rs =stmt.executeQuery();
 
-//            LogicInfoUtil liu = new LogicInfoUtil();
-
             // 取得データをListにセット
             while(rs.next()) {
             	LocationBean locationBn = new LocationBean();
 
-//                x = rs.getInt("location_x");
-//                y = rs.getInt("location_y");
-
                 locationBn.setLocation_x(rs.getInt("location_x"));
                 locationBn.setLocation_y(rs.getInt("location_y"));
             	locationBn.setTurn(rs.getInt("turn"));
-
-//                cc = liu.generateLogicInfoKey(x, y);
-//                locationBn.setLocation(cc);
-
             	locationList.add(locationBn);
-
-//            	map.put("locationConcat", locationBn);
             }
 
         }catch(Exception e){
@@ -128,11 +112,9 @@ public class BattleDetailDBAccess {
 				detailBn.setYear(sp.year);
 				detailBn.setMonth(sp.month);
 				detailBn.setDay(sp.day);
-
 				detailBn.setStart_hour(sp.startHour);
 				detailBn.setStart_min(sp.startMin);
 				detailBn.setStart_sec(sp.startSec);
-
 				detailBn.setEnd_hour(sp.endHour);
 				detailBn.setEnd_min(sp.endMin);
 				detailBn.setEnd_sec(sp.endSec);

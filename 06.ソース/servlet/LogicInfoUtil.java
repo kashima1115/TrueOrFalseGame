@@ -1,8 +1,5 @@
 package servlet;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.joda.time.LocalTime;
 public class LogicInfoUtil {
 
@@ -17,30 +14,6 @@ public class LogicInfoUtil {
 	String endSec;
 
 
-	public static String generateLogicInfoKey(int x, int y){
-		return String.valueOf(x + "-" + y);
-//		return String.valueOf(x).concat("-").valueOf(y);
-	}
-
-	//9つのデータを作成しなくても問題ないことが判明したため保留
-	public static Map<String, LocationBean> generate(String cc){
-
-		// 初期化(空データを作成）して返す。
-		Map<String, LocationBean> map = new HashMap<String, LocationBean>();
-
-		map.get("0-0");
-		map.get("1-0");
-		map.get("2-0");
-		map.get("0-1");
-		map.get("1-1");
-		map.get("2-1");
-		map.get("0-2");
-		map.get("1-2");
-		map.get("2-2");
-
-	    return map;
-
-	}
 
 //　複数の変数を持った1つのクラスにして返す
 	public LogicInfoUtil splitMethod(String spdt, String spst, String spet) {
@@ -78,6 +51,7 @@ public class LogicInfoUtil {
 
 		}
 	}
-
+	
+	
 }
 
