@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    id="WebApp_ID"
+    version="2.5">
+  <display-name>firstServlet</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+
+  <servlet>
+    <servlet-name>ResultServlet</servlet-name>
+    <servlet-class>servlet.BattleResult</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ResultServlet</servlet-name>
+    <url-pattern>/servlet/servlet.BattleResult</url-pattern>
+  </servlet-mapping>
+
+  <!-- 末尾に追加して行く -->
+  <servlet>
+    <servlet-name>BattleDetail</servlet-name>
+    <servlet-class>servlet.BattleDetail</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>BattleDetail</servlet-name>
+    <url-pattern>/servlet/servlet.BattleDetail</url-pattern>
+  </servlet-mapping>
+
+
+  <resource-ref>
+    <res-ref-name>jdbc/library</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+
+
+    <servlet>
+        <servlet-name>dbtest</servlet-name>
+        <servlet-class>servlet.DBTestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dbtest</servlet-name>
+        <url-pattern>/dbtest</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+</web-app>
