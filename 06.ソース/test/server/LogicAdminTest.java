@@ -1,8 +1,10 @@
 package server;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,6 +15,8 @@ import org.junit.Test;
 import net.sf.json.JSONObject;
 
 public class LogicAdminTest {
+	private LogicAdmin la;
+
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -24,6 +28,19 @@ public class LogicAdminTest {
 
 	@Before
 	public void setUp() throws Exception {
+		this.la=new LogicAdmin();
+
+		for(int i=1;i<3;i++){
+			//JSONObject生成
+			JSONObject testGameInfo=new JSONObject();
+			testGameInfo.accumulate("logicName",Integer.toString(i));
+			testGameInfo.accumulate("creator",Integer.toString(i));
+			testGameInfo.accumulate("version",Integer.toString(i));
+			testGameInfo.accumulate("address",Integer.toString(i));
+
+			//ロジック情報をロジック管理クラスで保持
+			la.logicSet(testGameInfo);
+		}
 	}
 
 	@After
@@ -31,37 +48,47 @@ public class LogicAdminTest {
 	}
 
 	@Test
-	public void testLogicSet() {
-
-		//ロジック管理クラスをインスタンス化
-		LogicAdmin la=new LogicAdmin();
-
-		//JSONObject生成
-		JSONObject testGameInfo=new JSONObject();
-
-		for(int i=1;i<3;i++){
-			testGameInfo.accumulate("logicName",Integer.toString(i));
-			testGameInfo.accumulate("creator",Integer.toString(i));
-			testGameInfo.accumulate("version",Integer.toString(i));
-			testGameInfo.accumulate("address",Integer.toString(i));
-		}
-
-		//ロジック情報をロジック管理クラスで保持
-		la.logicSet(testGameInfo);
+	public void testLogicSetFirstKey() throws IllegalArgumentException, IllegalAccessException{
 
 		try{
+			//対象テストクラスのフィールド取得
 			Field fieldLogicMap=LogicAdmin.class.getDeclaredField("logicMap");
-		}catch(Exception e){
 
+			//アクセス権限付与
+			fieldLogicMap.setAccessible(true);
+
+			//比較
+			assertThat((Map<String,LogicInfoBean>)fieldLogicMap.get(this.la),hasKey("1111"));
+
+		}catch(NoSuchFieldException e){
+			e.printStackTrace();
+		}catch(IllegalArgumentException e){
+			e.printStackTrace();
+		}catch(IllegalAccessException e){
+			e.printStackTrace();
 		}
-
-
-
 	}
 
 	@Test
-	public void testGetLogicMap() {
-		fail("まだ実装されていません");
+	public void testLogicSetSecondKey() {
+
+		try{
+			//対象テストクラスのフィールド取得
+			Field fieldLogicMap=LogicAdmin.class.getDeclaredField("logicMap");
+
+			//アクセス権限付与
+			fieldLogicMap.setAccessible(true);
+
+			//比較
+			assertThat((Map<String,LogicInfoBean>)fieldLogicMap.get(this.la),hasKey("2222"));
+
+		}catch(NoSuchFieldException e){
+			e.printStackTrace();
+		}catch(IllegalArgumentException e){
+			e.printStackTrace();
+		}catch(IllegalAccessException e){
+			e.printStackTrace();
+		}
 	}
 
 	@Test

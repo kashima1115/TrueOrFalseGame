@@ -97,26 +97,54 @@ public class BattleAdmin {
 	}
 
 	/**
-	 * ロジック情報を受信する
+	 * 送信されたロジック情報のイベント情報チェック
 	 */
-	private void logicReceive(LogicAdmin la){
-		//メッセージ受信メソッドの呼び出し
-		JSONObject gameInfo=this.samqm.receiveMessage();
+	private boolean logicEventCheck(LogicAdmin la,JSONObject logicInfo){
+
+		boolean eventJudge=true;
 
 		//イベント情報取得
-		String event=gameInfo.getString("event");
+		String event=logicInfo.getString("event");
 
 		//受信メッセージ振り分け
-		if(event.equals(this.READY)){
+		//期待していたメッセージを受信できた場合
+		if(this.READY.equals(event)){
+			eventJudge=true;
 
-			//受信したロジック情報をMapに格納
-			la.logicSet(gameInfo);
+		//期待していたメッセージ受信できなかった場合
+		}else if(!this.READY.equals(event)){
+			eventJudge=false;
+		}
 
-			//期待していたメッセージ受信できなかった場合
-		}else if(!event.equals(this.READY)){
+		return eventJudge;
+	}
 
-			System.out.println("受信メッセージを受け付けられません");
-			System.out.println("再度メッセージを受信します");
+	/**
+	 * ロジック情報を保持
+	 * @param la
+	 * @param readyConut
+	 */
+	private void logicPutMap(LogicAdmin la,int readyCount,JSONObject logicInfo){
+		//ロジック情報Beanを取得
+		LogicInfoBean lib=la.logicSet(logicInfo);
+
+		//Bean内の値を取得
+		String logicName=lib.getLogicName();
+		String creator=lib.getCreator();
+		String version=lib.getVersion();
+		String address=lib.getAddress();
+
+		//Mapのキー名を作成
+		String logicKey=logicName+creator+version+address;
+
+		//BeanをMapに格納
+		this.logicMap.put(logicKey,lib);
+
+		//キー名をbeanで保持
+		if(readyCount<=0){
+			this.clb.setFirstLogic(logicKey);
+		}else{
+			this.clb.setSecondLogic(logicKey);
 		}
 	}
 
@@ -125,11 +153,6 @@ public class BattleAdmin {
 	 */
 	private void enrollLogic(LogicAdmin la){
 		try{
-			//ロジック情報を格納したMapを取得
-			this.logicMap=la.getLogicMap();
-
-			//クライアントアドレスを格納したBeanを取得
-			this.clb=la.getClientAddressBean();
 
 			//最初に受信したロジック情報のBeanを取得
 			LogicInfoBean lib=this.logicMap.get(this.clb.getFirstLogic());
@@ -142,19 +165,54 @@ public class BattleAdmin {
 
 			//DBにロジック情報を登録
 			dbi.logicInsert(lib);
+
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * 指し手情報、試合開始・終了時間、指し手の考慮時間の取得とイベントエラーチェック
-	 * @param ta
-	 * @param location
-	 */
-	private DuringBattleInfoTrade locationAddTimeTurnAndErrJudge(DuringBattleInfoTrade dbit){
 
-		boolean errJudge=true;
+	private void sameLogicJudge(LogicAdmin la,Map<String,Integer> logicRefIdMap) throws SameLogicException{
+		//同名ロジック判定
+		boolean sameJudge=la.sameJudge(logicRefIdMap, this.clb);
+
+		if(sameJudge){
+			throw new SameLogicException();
+		}
+	}
+
+	/**
+	 *試合中に使用するオブジェクトを用意
+	 * @return
+	 */
+	private DuringBattleInfoTrade dbitSetObject(){
+		//メソッド間、値引渡し用Bean
+		DuringBattleInfoTrade dbit=new DuringBattleInfoTrade();
+
+		//手番管理クラスのインスタンス化
+		dbit.setTa(new TurnAdmin(this.clb));
+
+		//先攻・後攻決定処理
+		dbit.setTurnLogic(dbit.getTa().decideFirst());
+
+		//盤面保持・更新クラスのインスタンス化
+		dbit.setLca(new LocationAdmin());
+
+		//試合判定クラスをインスタンス化
+		dbit.setJm(new JudgeMatch());
+
+		//試合判定結果格納用変数の用意
+		dbit.setResult(this.CONTINUE);
+
+		return dbit;
+	}
+
+	/**
+	 * クライアントに手番通知オブジェクトを送信
+	 * @param dbit
+	 */
+	private void sendPlayStart(DuringBattleInfoTrade dbit){
+
 		TurnAdmin ta=dbit.getTa();
 
 		if(ta.getTurn()==1){
@@ -167,40 +225,80 @@ public class BattleAdmin {
 		//オブジェクト送信処理
 		this.samqm.sendMessage(gameInfo, dbit.getTurnLogic());
 
+	}
+
+
+	/**
+	 * イベントエラーチェック
+	 * @param dbit
+	 * @return
+	 */
+	private DuringBattleInfoTrade eventErrJudge(DuringBattleInfoTrade dbit){
+
+		boolean errJudge=true;
+
+		//JSONObject内のイベント情報を取得
+		String event=dbit.getReceiveGameInfo().getString("event");
+
+		//正しいイベント情報を取得できているか判定
+		if(!this.TURN_END.equals(event)){
+			errJudge=false;
+		}else{
+			errJudge=true;
+		}
+
+		dbit.setErrJudge(errJudge);
+
+		return dbit;
+	}
+
+
+
+	/**
+	 * 処理開始時刻を取得する
+	 * @param dbit
+	 */
+	private DuringBattleInfoTrade setTimeStart(DuringBattleInfoTrade dbit){
+
+		TurnAdmin ta=dbit.getTa();
+
 		//処理開始時間取得
 		Date startDate=new Date();
 		SimpleDateFormat sdfTime= new SimpleDateFormat("HH:mm:ss");
 		String playStartTime=sdfTime.format(startDate);
 		dbit.setPlayStartTime(playStartTime);
 
-		//受信メッセージ取得
-		JSONObject ReceiveGameInfo=samqm.receiveMessage();
-		dbit.setReceiveGameInfo(ReceiveGameInfo);
-
-		//処理終了時刻取得
-		Date endDate=new Date();
-		String playEndTime=sdfTime.format(endDate);
-		dbit.setPlayEndTime(playEndTime);
-
-
-		//JSONObject内のイベント情報を取得
-		String event=ReceiveGameInfo.getString("event");
-
-		//一番最初のターンのみフィールドの変数に開始日付を代入
+		//一番最初のターンのみ試合開始時刻をセット
 		if(ta.getTurn()==1){
-			SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy/MM/dd");
-			dbit.setStartDate(sdfDate.format(startDate));
 			dbit.setStartTime(playStartTime);
 		}
 
-		if(!event.equals(this.TURN_END)){
-			errJudge=false;
-		}
-
-		dbit.setErrJudge(errJudge);
+		return dbit;
+	}
+	/**
+	 * 処理終了時刻を取得
+	 * @param dbit
+	 * @param sdfTime
+	 */
+	private DuringBattleInfoTrade setTimeEnd(DuringBattleInfoTrade dbit){
+		//処理終了時刻取得
+		Date endDate=new Date();
+		SimpleDateFormat sdfTime= new SimpleDateFormat("HH:mm:ss");
+		String playEndTime=sdfTime.format(endDate);
+		dbit.setPlayEndTime(playEndTime);
 
 		return dbit;
+	}
+	/**
+	 * 試合開始日付を取得
+	 * @param dbit
+	 */
+	private String setDate(){
+		//試合開始日付取得
+		Date startDate=new Date();
+		SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy/MM/dd");
 
+		return sdfDate.format(startDate);
 	}
 
 /**
@@ -253,10 +351,13 @@ public class BattleAdmin {
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
-
 		return dbit;
 	}
 
+	/**
+	 * 受信したイベント情報が期待値ではなかったときの処理
+	 * @param dbit
+	 */
 	private void notExpectEventDuringBattle(DuringBattleInfoTrade dbit){
 
 		JSONObject gameInfoErr=null;
@@ -488,8 +589,20 @@ public class BattleAdmin {
 			//試合終了までループを繰り返す
 			while(true){
 
-				//指し手情報、試合開始・終了時間、指し手の考慮時間の取得と指し手情報のルール判定
-				dbit=locationAddTimeTurnAndErrJudge(dbit);
+				//クライアントに手番通知
+				sendPlayStart(dbit);
+
+				//クライアント処理開始時間を取得
+				dbit=setTimeStart(dbit);
+
+				//受信メッセージ取得
+				dbit.setReceiveGameInfo(samqm.receiveMessage());
+
+				//クライアント処理終了時間取得
+				dbit=setTimeEnd(dbit);
+
+				//正しいイベント情報を送信しているか判定
+				dbit=eventErrJudge(dbit);
 
 				//取得するメッセージで問題がない場合
 				if(dbit.isErrJudge()){
@@ -567,14 +680,23 @@ public class BattleAdmin {
 			LogicAdmin la=new LogicAdmin();
 
 			//ロジック情報を2つ受け取るまで、ループ
-			while(true){
+			int readyConut=0;
+			while(readyConut<2){
+
+				//メッセージ受信メソッドの呼び出し
+				JSONObject logicInfo=this.samqm.receiveMessage();
 
 				//ロジック情報をMapに格納
-				logicReceive(la);
+				boolean eventJudge=logicEventCheck(la,logicInfo);
 
-				//2つ受け取ったらbreak
-				if(la.fillClient()){
-					break;
+				//ロジック情報がMapに格納できた場合と、できなかった場合で条件分岐
+				if(eventJudge){
+					//受信したロジック情報をMapに格納
+					logicPutMap(la, readyConut, logicInfo);
+					readyConut++;
+				}else{
+					System.out.println("受信メッセージを受け付けられません");
+					System.out.println("再度メッセージを受信します");
 				}
 			}
 
@@ -582,38 +704,22 @@ public class BattleAdmin {
 			enrollLogic(la);
 
 			//ロジック情報（IPアドレス）とロジックIDを紐付け・取得
-			Map<String,Integer> logicRefIdMap=la.attachId(dbi);
+			Map<String,Integer> logicRefIdMap=la.attachId(this.dbi, this.logicMap, this.clb);
 
 			//同名ロジック判定
-			boolean sameJudge=la.sameJudge();
-
-			if(sameJudge==false){
-				throw new SameLogicException();
-			}
-
-			//メソッド間、値引渡し用Bean
-			DuringBattleInfoTrade dbit=new DuringBattleInfoTrade();
+			sameLogicJudge(la, logicRefIdMap);
 
 			//試合ID取得
 			int battleId=BattleIdAdmin.getBattleID(dbi);
 
-			//手番管理クラスのインスタンス化
-			dbit.setTa(new TurnAdmin(this.clb));
+			//メソッド間、値引渡し用Bean
+			DuringBattleInfoTrade dbit=dbitSetObject();
 
-			//先攻・後攻決定処理
-			dbit.setTurnLogic(dbit.getTa().decideFirst());
-
-			//盤面保持・更新クラスのインスタンス化
-			dbit.setLca(new LocationAdmin());
-
-			//試合判定クラスをインスタンス化
-			JudgeMatch jm=new JudgeMatch();
-
-			//試合判定結果格納用変数の用意
-			dbit.setResult(this.CONTINUE);
+			//試合開始日付をBeanにセット
+			dbit.setStartDate(setDate());
 
 			//試合中以降の処理に移行
-			gameLater(logicRefIdMap, dbit, jm, battleId);
+			gameLater(logicRefIdMap,dbit,dbit.getJm(), battleId);
 
 		}catch(SQLException e){
 			e.printStackTrace();
