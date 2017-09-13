@@ -16,8 +16,8 @@ public class ConvertJSON {
 	String[][]locary = new String[3][3];
 	BattleInfoBean bib = new BattleInfoBean();
 	/**
-	 * ロジック情報をJSONObjectに変換します
-	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します
+	 * ロジック情報をJSONObjectに変換します.
+	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します.
 	 * @return ロジック情報を格納したJSONObjectです
 	 */
 	public JSONObject convertToJSONF(BrainBean logic,String IPAdress){
@@ -30,8 +30,9 @@ public class ConvertJSON {
 		return obj;
 	}
 	/**
-	 * JSONObjectからデータを取り出してBattleInfoBeanに格納します
+	 * JSONObjectからデータを取り出してBattleInfoBeanに格納します.
 	 * @param rcvmsg サーバーから送られてきたJSONObjectです
+	 * @return gameInfoから取り出した情報です
 	 */
 	public BattleInfoBean convertFromJSON(JSONObject rcvmsg){
 		//エラー条件や終了条件がメッセージ中に含まれていた場合にeventにその旨を格納します。
@@ -44,8 +45,12 @@ public class ConvertJSON {
 				sary[i]=ary.getString(i);
 			}
 			bib.setError(sary);
+		//JSONにeventの情報が無かった場合
+		}else if(!rcvmsg.containsKey("event")){
+			bib.setEvent("blank");
 		//試合終了のメッセージを格納します
-		}else if(rcvmsg.getString("event").equals("win")||rcvmsg.getString("event").equals("lose")||rcvmsg.getString("event").equals("draw")){
+		}else if(rcvmsg.getString("event").equals("win")||rcvmsg.getString("event").equals("lose")||
+				rcvmsg.getString("event").equals("draw")){
 			bib.setEvent(rcvmsg.getString("event"));
 		//問題が無ければ盤面の情報を格納します。
 		}else{
@@ -62,7 +67,8 @@ public class ConvertJSON {
 		return bib;
 	}
 	/**
-	 * 指し手情報をJSONObjectに変換します
+	 * 指し手情報をJSONObjectに変換します.
+	 * @param bib 指し手情報が入ったBattleInfoBeanです
 	 * @return 指し手情報を格納したJSONObjectです
 	 */
 	public JSONObject convertToJSONS(BattleInfoBean bib){

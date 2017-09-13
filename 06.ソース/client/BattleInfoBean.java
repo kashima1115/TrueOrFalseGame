@@ -10,23 +10,23 @@ import java.io.Serializable;
 
 public class BattleInfoBean implements Serializable{
 	/**
-	 * そのターンでクライアントプログラムがどのような動作をするべきかという情報を格納します
+	 * そのターンでクライアントプログラムがどのような動作をするべきかという情報を格納します.
 	 */
 	private String event;
 	/**
-	 * エラーメッセージを格納します
+	 * エラーメッセージを格納します.
 	 */
-	private String error[];
+	private String[] error;
 	/**
-	 * 盤面全体の情報を格納します
+	 * 盤面全体の情報を格納します.
 	 */
 	private String[][] location;
 	/**
-	 * 指し手の横座標(列)を格納します。0~2までを想定しています
+	 * 指し手の横座標(列)を格納します。0~2までを想定しています.
 	 */
 	private int xAxis;
 	/**
-	 * 指し手の縦座標(行)を格納します。0~2までを想定しています
+	 * 指し手の縦座標(行)を格納します。0~2までを想定しています.
 	 */
 	private int yAxis;
 

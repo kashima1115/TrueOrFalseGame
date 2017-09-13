@@ -5,7 +5,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
- * JSONObjectに変換したりJSONObjectからデータを取り出したりするクラスです.
+ * JSONObjectに変換したりJSONObjectからデータを取り出したりするテスト用のクラスです.
  * @author hatsugai
  *
  */
