@@ -20,7 +20,7 @@ import brain.BrainBean;
 
 public class AccessBrainThreadMode{
 	/**
-	 * ロジック情報を取得
+	 * ロジック情報を取得します.
 	 * @return Beanで返します
 	 */
 	public BrainBean getLogicInfo(){
@@ -48,7 +48,8 @@ public class AccessBrainThreadMode{
 	}
 
 	/**
-	 * 指し手情報を取得
+	 * 指し手情報を取得します.
+	 * @deprecated 未修正のため使用しないでください
 	 * @param loc 盤面情報です。
 	 * @return 指し手情報です。beanで返します
 	 */

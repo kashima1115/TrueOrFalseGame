@@ -6,7 +6,7 @@ package client;
  */
 public class Main {
 /**
- * メインメソッドです
+ * メインメソッドです.
  * @param args 特に使用しません
  */
 	public static void main(String[] args) {

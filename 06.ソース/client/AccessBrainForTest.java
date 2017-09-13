@@ -4,7 +4,7 @@ import brain.BrainBean;
 import client.AccessBrainTest3.TestBrain;
 
 /**
- * Brainにアクセスするクラスのテストです.
+ * Brainにアクセスするテスト用のクラスです.
  * @author hatsugai
  */
 

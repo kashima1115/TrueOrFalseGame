@@ -15,9 +15,14 @@ public class SequenceControl{
 	static ConvertJSON cj = new ConvertJSON();
 	static messageQueue.ActiveMQMessaging amq = new messageQueue.ActiveMQMessaging();
 	static BattleInfoBean bib;
+	private static final String WIN = "win";
+	private static final String LOSE = "lose";
+	private static final String DRAW = "draw";
+	private static final String YOUR_TURN= "YourTurn";
+	private static final String ERROR = "error";
 
 	/**
-	 * 試合開始時の動作です
+	 * 試合開始時の動作です.
 	 */
 	public static void startGame(){
 		//ロジック情報を取得(bean)
@@ -39,7 +44,7 @@ public class SequenceControl{
 	}
 
 	/**
-	 * IPアドレスを特定します
+	 * IPアドレスを特定します（ローカルホストです）.
 	 * @return IPアドレスです。IPv4を想定しています
 	 */
 
@@ -69,11 +74,14 @@ public class SequenceControl{
 	}
 
 	/**
-	 * 自分のターンごとに状況に応じた処理を行います
+	 * 自分のターンごとに状況に応じた処理を行います.
 	 */
 	public static void myTurn(){
 		//変数eventの宣言
 		String event = "blank";
+		//Brainのインスタンス化
+		ab.createBrain();
+		//TODO ○×ゲームは最大5回+最後のメッセージ受信の1回でこの条件にしています。
 		for(int turn=0;turn<5;turn++){
 			//サーバーからのメッセージを受け取る
 			bib =receive();
@@ -84,15 +92,15 @@ public class SequenceControl{
 			System.out.println(event);
 
 			//例外条件分岐
-			if(event.equals("error")){
+			if(ERROR.equals(event)){
 				//エラーメッセージを表示する
 				System.out.println(bib.getError());
 				break;
 			//終了条件分岐
-			}else if(event.equals("win")||event.equals("lose")||event.equals("draw")){
+			}else if(WIN.equals(event)||LOSE.equals(event)||DRAW.equals(event)){
 				break;
 			//差し手選択
-			}else if(event.equals("YourTurn")){
+			}else if(YOUR_TURN.equals(event)){
 				//brainに送るための盤面情報の変数locationを宣言
 				String[][]location = null;
 				//BattleInfoBeanから盤面情報を取得する
@@ -103,6 +111,7 @@ public class SequenceControl{
 				send(bib);
 			//eventに何も入っていない場合（その他）
 			}else{
+				System.out.println("イベント情報の取得に失敗しました。");
 				break;
 			}
 		}
@@ -112,7 +121,7 @@ public class SequenceControl{
 	}
 
 	/**
-	 * ActiveMQからのメッセージを受信します
+	 * ActiveMQからのメッセージを受信します.
 	 * @return 盤面情報やイベント情報を格納したBattleInfoBeanです
 	 */
 	public static BattleInfoBean receive() {
@@ -124,7 +133,7 @@ public class SequenceControl{
 	}
 
 	/**
-	 * 盤面情報を渡して指し手の情報を渡します
+	 * 盤面情報を渡して指し手の情報を渡します.
 	 * @param location 盤面情報を格納した二次元配列のStringです
 	 * @return 指し手の情報が入ったBattleInfoBeanです
 	 */
@@ -135,7 +144,7 @@ public class SequenceControl{
 	}
 
 	/**
-	 * サーバーにメッセージを送信します
+	 * サーバーにメッセージを送信します.
 	 * @param bib 盤面情報を格納したBattleInfoBeanです
 	 */
 	public static void send(BattleInfoBean bib){
