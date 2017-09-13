@@ -3,7 +3,6 @@ package messageQueue;
 import java.util.ResourceBundle;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -44,7 +43,7 @@ public class ActiveMQMessaging implements MessageQueueController {
     		String serverIP = config.getString("serverIPAdress");
 
 			//Connectionを作成
-            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + serverIP +":61616");//ポート番号はとりあえず8080
+            QueueConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + serverIP +":61616");
             connection = factory.createQueueConnection();
             connection.start();
 
@@ -63,9 +62,15 @@ public class ActiveMQMessaging implements MessageQueueController {
         } finally {
 
             try {
-                if (sender != null) sender.close();
-                if (session != null) session.close();
-                if (connection != null) connection.close();
+                if (sender != null) {
+                	sender.close();
+                }
+                if (session != null){
+                	session.close();
+                }
+                if (connection != null) {
+                	connection.close();
+                }
             } catch (JMSException e) {
                 e.printStackTrace();
             }
@@ -75,7 +80,6 @@ public class ActiveMQMessaging implements MessageQueueController {
 
 	@Override
 	public JSONObject receiveMessage() {
-		//
 		try {
             //Connectionを作成
             QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
@@ -84,13 +88,17 @@ public class ActiveMQMessaging implements MessageQueueController {
 
             //Receiverの作成
             session = connection.createQueueSession(false,QueueSession.CLIENT_ACKNOWLEDGE);
-            Queue queue = session.createQueue(mypcip);//キュー名は考える
+            Queue queue = session.createQueue(mypcip);//キュー名は自分のIPアドレス
             receiver = session.createReceiver(queue);
 
             //メッセージの受信
-           Message msg = receiver.receive();
-           JSONObject obj = JSONObject.fromObject(msg);
-           return obj;
+            System.out.println("サーバーからの通信待ち");
+            TextMessage msg = (TextMessage)receiver.receive();
+            JSONObject gameInfo = JSONObject.fromObject(msg.getText());
+            System.out.println("データ受信");
+            //受信確認メッセージ送信
+            msg.acknowledge();
+            return gameInfo;
         } catch (JMSException e) {
             e.printStackTrace();
             System.out.println("通信に問題が発生しました。");

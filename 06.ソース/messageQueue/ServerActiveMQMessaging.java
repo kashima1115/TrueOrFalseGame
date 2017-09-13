@@ -1,7 +1,6 @@
 package messageQueue;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -46,12 +45,13 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 			// Receiverの作成
 			session = connection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
 			String myip = mypcip;
-			Queue queue = session.createQueue(myip);// キュー名は考える
+			Queue queue = session.createQueue(myip);// キュー名は自分のIPアドレス
 			receiver = session.createReceiver(queue);
 
 			// メッセージの受信
-			Message msg = receiver.receive();
-			JSONObject obj = JSONObject.fromObject(msg);
+			TextMessage msg = (TextMessage)receiver.receive();
+			JSONObject obj = JSONObject.fromObject(msg.getText());
+			msg.acknowledge();
 			return obj;
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -101,7 +101,7 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 			 * クライアントから受信したロジック情報を元にIPアドレスを取得 Connectionを作成
 			 */
 			QueueConnectionFactory factory = new ActiveMQConnectionFactory(
-					"tcp://" + IPAdress + ":8181?wireFormat=openwire&wireFormat.tightEncodingEnabled=true");
+					"tcp://" + IPAdress + ":61616");
 			connection = factory.createQueueConnection();
 			connection.start();
 
