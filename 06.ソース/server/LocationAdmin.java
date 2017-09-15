@@ -36,9 +36,9 @@ public class LocationAdmin {
 
 	/**盤面を作成して引き渡す
 	 *
-	 * @return 初期状態の盤面
+	 * @return 現在状態の盤面
 	 */
-	public String[][] createLocation(){
+	public String[][] getLocation(){
 		return this.location;
 	}
 

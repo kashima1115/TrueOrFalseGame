@@ -17,7 +17,6 @@ public class DuringBattleInfoTrade {
 	private boolean stopRoop;
 	private String startTime;
 	private String endTime;
-	private String[][] location;
 	private JSONObject receiveGameInfo;
 	private JudgeMatch jm;
 	private LocationAdmin lca;
@@ -77,12 +76,6 @@ public class DuringBattleInfoTrade {
 	}
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
-	}
-	public String[][] getLocation() {
-		return location;
-	}
-	public void setLocation(String[][] location) {
-		this.location = location;
 	}
 	public JSONObject getReceiveGameInfo() {
 		return receiveGameInfo;

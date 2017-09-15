@@ -3,31 +3,11 @@ package server;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
-import net.sf.json.JSONObject;
 /**
- * ロジック情報管理クラス
+ * ロジック情報加工クラス
  *@author kanayama
  */
 public class LogicAdmin {
-
-
-	/**ロジック情報保持（Map化）メソッド
-	 * @param gameInfo クライアントから受信ロジック情報を含むオブジェクト
-	 * @return なし
-	 */
-	public LogicInfoBean logicSet(JSONObject gameInfo){
-
-		//ロジック情報Beanに各ロジック情報をセット
-		LogicInfoBean lib=new LogicInfoBean();
-		lib.setLogicName(gameInfo.getString("logicName"));
-		lib.setCreator(gameInfo.getString("creator"));
-		lib.setVersion(gameInfo.getString("version"));
-		lib.setAddress(gameInfo.getString("address"));
-
-		return lib;
-	}
-
 
 	/**
 	 * ロジック情報をロジックIDと紐付け・取得
