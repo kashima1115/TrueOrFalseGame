@@ -46,6 +46,9 @@ public class SequenceControlTest {
 	      assertEquals("{\"xAxis\":" + row + ",\"yAxis\":" + col + ",\"event\":\"TurnEnd\"}"
 	    		  , cj.convertToJSONS(bib).toString());
 
+	      assertEquals("{\"xAxis\":" + row + ",\"yAxis\":" + col + ",\"event\":\"TurnEnd\"}"
+	    		  , amq.receiveMessage().toString());
+
 	   }
 
 
