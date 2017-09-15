@@ -7,27 +7,29 @@ import net.sf.json.JSONObject;
 /**
  * JSONObjectに変換したりJSONObjectからデータを取り出したりするクラスです.
  * @author hatsugai
- *
+ * @version 0.1
  */
 
 public class ConvertJSON {
-	JSONObject obj = new JSONObject();
+	JSONObject locateObj = new JSONObject();
 	JSONArray jary = new JSONArray();
 	String[][]locary = new String[3][3];
 	BattleInfoBean bib = new BattleInfoBean();
 	/**
 	 * ロジック情報をJSONObjectに変換します.
-	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します.
+	 * @param logic brainのロジック情報が入ったBrainBeanです
+	 * @param IPAdress 動作させているマシンのIPアドレスです。サーバー側でクライアントにデータを送るときに使用します
 	 * @return ロジック情報を格納したJSONObjectです
 	 */
 	public JSONObject convertToJSONF(BrainBean logic,String IPAdress){
-		obj.put("logicName", logic.getLogicName());
-		obj.put("logicVersion", logic.getLogicVersion());
-		obj.put("logicWriter", logic.getWriter());
-		obj.put("address", IPAdress);
-		obj.put("event", "ready");
+		JSONObject logicObj = new JSONObject();
+		logicObj.put("logicName", logic.getLogicName());
+		logicObj.put("logicVersion", logic.getLogicVersion());
+		logicObj.put("logicWriter", logic.getWriter());
+		logicObj.put("address", IPAdress);
+		logicObj.put("event", "ready");
 
-		return obj;
+		return logicObj;
 	}
 	/**
 	 * JSONObjectからデータを取り出してBattleInfoBeanに格納します.
@@ -73,11 +75,11 @@ public class ConvertJSON {
 	 */
 	public JSONObject convertToJSONS(BattleInfoBean bib){
 		//指し手情報をBattleInfoBeanから取り出して格納します。
-		obj.put("xAxis", bib.getxAxis());
-		obj.put("yAxis", bib.getyAxis());
-		obj.put("event", "TurnEnd");
+		locateObj.put("xAxis", bib.getxAxis());
+		locateObj.put("yAxis", bib.getyAxis());
+		locateObj.put("event", "TurnEnd");
 
-		return obj;
+		return locateObj;
 	}
 
 }

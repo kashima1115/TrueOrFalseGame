@@ -1,7 +1,5 @@
 package client;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +17,15 @@ import brain.BrainBean;
  */
 
 public class AccessBrainThreadMode{
+	private Brain bra = null;
+	/**
+	 * Brainをインスタンス化します.AccessBrain使用時に実行してください.
+	 */
+	public void createBrain(){
+		if(bra == null){
+			bra = new Brain();
+		}
+	}
 	/**
 	 * ロジック情報を取得します.
 	 * @return Beanで返します
@@ -49,15 +56,14 @@ public class AccessBrainThreadMode{
 
 	/**
 	 * 指し手情報を取得します.
-	 * @deprecated 未修正のため使用しないでください
 	 * @param loc 盤面情報です。
 	 * @return 指し手情報です。beanで返します
 	 */
-	public List<BattleInfoBean> getLocation(String[][] loc){
+	public BattleInfoBean getLocation(String[][] loc){
 		ExecutorService exec = Executors.newSingleThreadExecutor();
-		Future<List<BattleInfoBean>> future = exec.submit(new Location(loc));
+		Future<BattleInfoBean> future = exec.submit(new Location(loc));
 		try{
-			List<BattleInfoBean> bib;
+			BattleInfoBean bib;
 			//ここでタイムアウトの時間を設定しています。
 			bib= future.get(60, TimeUnit.SECONDS);
 			return bib;
@@ -88,22 +94,20 @@ class LogicInfo implements Callable<BrainBean>{
 	}
 }
 
-class Location implements Callable<List<BattleInfoBean>>{
+class Location implements Callable<BattleInfoBean>{
 	String[][] loc;
 	public Location(String[][] loc){
 		this.loc = loc;
 	}
 	@Override
-	public List<BattleInfoBean> call() throws Exception{
+	public BattleInfoBean call() throws Exception{
 		Brain bra = new Brain();
 		//指し手情報を保管するための変数を宣言
 		String loca = bra.getLocation(loc);
 		//BattleInfoBeanに指し手情報を格納
-		List<BattleInfoBean> bl = new ArrayList<BattleInfoBean>();
 		BattleInfoBean bib = new BattleInfoBean();
 		bib.setxAxis(Integer.parseInt(loca.substring(0,1)));
 		bib.setyAxis(Integer.parseInt(loca.substring(1)));
-		bl.add(bib);
-		return bl;
+		return bib;
 	}
 }

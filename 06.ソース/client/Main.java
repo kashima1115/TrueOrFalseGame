@@ -2,7 +2,7 @@ package client;
 /**
  * メインクラスです。クライアントプログラムを起動させるにはこのクラスを実行してください.
  * @author hatsugai
- *
+ * @version 0.1
  */
 public class Main {
 /**

@@ -6,6 +6,7 @@ import brain.BrainBean;
 /**
  * Brainにアクセスするクラスです.
  * @author hatsugai
+ * @version 0.1
  */
 
 public class AccessBrain{

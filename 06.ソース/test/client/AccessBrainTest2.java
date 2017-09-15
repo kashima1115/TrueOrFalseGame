@@ -12,8 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import brain.BrainBean;
-import client.AccessBrain;
-import client.BattleInfoBean;
 
 /**
  * AccessBrainのテストコードです。座標入力は自動です。
@@ -54,7 +52,7 @@ public class AccessBrainTest2 {
 		assertEquals("manual",bb.getLogicName());
 		System.out.println("ロジック名―OK!");
 		//ロジックバージョンが一致するかチェック
-		assertEquals("0.0",bb.getLogicVersion());
+		assertEquals("0.1",bb.getLogicVersion());
 		System.out.println("ロジックバージョン―OK!");
 		//作者が一致するかチェック
 		assertEquals("初谷惇志",bb.getWriter());
@@ -63,6 +61,8 @@ public class AccessBrainTest2 {
 
 	@Test
 	public void testGetLocation() {
+		AccessBrain ab = new AccessBrain();
+		ab.createBrain();
 		//xAxisに入れる予定の変数
 		String xax = "1";
 		//yAxisに入れる予定の変数
@@ -81,8 +81,7 @@ public class AccessBrainTest2 {
 			}
 		}
 		//getLocation実行（引数に盤面情報を渡す）
-		new AccessBrain().createBrain();
-		bib = new AccessBrain().getLocation(loc);
+		bib = ab.getLocation(loc);
 		//xAxis
 		assertEquals(Integer.parseInt(xax),bib.getxAxis());
 		System.out.println("xAxis―OK!");

@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 public class Brain implements BrainControl{
 	//ロジックの名前やバージョン、作者をここで定義します。
 	private String logicName = "manual";
-	private String logicVersion = "0.0";
+	private String logicVersion = "1.0";
 	private String writer ="初谷惇志";
 
 	BufferedReader br;

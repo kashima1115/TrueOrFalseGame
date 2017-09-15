@@ -9,8 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import brain.BrainBean;
-import client.AccessBrain;
-import client.BattleInfoBean;
 
 /**
  * AccessBrainのテストコードです。座標入力は手作業です。
@@ -46,7 +44,7 @@ public class AccessBrainTest1 {
 		assertEquals("manual",bb.getLogicName());
 		System.out.println("ロジック名―OK!");
 		//ロジックバージョンが一致するかチェック
-		assertEquals("0.0",bb.getLogicVersion());
+		assertEquals("0.1",bb.getLogicVersion());
 		System.out.println("ロジックバージョン―OK!");
 		//作者が一致するかチェック
 		assertEquals("初谷惇志",bb.getWriter());

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 試合中の情報を保管するためのBeanです.
  * @author hatsugai
- *
+ * @version 0.1
  */
 
 public class BattleInfoBean implements Serializable{

@@ -32,13 +32,14 @@ public class ActiveMQMessaging implements MessageQueueController {
 
 /**
  * このクラスを呼び出しているマシンのIPアドレスを格納します.
+ * ※（事前にconfig.propertyのserverIPAdressにサーバーのIPアドレスを入れてください）
  */
 	public static String mypcip = SequenceControl.myIP();
 
 	@Override
 	public void sendMessage(JSONObject gameInfo) {
 		try {
-			//config.propertyからサーバーのIPアドレスを取得する（事前にサーバーのIPアドレスを入れてください）
+			//config.propertyからサーバーのIPアドレスを取得する
     		ResourceBundle config = ResourceBundle.getBundle("config");
     		String serverIP = config.getString("serverIPAdress");
 
@@ -81,16 +82,6 @@ public class ActiveMQMessaging implements MessageQueueController {
 	@Override
 	public JSONObject receiveMessage() {
 		try {
-            //Connectionを作成
-            QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-            connection = factory.createQueueConnection();
-            connection.start();
-
-            //Receiverの作成
-            session = connection.createQueueSession(false,QueueSession.CLIENT_ACKNOWLEDGE);
-            Queue queue = session.createQueue(mypcip);//キュー名は自分のIPアドレス
-            receiver = session.createReceiver(queue);
-
             //メッセージの受信
             System.out.println("サーバーからの通信待ち");
             TextMessage msg = (TextMessage)receiver.receive();
@@ -120,8 +111,9 @@ public class ActiveMQMessaging implements MessageQueueController {
 
             //Receiverの作成
             session = connection.createQueueSession(false,QueueSession.CLIENT_ACKNOWLEDGE);
-            Queue queue = session.createQueue(IPAddress);//キュー名はとりあえず自分のPCのIPアドレス
+            Queue queue = session.createQueue(IPAddress);//キュー名は自分のPCのIPアドレス
             receiver = session.createReceiver(queue);
+
 		}catch(JMSException e ){
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
