@@ -11,7 +11,6 @@ public class DuringBattleInfoTrade {
 	private String  startDate;
 	private String playStartTime;
 	private String playEndTime;
-	private boolean errJudge;
 	private String turnLogic;
 	private String result;
 	private boolean stopRoop;
@@ -40,12 +39,6 @@ public class DuringBattleInfoTrade {
 	}
 	public void setPlayEndTime(String playEndTime) {
 		this.playEndTime = playEndTime;
-	}
-	public boolean isErrJudge() {
-		return errJudge;
-	}
-	public void setErrJudge(boolean errJudge) {
-		this.errJudge = errJudge;
 	}
 	public String getTurnLogic() {
 		return turnLogic;

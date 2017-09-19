@@ -41,14 +41,17 @@ public class LogicAdmin {
 
 	/**同名ロジック判定を行うメソッド
 	 *  @return 同名ロジックの場合true、それ以外の場合falseを返す
+	 * @throws SameLogicException
 	 */
-	public boolean sameJudge(Map<String,Integer> logicRefIdMap,ClientLogicBean clb){
+	public void sameJudge(Map<String,Integer> logicRefIdMap,ClientLogicBean clb) throws SameLogicException{
 
-		//同名ロジック判定
-		if(logicRefIdMap.get(clb.getFirstLogic())==logicRefIdMap.get(clb.getSecondLogic())){
-			return true;
+		try{
+			//同名ロジック判定
+			if(logicRefIdMap.get(clb.getFirstLogic())==logicRefIdMap.get(clb.getSecondLogic())){
+				throw new SameLogicException();
+			}
+		}catch(SameLogicException e){
+			throw e;
 		}
-
-		return false;
 	}
 }

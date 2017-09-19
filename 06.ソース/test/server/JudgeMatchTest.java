@@ -66,7 +66,7 @@ public class JudgeMatchTest {
 		testGameInfo.accumulate("xAxis", 0);
 		testGameInfo.accumulate("yAxis", 0);
 
-		boolean ruleJudge=jm.ruleJudge(9, JudgeMatchTest.testLocation, testGameInfo, 1, "1", "1", 1);
+		boolean ruleJudge=jm.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
 
 		//比較
 		assertThat(ruleJudge,is(true));
@@ -85,7 +85,7 @@ public class JudgeMatchTest {
 		//盤面情報変更
 		decideLocation(1);
 
-		boolean ruleJudge=jm.ruleJudge(9, JudgeMatchTest.testLocation, testGameInfo, 1, "1", "1", 1);
+		boolean ruleJudge=jm.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
 
 		//比較
 		assertThat(ruleJudge,is(false));
@@ -101,7 +101,8 @@ public class JudgeMatchTest {
 		testGameInfo.accumulate("xAxis", 0);
 		testGameInfo.accumulate("yAxis", 0);
 
-		jm.ruleJudge(9, JudgeMatchTest.testLocation, testGameInfo, 1, "1", "1", 1);
+		//値を引き渡しロジック情報Beanにセット
+		jm.setLocationInfo(9,testGameInfo, 1, "1", "1", 1);
 
 		//返すインスタンスを比較
 		assertThat(jm.getLocationInfo(),instanceOf(LocationInfoBean.class));

@@ -14,14 +14,9 @@ public class JudgeMatch {
 	 * @param turn ターン数
 	 * @param location 盤面
 	 * @param gameInfo 受信した指し手情報
-	 * @param battleId 試合ID
-	 * @param playStart 処理開始時間
-	 * @param playEnd 処理終了時間
-	 * @param logicId ロジックID
 	 * @return 盤面と指し手に被りがある場合false、ない場合trueを返す
 	 */
-	public boolean ruleJudge(int turn,String[][] location,JSONObject gameInfo,int battleId,
-			String playStart,String playEnd,int logicId){
+	public boolean ruleJudge(String[][] location,JSONObject gameInfo){
 
 		//指し手情報を取得
 		int locationX=gameInfo.getInt("xAxis");
@@ -30,10 +25,36 @@ public class JudgeMatch {
 		//被り判定
 		if(!location[locationX][locationY].equals("_")){
 			return false;
+		}else{
+			return true;
 		}
+	}
 
+	/**指し手情報Beanを返す
+	 * @return 指し手情報Beanクラス
+	 */
+	public LocationInfoBean getLocationInfo(){
+
+		return lifb;
+	}
+	/**
+	 * 指し手情報をセット
+	 * @param turn ターン数
+	 * @param location 盤面
+	 * @param gameInfo 受信した指し手情報
+	 * @param battleId 試合ID
+	 * @param playStart 処理開始時間
+	 * @param playEnd 処理終了時間
+	 * @param logicId ロジックID
+	 */
+	public void setLocationInfo(int turn,JSONObject gameInfo,int battleId,
+			String playStart,String playEnd,int logicId){
 		//指し手情報クラスに格納
 		this.lifb=new LocationInfoBean();
+
+		//指し手情報を取得
+		int locationX=gameInfo.getInt("xAxis");
+		int locationY=gameInfo.getInt("yAxis");
 
 		lifb.setBattleId(battleId);
 		lifb.setLocationX(locationX);
@@ -42,15 +63,6 @@ public class JudgeMatch {
 		lifb.setPlayEnd(playEnd);
 		lifb.setPlayStart(playStart);
 		lifb.setTurn(turn);
-
-		return true;
-	}
-
-	/**
-	 * @return 指し手情報Beanクラス
-	 */
-	public LocationInfoBean getLocationInfo(){
-		return this.lifb;
 	}
 
 	/**

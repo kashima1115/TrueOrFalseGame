@@ -97,8 +97,9 @@ public class LogicAdminTest {
 				hasEntry(logicFixture.exepectMapKey,logicFixture.expectMapValue));
 	}
 
-	@Test
-	public void testSameJudge() {
+
+	@Test(expected=SameLogicException.class)
+	public void testSameJudge() throws SameLogicException {
 
 		Map<String,Integer> logicRefIdMap=new HashMap<String,Integer>();
 		//キー名・値
@@ -118,11 +119,8 @@ public class LogicAdminTest {
 		//ロジック情報加工クラスのインスタンス化
 		LogicAdmin la=new LogicAdmin();
 
-		//同名ロジック判定
-		boolean judge=la.sameJudge(logicRefIdMap, clb);
-
-		//比較
-		assertThat(judge,is(true));
+		//テスト対象メソッドの実行（同名ロジック判定）
+		la.sameJudge(logicRefIdMap, clb);
 
 	}
 
@@ -147,11 +145,17 @@ public class LogicAdminTest {
 		//ロジック情報加工クラスのインスタンス化
 		LogicAdmin la=new LogicAdmin();
 
-		//同名ロジック判定
-		boolean judge=la.sameJudge(logicRefIdMap, clb);
+		try{
 
-		//比較
-		assertThat(judge,is(false));
+			//同名ロジック判定
+			la.sameJudge(logicRefIdMap, clb);
+
+		}catch(SameLogicException e){
+
+			//例外が発生したら失敗
+			fail("同名ロジックエラーが発生しました");
+		}
+
 	}
 
 	/**

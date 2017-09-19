@@ -156,18 +156,18 @@ public class BattleAdmin {
 
 		//JSONObject内の値を取得
 		String logicName=logicInfo.getString("logicName");
-		String creator=logicInfo.getString("creator");
-		String version=logicInfo.getString("version");
+		String logicCreator=logicInfo.getString("logicCreator");
+		String logicVersion=logicInfo.getString("logicVersion");
 		String address=logicInfo.getString("address");
 
 		//Beanにロジック情報の値を格納
 		lib.setLogicName(logicName);
-		lib.setCreator(creator);
-		lib.setVersion(version);
-		lib.setVersion(version);
+		lib.setCreator(logicCreator);
+		lib.setVersion(logicVersion);
+		lib.setVersion(address);
 
 		//Mapのキー名を作成
-		String logicKey=logicName+creator+version+address;
+		String logicKey=logicName+logicCreator+logicVersion+address;
 
 		//BeanをMapに格納
 		this.logicMap.put(logicKey,lib);
@@ -197,21 +197,8 @@ public class BattleAdmin {
 	}
 
 	/**
-	 * 同名ロジック判定を行う
-	 * @param la
-	 * @param logicRefIdMap
-	 * @throws SameLogicException
-	 */
-	private void sameLogicJudge(LogicAdmin la,Map<String,Integer> logicRefIdMap) throws SameLogicException{
-		//同名ロジック判定
-		if(la.sameJudge(logicRefIdMap, this.clb)){
-			throw new SameLogicException();
-		}
-	}
-
-	/**
 	 *試合中に使用するオブジェクトを用意
-	 * @return
+	 * @return dbit 試合中に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade dbitSetObject(){
 		//メソッド間、値引渡し用Bean
@@ -251,32 +238,6 @@ public class BattleAdmin {
 		this.samqm.sendMessage(gameInfo, dbit.getTurnLogic());
 
 	}
-
-
-	/**
-	 * イベントエラーチェック
-	 * @param dbit
-	 * @return
-	 */
-	private DuringBattleInfoTrade eventErrJudge(DuringBattleInfoTrade dbit){
-
-		boolean errJudge=true;
-
-		//JSONObject内のイベント情報を取得
-		String event=dbit.getReceiveGameInfo().getString("event");
-
-		//正しいイベント情報を取得できているか判定
-		if(!this.TURN_END.equals(event)){
-			errJudge=false;
-		}else{
-			errJudge=true;
-		}
-
-		dbit.setErrJudge(errJudge);
-
-		return dbit;
-	}
-
 
 
 	/**
@@ -330,13 +291,12 @@ public class BattleAdmin {
  * 試合の継戦・終了判断
  *
  */
-	private DuringBattleInfoTrade expectEventDuringBattle(DuringBattleInfoTrade dbit){
+	private DuringBattleInfoTrade normalStopRoopCheck(DuringBattleInfoTrade dbit){
 
 		//ループを終了させるか否かを格納する変数
 		boolean stopRoop=false;
 
 		JudgeMatch jm=dbit.getJm();
-		TurnAdmin ta=dbit.getTa();
 		LocationAdmin lca=dbit.getLca();
 
 		//勝敗判定結果を取得
@@ -345,15 +305,9 @@ public class BattleAdmin {
 
 		//試合終了と継戦で条件分岐
 		if(result.equals(this.WIN)||result.equals(this.DRAW)){
-
-			//試合終了時刻を取得
-			dbit.setEndTime(jm.getLocationInfo().getPlayEnd());
-
 			stopRoop=true;
-
 		}else if(result.equals(this.CONTINUE)){
-			//次手番のクライアントのIPアドレスを取得
-			dbit.setTurnLogic(ta.judgeTurn());
+			stopRoop=false;
 		}
 
 		dbit.setStopRoop(stopRoop);
@@ -547,8 +501,9 @@ public class BattleAdmin {
 		try{
 			//先攻反則負けした場合
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
-				//先攻の試合結果を登録
-					dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
+
+			//先攻の試合結果を登録
+			dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
 							this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),
 							dbit.getStartDate(),FIRST);
 
@@ -637,38 +592,51 @@ public class BattleAdmin {
 				//クライアント処理終了時間取得
 				dbit=setTimeEnd(dbit);
 
-				//正しいイベント情報を送信しているか判定
-				dbit=eventErrJudge(dbit);
+				//JSONObject内のイベント情報を取得
+				String event=dbit.getReceiveGameInfo().getString("event");
 
-				//正しいイベント情報の場合
-				if(dbit.isErrJudge()){
-					//指し手情報のルール判定を行う
-					boolean ruleJudge=jm.ruleJudge(dbit.getTa().getTurn(), dbit.getLca().getLocation(),
-							dbit.getReceiveGameInfo(), battleId,dbit.getPlayStartTime(),
-							dbit.getPlayEndTime(),logicRefIdMap.get(dbit.getTurnLogic()));
+				//指し手情報のルール判定を行う
+				boolean ruleJudge=jm.ruleJudge(dbit.getLca().getLocation(),dbit.getReceiveGameInfo());
 
-					//メソッド間、値引渡し用Bean内のjmオブジェクトを更新
-					dbit.setJm(jm);
+				//正しいイベント情報取得・ルール違反なしの場合
+				if(!this.TURN_END.equals(event) && ruleJudge==true){
 
-					if(ruleJudge){
-						//指し手情報登録
-						dbit=locationInsert(dbit);
+				//指し手情報をBeanにセット
+				jm.setLocationInfo(dbit.getTa().getTurn(), dbit.getReceiveGameInfo(),
+					battleId,dbit.getPlayStartTime(),dbit.getPlayEndTime(),
+					logicRefIdMap.get(dbit.getTurnLogic()));
 
-						//継戦・試合終了の判定をする
-						dbit=expectEventDuringBattle(dbit);
+				//メソッド間、値引渡し用Bean内のjmオブジェクトを更新
+				dbit.setJm(jm);
 
-						//試合が終了条件に当てはまった場合、ループから抜け出す
-						if(dbit.isStopRoop()){
-							break;
-						}
+				//指し手情報登録
+				dbit=locationInsert(dbit);
 
-					//不正なイベント情報の場合
-					}else{
-						break;
-					}
+				//継戦・試合終了の判定をする
+				dbit=normalStopRoopCheck(dbit);
+
+				//正しいイベント情報取得・ルール違反ありの場合
+				}else if(!this.TURN_END.equals(event) && ruleJudge==false){
+					break;
+
+				//不正なイベント情報を取得した場合
 				}else{
 					//期待するイベント情報を得られなかったときの処理
 					notExpectEventDuringBattle(dbit);
+
+					continue;
+				}
+
+				//通常の試合が終了条件に当てはまった場合の処理
+				if(dbit.isStopRoop()){
+					//試合終了時刻を取得
+					dbit.setEndTime(jm.getLocationInfo().getPlayEnd());
+
+					break;
+				//試合の終了条件に当てはまらない場合の処理
+				}else{
+					//次手番のクライアントのIPアドレスを取得
+					dbit.setTurnLogic(dbit.getTa().judgeTurn());
 
 					continue;
 				}
@@ -735,7 +703,7 @@ public class BattleAdmin {
 			Map<String,Integer> logicRefIdMap=la.attachId(this.dbi, this.logicMap, this.clb);
 
 			//同名ロジック判定
-			sameLogicJudge(la, logicRefIdMap);
+			la.sameJudge(logicRefIdMap, clb);
 
 			//試合ID取得
 			int battleId=BattleIdAdmin.getBattleID(dbi);
