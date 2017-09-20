@@ -22,8 +22,10 @@ import net.sf.json.JSONObject;
  */
 public class ServerActiveMQMessaging implements MessageQueueController {
 
-	QueueConnection connection = null;
-	QueueSession session = null;
+	QueueConnection connectionS = null;
+	QueueSession sessionS = null;
+	QueueConnection connectionR = null;
+	QueueSession sessionR = null;
 	QueueReceiver receiver = null;
 	QueueSender sender = null;
 
@@ -56,13 +58,13 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 		try {
 			// Connectionを作成
 			QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-			connection = factory.createQueueConnection();
-			connection.start();
+			connectionR = factory.createQueueConnection();
+			connectionR.start();
 
 			// Receiverの作成
-			session = connection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
-			Queue queue = session.createQueue(IPAddress);// キュー名はとりあえず自分のPCのIPアドレス
-			receiver = session.createReceiver(queue);
+			sessionR = connectionR.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
+			Queue queue = sessionR.createQueue(IPAddress);// キュー名はとりあえず自分のPCのIPアドレス
+			receiver = sessionR.createReceiver(queue);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
@@ -74,8 +76,8 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 		// Queueの終了処理
 		try {
 			receiver.close();
-			session.close();
-			connection.close();
+			sessionR.close();
+			connectionR.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
@@ -91,16 +93,16 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 			 */
 			QueueConnectionFactory factory = new ActiveMQConnectionFactory(
 					"tcp://" + IPAdress + ":61616");
-			connection = factory.createQueueConnection();
-			connection.start();
+			connectionS = factory.createQueueConnection();
+			connectionS.start();
 
 			// Senderの作成（メッセージ配信モードをclientモードに設定）
-			session = connection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
+			sessionS = connectionS.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
 			// 送り先はサーバー
-			Queue queue = session.createQueue(IPAdress);
-			sender = session.createSender(queue);
+			Queue queue = sessionS.createQueue(IPAdress);
+			sender = sessionS.createSender(queue);
 			// メッセージの送信
-			TextMessage msg = session.createTextMessage(gameInfo.toString());
+			TextMessage msg = sessionS.createTextMessage(gameInfo.toString());
 			sender.send(msg);
 
 		} catch (JMSException e) {
@@ -112,12 +114,12 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 					sender.close();
 				}
 
-				if(connection!=null){
-					connection.close();
+				if(connectionS!=null){
+					connectionS.close();
 				}
 
-				if(session!=null){
-					session.close();
+				if(sessionS!=null){
+					sessionS.close();
 				}
 			}catch(JMSException e){
 				e.printStackTrace();
