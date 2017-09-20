@@ -37,17 +37,6 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 	public JSONObject receiveMessage() {
 		//
 		try {
-			// Connectionを作成
-			QueueConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-			connection = factory.createQueueConnection();
-			connection.start();
-
-			// Receiverの作成
-			session = connection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
-			String myip = mypcip;
-			Queue queue = session.createQueue(myip);// キュー名は自分のIPアドレス
-			receiver = session.createReceiver(queue);
-
 			// メッセージの受信
 			TextMessage msg = (TextMessage)receiver.receive();
 			JSONObject obj = JSONObject.fromObject(msg.getText());
@@ -71,7 +60,7 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 			connection.start();
 
 			// Receiverの作成
-			session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+			session = connection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
 			Queue queue = session.createQueue(IPAddress);// キュー名はとりあえず自分のPCのIPアドレス
 			receiver = session.createReceiver(queue);
 		} catch (Exception e) {
