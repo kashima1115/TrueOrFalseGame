@@ -37,4 +37,22 @@ public enum EventType {
 		}
 	}
 
+	public boolean isError() {
+		return isError;
+	}
+	public void setError(boolean isError) {
+		this.isError = isError;
+	}
+	public boolean isFinish(){
+		return isFinish;
+	}
+	public void setFinish(boolean isFinish){
+		this.isFinish = isFinish;
+	}
+	public boolean isTurn(){
+		return isTurn;
+	}
+	public void setTurn(boolean isTurn){
+		this.isTurn = isTurn;
+	}
 }
