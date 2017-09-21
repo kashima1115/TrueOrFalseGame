@@ -10,6 +10,7 @@ public class Main {
  * @param args 特に使用しません
  */
 	public static void main(String[] args) {
+		SequenceControl.initialize();
 		SequenceControl.startGame();
 		SequenceControl.myTurn();
 	}

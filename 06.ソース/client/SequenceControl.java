@@ -3,7 +3,11 @@ package client;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
+
 import brain.BrainBean;
+import messageQueue.MessageQueueController;
+import messageQueue.MessageQueueControllerFactory;
 import net.sf.json.JSONObject;
 /**
  * クライアント機能の動作をコントロールするクラスです.
@@ -13,8 +17,14 @@ import net.sf.json.JSONObject;
 public class SequenceControl{
 	static AccessBrain ab = new AccessBrain();
 	static ConvertJSON cj = new ConvertJSON();
-	static messageQueue.ActiveMQMessaging amq = new messageQueue.ActiveMQMessaging();
+	static MessageQueueController amq;
 	static BattleInfoBean bib;
+	//Log用
+	static Logger logger = Logger.getLogger(SequenceControl.class.getName());
+
+	public static void initialize() {
+		amq = MessageQueueControllerFactory.create();
+	}
 
 	/**
 	 * 試合開始時の動作です.
@@ -51,6 +61,7 @@ public class SequenceControl{
 					IPAdress = host.getHostAddress();
 				}catch(UnknownHostException e){
 					e.printStackTrace();
+					logger.fatal("IPアドレス取得失敗");
 				}
 		return IPAdress;
 	}
@@ -63,8 +74,8 @@ public class SequenceControl{
 		String event = "blank";
 		//Brainのインスタンス化
 		ab.createBrain();
-		//TODO ○×ゲームは最大5回+最後のメッセージ受信の1回でこの条件にしています。
-		for(int turn=0;turn<5;turn++){
+		//サーバーから送られてくるeventによって処理の内容が異なる
+		while(true){
 			//サーバーからのメッセージを受け取る
 			bib =receive();
 
@@ -73,22 +84,22 @@ public class SequenceControl{
 			EventType et = EventType.getEventType(event);
 
 			//例外条件分岐
-			if(et.equals(EventType.ERROR)){
+			if(et.isError()){
 				//エラーメッセージを表示する
 				String errors[]=bib.getError();
-				System.out.println("以下のエラーが発生しました。");
+				logger.warn("以下のエラーが発生");
 				for(int error = 0;error <= errors.length - 1;error++){
-					System.out.println(errors[error]);
+					logger.info(errors[error]);
 				}
 				break;
 			//終了条件分岐
-			}else if(et.equals(EventType.FINISH)){
-				System.out.println("試合が終了しました。");
-				System.out.println("You "+event);
+			}else if(et.isFinish()){
+				logger.info("試合が終了しました。");
+				logger.info("You"+event);
 				break;
 			//差し手選択
-			}else if(et.equals(EventType.YOURTURN)){
-				System.out.println("あなたの番です。");
+			}else if(et.isTurn()){
+				logger.debug("あなたの番です。");
 				//brainに送るための盤面情報の変数locationを宣言
 				String[][]location = null;
 				//BattleInfoBeanから盤面情報を取得する
@@ -99,15 +110,15 @@ public class SequenceControl{
 				send(bib);
 			//eventに何も入っていない場合（その他）
 			}else{
-				System.out.println("イベント情報の取得に失敗しました。");
+				logger.error("eventの取得に失敗");
 				break;
 			}
 		}
 
 		//例外・終了条件時の受信用Queueの処理
-		System.out.println("キューを終了します");
+		logger.info("受信用Queue終了処理開始");
 		amq.quitQueue();
-		System.out.println("キューを終了しました");
+		logger.info("受信用Queue終了処理完了");
 	}
 
 	/**
