@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 public class LogicInfoBean implements Serializable {
 private String logicName;
-private String creator;
+private String writer;
 private String version;
 private String address;
 
@@ -19,11 +19,11 @@ public String getLogicName() {
 public void setLogicName(String logicName) {
 	this.logicName = logicName;
 }
-public String getCreator() {
-	return creator;
+public String getWriter() {
+	return writer;
 }
-public void setCreator(String creator) {
-	this.creator = creator;
+public void setWriter(String writer) {
+	this.writer = writer;
 }
 public String getVersion() {
 	return version;

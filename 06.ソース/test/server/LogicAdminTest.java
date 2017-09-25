@@ -161,13 +161,13 @@ public class LogicAdminTest {
 	/**
 	 * Beanの生成を行う
 	 */
-	private LogicInfoBean createLogicInfoBean(String logicName,String creator,
+	private LogicInfoBean createLogicInfoBean(String logicName,String writer,
 			String version,String address){
 		//Beanの生成
 		LogicInfoBean testLib=new LogicInfoBean();
 
 		testLib.setLogicName(logicName);
-		testLib.setCreator(creator);
+		testLib.setWriter(writer);
 		testLib.setVersion(version);
 		testLib.setAddress(address);
 

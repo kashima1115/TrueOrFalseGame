@@ -19,7 +19,7 @@ import net.sf.json.JSONObject;
 @RunWith(Theories.class)
 public class JudgeMatchTest {
 	//盤面情報の配列に格納する値
-	private final String NOT_FILL="_";
+	private final String NOT_FILL="-";
 	private final String FIRST="○";
 	private final String SECOND="×";
 	private static String[][] testLocation;
@@ -89,23 +89,6 @@ public class JudgeMatchTest {
 
 		//比較
 		assertThat(ruleJudge,is(false));
-	}
-
-	@Test
-	public void testGetLocationInfo() {
-		//テスト対象クラスのインスタンス化
-		JudgeMatch jm=new JudgeMatch();
-
-		//JSONObject生成
-		JSONObject testGameInfo=new JSONObject();
-		testGameInfo.accumulate("xAxis", 0);
-		testGameInfo.accumulate("yAxis", 0);
-
-		//値を引き渡しロジック情報Beanにセット
-		jm.setLocationInfo(9,testGameInfo, 1, "1", "1", 1);
-
-		//返すインスタンスを比較
-		assertThat(jm.getLocationInfo(),instanceOf(LocationInfoBean.class));
 	}
 
 	@Theory

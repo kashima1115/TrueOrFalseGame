@@ -84,7 +84,7 @@ public class DbInsert {
 
 			//プリペアドステートメントの？の値をセット
 			this.logicPstateLook.setString(1, lib.getLogicName());
-			this.logicPstateLook.setString(2, lib.getCreator());
+			this.logicPstateLook.setString(2, lib.getWriter());
 			this.logicPstateLook.setString(3, lib.getVersion());
 
 			//sql文実行
@@ -108,7 +108,7 @@ public class DbInsert {
 
 			//プリペアドステートメントの？の値をセット
 			this.logicPstate.setString(1, lib.getLogicName());
-			this.logicPstate.setString(2, lib.getCreator());
+			this.logicPstate.setString(2, lib.getWriter());
 			this.logicPstate.setString(3, lib.getVersion());
 
 			//sql実行
@@ -207,6 +207,7 @@ public class DbInsert {
 			this.resultPstate.setString(4, startDate);
 			this.resultPstate.setString(5, startTime);
 			this.resultPstate.setString(6,endTime);
+			this.resultPstate.setString(7,firstSecond);
 
 			//sql実行
 			this.resultPstate.executeUpdate();
@@ -247,7 +248,7 @@ public class DbInsert {
 
 			//検索条件のセット
 			this.logicIdPstate.setString(1, lb.getLogicName());
-			this.logicIdPstate.setString(2, lb.getCreator());
+			this.logicIdPstate.setString(2, lb.getWriter());
 			this.logicIdPstate.setString(3, lb.getVersion());
 
 			//sql実行

@@ -23,7 +23,7 @@ public class LocationAdmin {
 		MAX_Y=3;
 		FIRST_PLAYER="○";
 		SECOND_PLAYER="×";
-		NOT_FILL="_";
+		NOT_FILL="-";
 
 		location=new String[MAX_X][MAX_Y];
 

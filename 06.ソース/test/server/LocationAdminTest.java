@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 public class LocationAdminTest {
 	private final int MAX_X = 3;
 	private final int MAX_Y = 3;
-	private final String NOT_FILL = "_";
+	private final String NOT_FILL = "-";
 	private static final String FIRST_PLAYER = "○";
 	private static final String SECOND_PLAYER = "×";
 

@@ -45,16 +45,16 @@ public class TurnAdmin {
 	 */
 	public String judgeTurn(){
 		TurnAdmin.turn++;
-		String nextPlayerAdd="";
+		String nextPlayer="";
 
 		if(TurnAdmin.turn%2==FIRST_PLAYER){
-			nextPlayerAdd=this.clb.getFirstLogic();
+			nextPlayer=this.clb.getFirstLogic();
 		}else if(TurnAdmin.turn%2==SECOND_PLAYER){
-			nextPlayerAdd=this.clb.getSecondLogic();
+			nextPlayer=this.clb.getSecondLogic();
 		}
 
 		//次手番のプレイヤーのIPアドレスを返す
-		return nextPlayerAdd;
+		return nextPlayer;
 	}
 
 	/**

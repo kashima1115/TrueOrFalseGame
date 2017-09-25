@@ -8,7 +8,6 @@ import net.sf.json.JSONObject;
  *
  */
 public class JudgeMatch {
-	private LocationInfoBean lifb;
 	/**
 	 * ルール判定（盤面と指し手の被りを確認）
 	 * @param turn ターン数
@@ -23,47 +22,13 @@ public class JudgeMatch {
 		int locationY=gameInfo.getInt("yAxis");
 
 		//被り判定
-		if(!location[locationX][locationY].equals("_")){
+		if(!location[locationX][locationY].equals("-")){
 			return false;
 		}else{
 			return true;
 		}
 	}
 
-	/**指し手情報Beanを返す
-	 * @return 指し手情報Beanクラス
-	 */
-	public LocationInfoBean getLocationInfo(){
-
-		return lifb;
-	}
-	/**
-	 * 指し手情報をセット
-	 * @param turn ターン数
-	 * @param location 盤面
-	 * @param gameInfo 受信した指し手情報
-	 * @param battleId 試合ID
-	 * @param playStart 処理開始時間
-	 * @param playEnd 処理終了時間
-	 * @param logicId ロジックID
-	 */
-	public void setLocationInfo(int turn,JSONObject gameInfo,int battleId,
-			String playStart,String playEnd,int logicId){
-		//指し手情報クラスに格納
-		this.lifb=new LocationInfoBean();
-
-		//指し手情報を取得
-		int locationX=gameInfo.getInt("xAxis");
-		int locationY=gameInfo.getInt("yAxis");
-
-		lifb.setBattleId(battleId);
-		lifb.setLocationX(locationX);
-		lifb.setLocationY(locationY);
-		lifb.setLogicId(logicId);
-		lifb.setPlayEnd(playEnd);
-		lifb.setPlayStart(playStart);
-		lifb.setTurn(turn);
-	}
 
 	/**
 	 * 勝敗判定
@@ -105,7 +70,7 @@ public class JudgeMatch {
 		//プレイヤー判別
 		final String FIRST_PLAYER="○";
 		final String SECOND_PLAYER="×";
-		final String NOT_FILL="_";
+		final String NOT_FILL="-";
 
 		//返すオブジェクト
 		String judgeBattle="draw";
