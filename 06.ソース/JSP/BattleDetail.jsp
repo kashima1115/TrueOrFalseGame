@@ -91,7 +91,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 1) {	%>
+		<%	if (bn.getLocation_x() == 1 && bn.getLocation_y() == 0) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							b++;
 						}
@@ -100,7 +100,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 2) {	%>
+		<%	if (bn.getLocation_x() == 2 && bn.getLocation_y() == 0) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							c++;
 						}
@@ -109,7 +109,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 1 && bn.getLocation_y() == 0) {	%>
+		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 1) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							d++;
 						}
@@ -127,7 +127,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 1 && bn.getLocation_y() == 2) {	%>
+		<%	if (bn.getLocation_x() == 2 && bn.getLocation_y() == 1) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							f++;
 						}
@@ -136,7 +136,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 2 && bn.getLocation_y() == 0) {	%>
+		<%	if (bn.getLocation_x() == 0 && bn.getLocation_y() == 2) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							g++;
 						}
@@ -145,7 +145,7 @@
 						}
 					}	%>
 
-		<%	if (bn.getLocation_x() == 2 && bn.getLocation_y() == 1) {	%>
+		<%	if (bn.getLocation_x() == 1 && bn.getLocation_y() == 2) {	%>
 		<%	if (bn.getTurn() % 2 != 0) {
 							h++;
 						}
