@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.jms.JMSException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +29,7 @@ public class SequenceControlTest {
 	}
 
 	@Test
-	public void testMyTurn() {
+	public void testMyTurn() throws JMSException {
 
 		System.out.println("行番号(横)を数字で入力してエンターキーを押してください。");
 		//行を入力
@@ -74,7 +76,7 @@ public class SequenceControlTest {
 		}
 		return console;
 	}
-	public static void send(BattleInfoBean bib){
+	public static void send(BattleInfoBean bib) throws JMSException{
 		//JSONに変換
 		JSONObject jo2 = cj.convertToJSONS(bib);
 		//ActiveMQを通してサーバープログラムに送信する
