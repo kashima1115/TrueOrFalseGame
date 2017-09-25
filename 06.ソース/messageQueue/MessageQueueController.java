@@ -1,5 +1,7 @@
 package messageQueue;
 
+import javax.jms.JMSException;
+
 import net.sf.json.JSONObject;
 /**
  * MQの制御のためのインターフェース.
@@ -10,18 +12,20 @@ public interface MessageQueueController {
 	/**
 	 * メッセージを送信します.
 	 * @param gameInfo 試合に関わる情報が入っています（JSONObject方式です)
+	 * @throws JMSException
 	 */
-	public void sendMessage(JSONObject gameInfo);
+	public void sendMessage(JSONObject gameInfo) throws JMSException;
 	/**
 	 * メッセージを受信します.
 	 * @return 受信したメッセージです（JSONObject方式です)
+	 * @throws JMSException
 	 */
-	public JSONObject receiveMessage();
+	public JSONObject receiveMessage() throws JMSException;
 	/**
 	 * 受信用Queueを作成します.
 	 * @param IPAdress 自身のマシンのIPアドレスです
 	 */
-	public void createQueue(String IPAdress);
+	public void createQueue(String IPAdress) throws JMSException;
 	/**
 	 * 受信用Queueを破棄します.
 	 */

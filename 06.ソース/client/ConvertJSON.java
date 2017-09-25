@@ -11,10 +11,13 @@ import net.sf.json.JSONObject;
  */
 
 public class ConvertJSON {
-	JSONObject locateObj = new JSONObject();
-	JSONArray jary = new JSONArray();
-	String[][]locary = new String[3][3];
-	BattleInfoBean bib = new BattleInfoBean();
+	private JSONObject locateObj = new JSONObject();
+	private JSONArray jary = new JSONArray();
+	private String[][]locary = new String[3][3];
+	private BattleInfoBean bib = new BattleInfoBean();
+
+	final private String READY = "ready";
+	final private String TURN_END = "TurnEnd";
 	/**
 	 * ロジック情報をJSONObjectに変換します.
 	 * @param logic brainのロジック情報が入ったBrainBeanです
@@ -27,7 +30,7 @@ public class ConvertJSON {
 		logicObj.put("logicVersion", logic.getLogicVersion());
 		logicObj.put("logicWriter", logic.getWriter());
 		logicObj.put("address", IPAdress);
-		logicObj.put("event", "ready");
+		logicObj.put("event", READY);
 
 		return logicObj;
 	}
@@ -47,24 +50,28 @@ public class ConvertJSON {
 				sary[i]=ary.getString(i);
 			}
 			bib.setError(sary);
-		//JSONにeventの情報が無かった場合
-		}else if(!rcvmsg.containsKey("event")){
-			bib.setEvent("blank");
+		}
 		//試合終了のメッセージを格納します
-		}else if(rcvmsg.getString("event").equals("win")||rcvmsg.getString("event").equals("lose")||
+		if(rcvmsg.containsKey("event")){
+			if(rcvmsg.getString("event").equals("win")||rcvmsg.getString("event").equals("lose")||
 				rcvmsg.getString("event").equals("draw")){
-			bib.setEvent(rcvmsg.getString("event"));
-		//問題が無ければ盤面の情報を格納します。
-		}else{
-			bib.setEvent(rcvmsg.getString("event"));
-			//盤面情報を格納します
-			jary = rcvmsg.getJSONArray("location");
-			for(int i=0;i<=2;i++){
-				for(int j=0;j<=2;j++){
-					locary[i][j] = jary.getJSONArray(i).getString(j);
+				bib.setEvent(rcvmsg.getString("event"));
+				//問題が無ければ盤面の情報を格納します。
+			}else if(rcvmsg.getString("event").equals("YourTurn")){
+				bib.setEvent(rcvmsg.getString("event"));
+				//盤面情報を格納します
+				jary = rcvmsg.getJSONArray("location");
+				for(int i=0;i<=2;i++){
+					for(int j=0;j<=2;j++){
+						locary[i][j] = jary.getJSONArray(i).getString(j);
+					}
 				}
+				bib.setLocation(locary);
 			}
-			bib.setLocation(locary);
+		}
+		//JSONにeventの情報が無かった場合
+		if(!rcvmsg.containsKey("event")&&!rcvmsg.containsKey("error[]")){
+			bib.setEvent("blank");
 		}
 		return bib;
 	}
@@ -77,7 +84,7 @@ public class ConvertJSON {
 		//指し手情報をBattleInfoBeanから取り出して格納します。
 		locateObj.put("xAxis", bib.getxAxis());
 		locateObj.put("yAxis", bib.getyAxis());
-		locateObj.put("event", "TurnEnd");
+		locateObj.put("event", TURN_END);
 
 		return locateObj;
 	}

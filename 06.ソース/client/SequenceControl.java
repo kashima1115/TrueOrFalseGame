@@ -3,6 +3,8 @@ package client;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.jms.JMSException;
+
 import org.apache.log4j.Logger;
 
 import brain.BrainBean;
@@ -15,12 +17,14 @@ import net.sf.json.JSONObject;
  * @version 0.1
  */
 public class SequenceControl{
-	static AccessBrain ab = new AccessBrain();
-	static ConvertJSON cj = new ConvertJSON();
-	static MessageQueueController amq;
-	static BattleInfoBean bib;
 	//Log用
-	static Logger logger = Logger.getLogger(SequenceControl.class.getName());
+	private static Logger logger = Logger.getLogger(SequenceControl.class.getName());
+
+	//フィールド
+	private static AccessBrain ab = new AccessBrain();
+	private static ConvertJSON cj = new ConvertJSON();
+	private static MessageQueueController amq;
+	private static BattleInfoBean bib;
 
 	public static void initialize() {
 		amq = MessageQueueControllerFactory.create();
@@ -28,8 +32,10 @@ public class SequenceControl{
 
 	/**
 	 * 試合開始時の動作です.
+	 * @throws UnknownHostException
+	 * @throws JMSException
 	 */
-	public static void startGame(){
+	public static void startGame() throws UnknownHostException, JMSException{
 		//ロジック情報を取得(bean)
 		ab.createBrain();
 		BrainBean logic = ab.getLogicInfo();
@@ -51,25 +57,23 @@ public class SequenceControl{
 	/**
 	 * IPアドレスを特定します（ローカルホストです）.
 	 * @return IPアドレスです。IPv4を想定しています
+	 * @throws UnknownHostException
 	 */
 
-	public static String myIP(){
+	public static String myIP() throws UnknownHostException{
 		//起動しているマシンのIPアドレスを特定する
-				String IPAdress ="123.123.1.123";
-				try{
-					InetAddress host = InetAddress.getLocalHost();
-					IPAdress = host.getHostAddress();
-				}catch(UnknownHostException e){
-					e.printStackTrace();
-					logger.fatal("IPアドレス取得失敗");
-				}
+		String IPAdress ="123.123.1.123";
+		InetAddress host;
+		host = InetAddress.getLocalHost();
+		IPAdress = host.getHostAddress();
 		return IPAdress;
 	}
 
 	/**
 	 * 自分のターンごとに状況に応じた処理を行います.
+	 * @throws JMSException
 	 */
-	public static void myTurn(){
+	public static void myTurn() throws JMSException{
 		//変数eventの宣言
 		String event = "blank";
 		//Brainのインスタンス化
@@ -85,11 +89,11 @@ public class SequenceControl{
 
 			//例外条件分岐
 			if(et.isError()){
-				//エラーメッセージを表示する
+				//サーバーからのエラーメッセージを表示する
 				String errors[]=bib.getError();
 				logger.warn("以下のエラーが発生");
 				for(int error = 0;error <= errors.length - 1;error++){
-					logger.info(errors[error]);
+					logger.warn(errors[error]);
 				}
 				break;
 			//終了条件分岐
@@ -124,8 +128,9 @@ public class SequenceControl{
 	/**
 	 * ActiveMQからのメッセージを受信します.
 	 * @return 盤面情報やイベント情報を格納したBattleInfoBeanです
+	 * @throws JMSException
 	 */
-	private static BattleInfoBean receive() {
+	private static BattleInfoBean receive() throws JMSException {
 		//ActiveMQからメッセージを受信する
 		JSONObject obj2 = amq.receiveMessage();
 		//JSONから変換
@@ -147,8 +152,9 @@ public class SequenceControl{
 	/**
 	 * サーバーにメッセージを送信します.
 	 * @param bib 盤面情報を格納したBattleInfoBeanです
+	 * @throws JMSException
 	 */
-	private static void send(BattleInfoBean bib){
+	private static void send(BattleInfoBean bib) throws JMSException{
 		//JSONに変換
 		JSONObject jo2 = cj.convertToJSONS(bib);
 		//ActiveMQを通してサーバープログラムに送信する

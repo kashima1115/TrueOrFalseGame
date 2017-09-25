@@ -13,8 +13,8 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
 
-import client.SequenceControl;
 import net.sf.json.JSONObject;
 /**
  * ActiveMQの操作を行うクラスです.
@@ -25,21 +25,21 @@ public class ActiveMQMessaging implements MessageQueueController {
 /**
  * ActiveMQ関連の変数です.
  */
-	QueueConnection connectionS = null;
-	QueueConnection connectionR = null;
-    QueueSession sessionS = null;
-    QueueSession sessionR = null;
-    QueueReceiver receiver = null;
-    QueueSender sender = null;
+	private QueueConnection connectionS = null;
+	private QueueConnection connectionR = null;
+	private QueueSession sessionS = null;
+	private QueueSession sessionR = null;
+	private QueueReceiver receiver = null;
+	private QueueSender sender = null;
 
 /**
  * このクラスを呼び出しているマシンのIPアドレスを格納します.
  * ※（事前にconfig.propertyのserverIPAdressにサーバーのIPアドレスを入れてください）
  */
-	public static String mypcip = SequenceControl.myIP();
+	final private static Logger logger = Logger.getLogger(ActiveMQMessaging.class.getName());
 
 	@Override
-	public void sendMessage(JSONObject gameInfo) {
+	public void sendMessage(JSONObject gameInfo) throws JMSException{
 		try {
 			//config.propertyからサーバーのIPアドレスを取得する
     		ResourceBundle config = ResourceBundle.getBundle("config");
@@ -58,12 +58,13 @@ public class ActiveMQMessaging implements MessageQueueController {
 
             //メッセージの送信
             TextMessage msg = sessionS.createTextMessage(gameInfo.toString());
+            //TODO 動作確認用に付き
+            System.out.println(msg);
             sender.send(msg);
         } catch (JMSException e) {
-            e.printStackTrace();
-            System.out.println("通信に問題が発生しました。");
+        	logger.fatal("送信失敗", e);
+        	throw e;
         } finally {
-
             try {
                 if (sender != null) {
                 	sender.close();
@@ -75,14 +76,15 @@ public class ActiveMQMessaging implements MessageQueueController {
                 	connectionS.close();
                 }
             } catch (JMSException e) {
-                e.printStackTrace();
+                logger.fatal("送信後の処理失敗",e);
+                throw e;
             }
         }
 
 	}
 
 	@Override
-	public JSONObject receiveMessage() {
+	public JSONObject receiveMessage() throws JMSException{
 		try {
             //メッセージの受信
             System.out.println("サーバーからの通信待ち");
@@ -93,17 +95,13 @@ public class ActiveMQMessaging implements MessageQueueController {
             msg.acknowledge();
             return gameInfo;
         } catch (JMSException e) {
-            e.printStackTrace();
-            System.out.println("通信に問題が発生しました。");
+        	logger.fatal("受信失敗",e);
+        	throw e;
         }
-		return null;
 	}
 
 	@Override
-	public void createQueue(String IPAddress) {
-		mypcip = IPAddress;
-
-
+	public void createQueue(String IPAddress) throws JMSException{
 		//Queueの作成
 		try {
             //Connectionを作成
@@ -117,8 +115,8 @@ public class ActiveMQMessaging implements MessageQueueController {
             receiver = sessionR.createReceiver(queue);
 
 		}catch(JMSException e ){
-			e.printStackTrace();
-			System.out.println("通信に問題が発生しました。");
+			logger.fatal("キュー作成失敗",e);
+			throw e;
 		}
 	}
 
@@ -126,12 +124,18 @@ public class ActiveMQMessaging implements MessageQueueController {
 	public void quitQueue() {
 		//Queueの終了処理
 		try {
-            receiver.close();
-            sessionR.close();
-            connectionR.close();
+            if(receiver != null){
+            	receiver.close();
+            }
+			if(sessionR != null){
+				sessionR.close();
+            }
+			if(connectionR != null){
+				connectionR.close();
+			}
         } catch (JMSException e) {
-            e.printStackTrace();
-            System.out.println("通信に問題が発生しました。");
+            logger.fatal("キュー終了失敗");
+        	e.printStackTrace();
         }
 
 	}
