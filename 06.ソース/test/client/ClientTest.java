@@ -1,5 +1,7 @@
 package client;
 
+import javax.jms.JMSException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +21,12 @@ public class ClientTest {
 
 	@Test
 	public void mainTest() {
-		SequenceControl.myTurn();
+		try {
+			SequenceControl.myTurn();
+		} catch (JMSException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 	}
 
 }

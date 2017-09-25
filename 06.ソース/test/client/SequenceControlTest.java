@@ -29,7 +29,7 @@ public class SequenceControlTest {
 	}
 
 	@Test
-	public void testMyTurn() throws JMSException {
+	public void testMyTurn() {
 
 		System.out.println("行番号(横)を数字で入力してエンターキーを押してください。");
 		//行を入力
@@ -48,8 +48,13 @@ public class SequenceControlTest {
 	      assertEquals("{\"xAxis\":" + row + ",\"yAxis\":" + col + ",\"event\":\"TurnEnd\"}"
 	    		  , cj.convertToJSONS(bib).toString());
 
-	      assertEquals("{\"xAxis\":" + row + ",\"yAxis\":" + col + ",\"event\":\"TurnEnd\"}"
-	    		  , amq.receiveMessage().toString());
+	      try {
+			assertEquals("{\"xAxis\":" + row + ",\"yAxis\":" + col + ",\"event\":\"TurnEnd\"}"
+					  , amq.receiveMessage().toString());
+		} catch (JMSException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 
 	   }
 
@@ -76,11 +81,16 @@ public class SequenceControlTest {
 		}
 		return console;
 	}
-	public static void send(BattleInfoBean bib) throws JMSException{
+	public static void send(BattleInfoBean bib){
 		//JSONに変換
 		JSONObject jo2 = cj.convertToJSONS(bib);
 		//ActiveMQを通してサーバープログラムに送信する
-		amq.sendMessage(jo2);
+		try {
+			amq.sendMessage(jo2);
+		} catch (JMSException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 	}
 
 }
