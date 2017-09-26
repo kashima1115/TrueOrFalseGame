@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author kanayama
  *
  */
-public class LocationInfoBean implements Serializable {
+class LocationInfoBean implements Serializable {
 	private int logicId;
 	private int battleId;
 	private int locationX;

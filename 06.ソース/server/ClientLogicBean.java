@@ -4,7 +4,7 @@ package server;
  * @author kanayama
  *
  */
-public class ClientLogicBean {
+class ClientLogicBean {
 	private String firstLogic;
 	private String secondLogic;
 

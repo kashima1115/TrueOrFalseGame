@@ -7,8 +7,8 @@ import net.sf.json.JSONObject;
  * @author kanayama
  *
  */
-public class TurnAdmin {
-	private static int turn;
+class TurnAdmin {
+	private int turn;
 	private final int FIRST_PLAYER;
 	private final int SECOND_PLAYER;
 	private final String INFORM_EVENT;
@@ -29,10 +29,9 @@ public class TurnAdmin {
 
 	/**
 	 * 先攻・後攻決定処理
-	 * @param logicList ロジック情報を含むBean
-	 * @return 先手のクライアントのIPアドレス
+	 * @return 先手のクライアントのロジックキー
 	 */
-	public String decideFirst(){
+	String decideFirst(){
 
 		//先に受信したメッセージを送信したクライアントが先攻
 		return this.clb.getFirstLogic();
@@ -40,16 +39,15 @@ public class TurnAdmin {
 
 	/**
 	 * 手番判定処理
-	 * @param logicList ロジック情報を含むBean
-	 * @return 次手番のクライアントのIPアドレス
+	 * @return 次手番のクライアントのロジックキー
 	 */
-	public String judgeTurn(){
-		TurnAdmin.turn++;
+	String judgeTurn(){
+		this.turn++;
 		String nextPlayer="";
 
-		if(TurnAdmin.turn%2==FIRST_PLAYER){
+		if(this.turn%2==FIRST_PLAYER){
 			nextPlayer=this.clb.getFirstLogic();
-		}else if(TurnAdmin.turn%2==SECOND_PLAYER){
+		}else if(this.turn%2==SECOND_PLAYER){
 			nextPlayer=this.clb.getSecondLogic();
 		}
 
@@ -62,7 +60,7 @@ public class TurnAdmin {
 	 * @param location 最新の状態の盤面
 	 * @return クライアントに送信するJSONObject
 	 */
-	public JSONObject informTurn(String[][] location){
+	JSONObject informTurn(String[][] location){
 		JSONObject gameInfo=new JSONObject();
 
 		gameInfo.accumulate("event", INFORM_EVENT);
@@ -75,7 +73,7 @@ public class TurnAdmin {
 	 * 試合の経過ターン数を返すメソッド
 	 * @return 経過ターン数
 	 */
-	public int getTurn(){
-		return TurnAdmin.turn;
+	int getTurn(){
+		return this.turn;
 	}
 }

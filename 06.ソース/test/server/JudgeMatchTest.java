@@ -58,15 +58,13 @@ public class JudgeMatchTest {
 
 	@Test
 	public void testRuleJudgeTrue() {
-		//テスト対象クラスのインスタンス化
-		JudgeMatch jm=new JudgeMatch();
 
 		//JSONObject生成
 		JSONObject testGameInfo=new JSONObject();
 		testGameInfo.accumulate("xAxis", 0);
 		testGameInfo.accumulate("yAxis", 0);
 
-		boolean ruleJudge=jm.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
+		boolean ruleJudge=JudgeMatch.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
 
 		//比較
 		assertThat(ruleJudge,is(true));
@@ -74,8 +72,6 @@ public class JudgeMatchTest {
 
 	@Test
 	public void testRuleJudgeFalse() {
-		//テスト対象クラスのインスタンス化
-		JudgeMatch jm=new JudgeMatch();
 
 		//JSONObject生成
 		JSONObject testGameInfo=new JSONObject();
@@ -85,7 +81,7 @@ public class JudgeMatchTest {
 		//盤面情報変更
 		decideLocation(1);
 
-		boolean ruleJudge=jm.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
+		boolean ruleJudge=JudgeMatch.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
 
 		//比較
 		assertThat(ruleJudge,is(false));
@@ -112,24 +108,19 @@ public class JudgeMatchTest {
 			result=DRAW;
 		}
 
-		//テスト対象クラスのインスタンス化
-		JudgeMatch jm=new JudgeMatch();
-
 		//勝敗判定の返り値を比較
-		assertThat(jm.battleJudge(JudgeMatchTest.testLocation),is(result));
+		assertThat(JudgeMatch.battleJudge(JudgeMatchTest.testLocation),is(result));
 	}
 
 	@Theory
 	public void testInformResult(String result) {
-		//テスト対象クラスのインスタンス化
-		JudgeMatch jm=new JudgeMatch();
 
 		//JSONObject作成
 		JSONObject testGameInfo=new JSONObject();
 
 		testGameInfo.accumulate("event", result);
 
-		assertThat(jm.informResult(result),is(testGameInfo));
+		assertThat(JudgeMatch.informResult(result),is(testGameInfo));
 	}
 /**
  * 継戦状態の盤面を作成

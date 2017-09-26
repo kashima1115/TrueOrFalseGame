@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
  * @author kanayama
  *
  */
-public class JudgeMatch {
+class JudgeMatch {
 	/**
 	 * ルール判定（盤面と指し手の被りを確認）
 	 * @param turn ターン数
@@ -15,7 +15,7 @@ public class JudgeMatch {
 	 * @param gameInfo 受信した指し手情報
 	 * @return 盤面と指し手に被りがある場合false、ない場合trueを返す
 	 */
-	public boolean ruleJudge(String[][] location,JSONObject gameInfo){
+	static boolean ruleJudge(String[][] location,JSONObject gameInfo){
 
 		//指し手情報を取得
 		int locationX=gameInfo.getInt("xAxis");
@@ -35,7 +35,7 @@ public class JudgeMatch {
 	 * @param location 最新の盤面
 	 * @return 判定が勝利の場合"win"、引き分けの場合"draw"、継戦の場合"continue"を返す
 	 */
-	public String battleJudge(String[][] location){
+	static String battleJudge(String[][] location){
 
 		//勝利条件充足カウンター
 		int trueLineX0=0;
@@ -174,8 +174,9 @@ public class JudgeMatch {
 
 	/**
 	 * 勝敗通知オブジェクト作成
+	 * @return 勝敗通知オブジェクト
 	 */
-	public JSONObject informResult(String result){
+	static JSONObject informResult(String result){
 		final String WIN="win";
 		final String LOSE="lose";
 		final String DRAW="draw";

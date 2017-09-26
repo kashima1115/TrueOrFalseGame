@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
  * @author kanayama
  *
  */
-public class DbInsert {
+class DbInsert {
 	// プロファイル(パラメータ)読込み定義
 	// プロパティファイルバンドル
 	private final ResourceBundle bundle=ResourceBundle.getBundle("config");
@@ -65,7 +65,7 @@ public class DbInsert {
 	 *  @throws SQLException
 	 *  @return なし
 	 */
-	public void logicInsert(LogicInfoBean lib) throws SQLException {
+	void logicInsert(LogicInfoBean lib) throws SQLException {
 		// データベースへの検索処理*****************************************************/
 		ResultSet rset=null;
 
@@ -137,7 +137,7 @@ public class DbInsert {
 	 * @param lcib 指し手情報のBean
 	 * @throws SQLException
 	 */
-	public void locationInsert(LocationInfoBean lcib) throws SQLException{
+	 void locationInsert(LocationInfoBean lcib) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 		try{
 
@@ -183,11 +183,12 @@ public class DbInsert {
 	 * @param endTime 試合終了時刻
 	 * @param result 試合結果
 	 * @param logicId ロジックID
+	 * @param firstSecond 先攻・後攻ラベル
 	 * @return なし
-	 * @throws Exception
+	 * @throws SQLException
 	 *
 	 */
-	public void resultInsert(int battleId,String startTime,String endTime,String result,
+	 void resultInsert(int battleId,String startTime,String endTime,String result,
 			int logicId,String startDate,String firstSecond) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 
@@ -229,10 +230,11 @@ public class DbInsert {
 
 	/**
 	 *ロジックIDをDBから取得
+	 *@param ib ロジック情報Bean
 	 *@return ロジックID
-	 *@throws Exception
+	 *@throws SQLException
 	 */
-	public int getLogicId(LogicInfoBean lb) throws SQLException{
+	int getLogicId(LogicInfoBean lb) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 		ResultSet rset=null;
 
@@ -277,9 +279,9 @@ public class DbInsert {
 	/**
 	 * 直近試合をDBから取得
 	 * @return 直近試合ID
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public int getFormerId() throws SQLException{
+	int getFormerId() throws SQLException{
 		// データベースへの検索処理*****************************************************/
 		ResultSet rset=null;
 		int battleId=0;
@@ -314,10 +316,10 @@ public class DbInsert {
 	}
 
 	/**
-	 *
-	 * @throws Exception
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
 	 */
-	public void  connect() throws SQLException,ClassNotFoundException{
+	void  connect() throws SQLException,ClassNotFoundException{
 		try{
 
 			// JDBCドライバロード
@@ -343,7 +345,7 @@ public class DbInsert {
 	 *各種クローズ処理を行う
 	 * @throws SQLException
 	 */
-	public void disconnect() throws SQLException{
+	void disconnect() throws SQLException{
 		try{
 			if(this.con!=null){
 				this.con.close();

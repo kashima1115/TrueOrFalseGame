@@ -89,11 +89,8 @@ public class LogicAdminTest {
 		testClb.setFirstLogic(FIRST_KEY);
 		testClb.setSecondLogic(SECOND_KEY);
 
-		//テスト対象クラスのインスタンス化
-		LogicAdmin la=new LogicAdmin();
-
 		//比較
-		assertThat(la.attachId(dbi, testLogicMap, testClb),
+		assertThat(LogicUtil.attachId(dbi, testLogicMap, testClb),
 				hasEntry(logicFixture.exepectMapKey,logicFixture.expectMapValue));
 	}
 
@@ -116,11 +113,8 @@ public class LogicAdminTest {
 		clb.setFirstLogic(FIRST_KEY);
 		clb.setSecondLogic(SECOND_KEY);
 
-		//ロジック情報加工クラスのインスタンス化
-		LogicAdmin la=new LogicAdmin();
-
 		//テスト対象メソッドの実行（同名ロジック判定）
-		la.sameJudge(logicRefIdMap, clb);
+		LogicUtil.sameJudge(logicRefIdMap, clb);
 
 	}
 
@@ -142,13 +136,10 @@ public class LogicAdminTest {
 		clb.setFirstLogic(FIRST_KEY);
 		clb.setSecondLogic(SECOND_KEY);
 
-		//ロジック情報加工クラスのインスタンス化
-		LogicAdmin la=new LogicAdmin();
-
 		try{
 
 			//同名ロジック判定
-			la.sameJudge(logicRefIdMap, clb);
+			LogicUtil.sameJudge(logicRefIdMap, clb);
 
 		}catch(SameLogicException e){
 

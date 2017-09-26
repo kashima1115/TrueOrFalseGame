@@ -16,7 +16,7 @@ import net.sf.json.JSONObject;
  * @author kanayama
  *
  */
-public class BattleAdmin {
+class BattleAdmin {
 	//エラー通知オブジェクト
 	private InformError ie;
 
@@ -101,9 +101,8 @@ public class BattleAdmin {
 
 	/**
 	 * ロジック情報受信管理
-	 * @param la
 	 */
-	private void stayReady(LogicAdmin la){
+	private void stayReady(){
 		//ロジック情報を2つ受け取るまで、ループ
 		int readyConut=0;
 		while(readyConut<2){
@@ -112,7 +111,7 @@ public class BattleAdmin {
 			JSONObject logicInfo=this.samqm.receiveMessage();
 
 			//送信されたメッセージのイベント情報をチェック
-			boolean eventJudge=logicEventCheck(la,logicInfo);
+			boolean eventJudge=logicEventCheck(logicInfo);
 
 			//ロジック情報がMapに格納できた場合と、できなかった場合で条件分岐
 			if(eventJudge){
@@ -129,8 +128,10 @@ public class BattleAdmin {
 
 	/**
 	 * 送信されたロジック情報のイベント情報チェック
+	 * @param logicInfo 受信したロジック情報
+	 * @return logicInfo内のイベント情報が期待値ならtrueを返す
 	 */
-	private boolean logicEventCheck(LogicAdmin la,JSONObject logicInfo){
+	private boolean logicEventCheck(JSONObject logicInfo){
 
 		boolean eventJudge=true;
 
@@ -152,7 +153,8 @@ public class BattleAdmin {
 
 	/**
 	 * ロジック情報を保持
-	 * @param readyConut
+	 * @param readyConut イベント情報が「ready」であるlogicInfoを取得した数
+	 * @param logicInfo 受信したロジック情報
 	 */
 	private void logicPutMap(int readyCount,JSONObject logicInfo){
 		//ロジック情報Beanを取得
@@ -202,7 +204,7 @@ public class BattleAdmin {
 
 	/**
 	 *試合中に使用するオブジェクトを用意
-	 * @return dbit 試合中に使用するオブジェクト
+	 * @return dbit 試合中・試合終了後に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade dbitSetObject(){
 		//メソッド間、値引渡し用Bean
@@ -217,9 +219,6 @@ public class BattleAdmin {
 		//盤面保持・更新クラスのインスタンス化
 		dbit.setLca(new LocationAdmin());
 
-		//試合判定クラスをインスタンス化
-		dbit.setJm(new JudgeMatch());
-
 		//試合判定結果格納用変数の用意
 		dbit.setResult(this.CONTINUE);
 
@@ -228,7 +227,7 @@ public class BattleAdmin {
 
 	/**
 	 * クライアントに手番通知オブジェクトを送信
-	 * @param dbit
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
 	 */
 	private void sendPlayStart(DuringBattleInfoTrade dbit){
 
@@ -246,7 +245,8 @@ public class BattleAdmin {
 
 	/**
 	 * 処理開始時刻を取得する
-	 * @param dbit
+	 *  @param dbit 試合中・試合終了後に使用するオブジェクト
+	 *  @return 試合中・試合終了後に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade setTimeStart(DuringBattleInfoTrade dbit){
 
@@ -267,8 +267,8 @@ public class BattleAdmin {
 	}
 	/**
 	 * 処理終了時刻を取得
-	 * @param dbit
-	 * @param sdfTime
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @return 試合中・試合終了後に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade setTimeEnd(DuringBattleInfoTrade dbit){
 		//処理終了時刻取得
@@ -281,7 +281,8 @@ public class BattleAdmin {
 	}
 	/**
 	 * 試合開始日付を取得
-	 * @param dbit
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @return 試合開始日付を返す
 	 */
 	private String setDate(){
 		//試合開始日付取得
@@ -293,7 +294,9 @@ public class BattleAdmin {
 
 	/**
 	 * 指し手情報をセット
-	 * @return
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+	 * @return 指し手情報Beanを返す
 	 */
 	private LocationInfoBean setLocationInfo(DuringBattleInfoTrade dbit,Map<String,Integer> logicRefIdMap,
 			int battleId){
@@ -316,18 +319,18 @@ public class BattleAdmin {
 
 /**
  * 試合の継戦・終了判断
- *
+ * @param dbit 試合中・試合終了後に使用するオブジェクト
+ * @return 試合中・試合終了後に使用するオブジェクト
  */
 	private DuringBattleInfoTrade normalStopRoopCheck(DuringBattleInfoTrade dbit){
 
 		//ループを終了させるか否かを格納する変数
 		boolean stopRoop=false;
 
-		JudgeMatch jm=dbit.getJm();
 		LocationAdmin lca=dbit.getLca();
 
 		//勝敗判定結果を取得
-		String result=jm.battleJudge(lca.getLocation());
+		String result=JudgeMatch.battleJudge(lca.getLocation());
 		dbit.setResult(result);
 
 		//試合終了と継戦で条件分岐
@@ -344,8 +347,8 @@ public class BattleAdmin {
 
 	/**
 	 * 指し手情報登録
-	 * @param dbit
-	 * @return
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @return 試合中・試合終了後に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade locationInsert(DuringBattleInfoTrade dbit,LocationInfoBean lifb){
 
@@ -371,7 +374,7 @@ public class BattleAdmin {
 
 	/**
 	 * 受信したイベント情報が期待値ではなかったときの処理
-	 * @param dbit
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
 	 */
 	private void notExpectEventDuringBattle(DuringBattleInfoTrade dbit){
 
@@ -412,50 +415,48 @@ public class BattleAdmin {
 
 	/**
 	 * 先攻クライアントの試合結果登録と、勝敗通知オブジェクト作成（通常）
-	 * @param turnAdd
-	 * @param battleId
-	 * @param result
-	 * @param addRefIdMap
-	 * @return
+	 * @param battleId 試合ID
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+	 * @return 先攻クライアントへの勝敗通知オブジェクト
 	 */
 	private JSONObject normalFirstResult(int battleId,DuringBattleInfoTrade dbit,
-			Map<String,Integer> addRefIdMap){
+			Map<String,Integer> logicRefIdMap){
 
 		JSONObject firstPlayerGameInfo=null;
-		JudgeMatch jm=dbit.getJm();
 
 		try{
 			//先攻が勝利した場合
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getResult(),logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
-				firstPlayerGameInfo=jm.informResult(dbit.getResult());
+				firstPlayerGameInfo=JudgeMatch.informResult(dbit.getResult());
 
 				//引き分けの場合
 			}else if(dbit.getResult().equals(this.DRAW)){
 
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getFirstLogic()),
+						dbit.getResult(),logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
-				firstPlayerGameInfo=jm.informResult(dbit.getResult());
+				firstPlayerGameInfo=JudgeMatch.informResult(dbit.getResult());
 
 				//敗北の場合
 			}else if(!dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),
+						this.LOSE,logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
-				firstPlayerGameInfo=jm.informResult(this.LOSE);
+				firstPlayerGameInfo=JudgeMatch.informResult(this.LOSE);
 			}
 
 		}catch(SQLException e){
@@ -466,46 +467,48 @@ public class BattleAdmin {
 
 	/**
 	 *後攻クライアントの試合結果登録と、勝敗通知オブジェクト作成（通常）
-	 * @return
+	 * @param battleId 試合ID
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+	 * @return 後攻クライアントへの勝敗通知オブジェクト
 	 */
 	private JSONObject normalSecondResult(int battleId,DuringBattleInfoTrade dbit,
-			Map<String,Integer> addRefIdMap){
+			Map<String,Integer> logicRefIdMap){
 
 		JSONObject secondPlayerGameInfo=null;
-		JudgeMatch jm=dbit.getJm();
 
 		try{
 			//後攻が勝利した場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(), dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getResult(),logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
-				secondPlayerGameInfo=jm.informResult(dbit.getResult());
+				secondPlayerGameInfo=JudgeMatch.informResult(dbit.getResult());
 
 				//引き分けの場合
 			}else if(dbit.getResult().equals(this.DRAW)){
 
 				//後攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
-						dbit.getResult(),addRefIdMap.get(this.clb.getSecondLogic()),
+						dbit.getResult(),logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
-				secondPlayerGameInfo=jm.informResult(dbit.getResult());
+				secondPlayerGameInfo=JudgeMatch.informResult(dbit.getResult());
 
 				//敗北の場合
 			}else if(!dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 
 				//後攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),
+						this.LOSE,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
-				secondPlayerGameInfo=jm.informResult(this.LOSE);
+				secondPlayerGameInfo=JudgeMatch.informResult(this.LOSE);
 			}
 
 		}catch(SQLException e){
@@ -516,13 +519,15 @@ public class BattleAdmin {
 
 	/**
 	 * 先攻クライアントの試合結果登録と、勝敗通知オブジェクト作成（反則）
-	 * @return
+	 * @param battleId 試合ID
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+	 * @return 先攻クライアントの勝敗通知オブジェクト
 	 */
-	private JSONObject abnormalFirstResult(int battleId,Map<String,Integer> addRefIdMap,
+	private JSONObject abnormalFirstResult(int battleId,Map<String,Integer> logicRefIdMap,
 			DuringBattleInfoTrade dbit){
 
 		JSONObject firstPlayerGameInfo=null;
-		JudgeMatch jm=dbit.getJm();
 
 		try{
 			//先攻反則負けした場合
@@ -530,7 +535,7 @@ public class BattleAdmin {
 
 			//先攻の試合結果を登録
 			dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-							this.LOSE,addRefIdMap.get(this.clb.getFirstLogic()),
+							this.LOSE,logicRefIdMap.get(this.clb.getFirstLogic()),
 							dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
@@ -540,11 +545,11 @@ public class BattleAdmin {
 			}else{
 				//先攻の試合結果を登録
 				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
-						this.WIN,addRefIdMap.get(this.clb.getFirstLogic()),
+						this.WIN,logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
 				//先攻クライアントに渡す勝敗通知オブジェクトを作成
-				firstPlayerGameInfo=jm.informResult(this.WIN);
+				firstPlayerGameInfo=JudgeMatch.informResult(this.WIN);
 			}
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -554,23 +559,22 @@ public class BattleAdmin {
 
 /**
  * 後攻クライアントの試合結果登録と、勝敗通知オブジェクト作成（反則）
- * @param battleId
- * @param addRefIdMap
- * @param dbit
- * @return
+ * @param battleId 試合ID
+ * @param dbit 試合中・試合終了後に使用するオブジェクト
+ * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+ * @return 後攻クライアントの勝敗通知オブジェクト
  */
-	private JSONObject abnormalSecondResult(int battleId,Map<String,Integer> addRefIdMap,
+	private JSONObject abnormalSecondResult(int battleId,Map<String,Integer> logicRefIdMap,
 			DuringBattleInfoTrade dbit){
 
 		JSONObject secondPlayerGameInfo=null;
-		JudgeMatch jm=dbit.getJm();
 
 		try{
 			//後攻反則負けした場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.LOSE,addRefIdMap.get(this.clb.getSecondLogic()),
+						this.LOSE,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
@@ -580,11 +584,11 @@ public class BattleAdmin {
 			}else{
 				//後攻の試合結果を登録
 				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
-						this.WIN,addRefIdMap.get(this.clb.getSecondLogic()),
+						this.WIN,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
 				//後攻クライアントに渡す勝敗通知オブジェクトを作成
-				secondPlayerGameInfo=jm.informResult(this.WIN);
+				secondPlayerGameInfo=JudgeMatch.informResult(this.WIN);
 			}
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -600,9 +604,13 @@ public class BattleAdmin {
 	/**
 	 * 試合中を管理するメソッド
 	 * @throws Exception
+	 * @param battleId 試合ID
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+	 * @return 試合中・試合終了後に使用するオブジェクト
 	 */
 	private DuringBattleInfoTrade gameLater(Map<String,Integer> logicRefIdMap,DuringBattleInfoTrade dbit,
-			JudgeMatch jm,int battleId) throws Exception{
+			int battleId) throws Exception{
 		try{
 			//試合終了までループを繰り返す
 			while(true){
@@ -625,7 +633,7 @@ public class BattleAdmin {
 				String event=dbit.getReceiveGameInfo().getString("event");
 
 				//指し手情報のルール判定を行う
-				boolean ruleJudge=jm.ruleJudge(dbit.getLca().getLocation(),dbit.getReceiveGameInfo());
+				boolean ruleJudge=JudgeMatch.ruleJudge(dbit.getLca().getLocation(),dbit.getReceiveGameInfo());
 
 				//正しいイベント情報取得・ルール違反なしの場合
 				if(this.TURN_END.equals(event) && ruleJudge==true){
@@ -675,9 +683,9 @@ public class BattleAdmin {
 
 /**
  * 試合終了後の処理を管理するメソッド
- * @param battleId
- * @param logicRefIdMap
- * @param dbit
+ * @param battleId 試合ID
+ * @param dbit 試合中・試合終了後に使用するオブジェクト
+ * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
  */
 	private void gameEnd(int battleId,Map<String,Integer> logicRefIdMap,DuringBattleInfoTrade dbit){
 		//試合結果DB登録作業・勝敗オブジェクト作成
@@ -709,25 +717,22 @@ public class BattleAdmin {
 	 * 試合開始前を管理するメソッド
 	 * @throws Exception
 	 */
-	public void gameStart() throws Exception{
+	void gameStart() throws Exception{
 		try{
 			//MQとDBの接続処理
 			mqDbAccess();
 
-			//ロジック管理クラスのインスタンス化
-			LogicAdmin la=new LogicAdmin();
-
 			//ロジック情報受信管理
-			stayReady(la);
+			stayReady();
 
 			//ロジック情報をDBに登録
 			enrollLogic();
 
 			//ロジック情報（IPアドレス）とロジックIDを紐付け・取得
-			Map<String,Integer> logicRefIdMap=la.attachId(this.dbi, this.logicMap, this.clb);
+			Map<String,Integer> logicRefIdMap=LogicUtil.attachId(this.dbi, this.logicMap, this.clb);
 
 			//同名ロジック判定
-			la.sameJudge(logicRefIdMap, clb);
+			LogicUtil.sameJudge(logicRefIdMap, clb);
 
 			//試合ID取得
 			int battleId=BattleIdAdmin.getBattleID(dbi);
@@ -739,7 +744,7 @@ public class BattleAdmin {
 			dbit.setStartDate(setDate());
 
 			//試合中の処理に移行
-			dbit=gameLater(logicRefIdMap,dbit,dbit.getJm(), battleId);
+			dbit=gameLater(logicRefIdMap,dbit,battleId);
 
 			//試合終了後の処理に移行
 			gameEnd(battleId, logicRefIdMap, dbit);

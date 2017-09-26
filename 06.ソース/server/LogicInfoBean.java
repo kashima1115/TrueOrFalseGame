@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author kanayama
  *
  */
-public class LogicInfoBean implements Serializable {
+class LogicInfoBean implements Serializable {
 private String logicName;
 private String writer;
 private String version;

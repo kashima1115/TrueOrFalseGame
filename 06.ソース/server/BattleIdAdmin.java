@@ -7,14 +7,14 @@ import java.sql.SQLException;
  * @author kanayama
  *
  */
-public class BattleIdAdmin {
+class BattleIdAdmin {
 
 /**
- *
+ *	DBに存在する直近試合の試合IDを元に現在試合の試合IDを採番
  * @return 採番した試合ID
- * @throws Exception
+ * @throws SQLException
  */
-	public static int getBattleID(DbInsert dbi) throws SQLException{
+	static int getBattleID(DbInsert dbi) throws SQLException{
 		int battleId=0;
 		try{
 

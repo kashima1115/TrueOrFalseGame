@@ -4,6 +4,6 @@ package server;
  * @author kanayama
  *
  */
-public class SameLogicException extends Exception {
+class SameLogicException extends Exception {
 
 }

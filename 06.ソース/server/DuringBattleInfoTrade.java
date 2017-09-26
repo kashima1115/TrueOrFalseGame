@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
  * @author kanayama
  *
  */
-public class DuringBattleInfoTrade {
+class DuringBattleInfoTrade {
 	private String  startDate;
 	private String playStartTime;
 	private String playEndTime;
@@ -17,7 +17,6 @@ public class DuringBattleInfoTrade {
 	private String startTime;
 	private String endTime;
 	private JSONObject receiveGameInfo;
-	private JudgeMatch jm;
 	private LocationAdmin lca;
 	private TurnAdmin ta;
 
@@ -75,12 +74,6 @@ public class DuringBattleInfoTrade {
 	}
 	public void setReceiveGameInfo(JSONObject receiveGameInfo) {
 		this.receiveGameInfo = receiveGameInfo;
-	}
-	public JudgeMatch getJm() {
-		return jm;
-	}
-	public void setJm(JudgeMatch jm) {
-		this.jm = jm;
 	}
 	public LocationAdmin getLca() {
 		return lca;

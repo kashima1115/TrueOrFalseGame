@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
  * @author kanayama
  *
  */
-public class InformError {
+class InformError {
 	//発生したエラーを格納する配列
 	private String error[];
 
@@ -34,9 +34,9 @@ public class InformError {
 
 	/**
 	 *サーバーに３つ以上のアクセスがあった際に、処理が行われる
-	 * @return gameInfo エラーメッセージの入ったJSONObject
+	 * @return  エラーメッセージの入ったJSONObject
 	 */
-	public JSONObject oversubscribedError(){
+	JSONObject oversubscribedError(){
 		//JSONObject生成
 		JSONObject gameInfo=new JSONObject();
 
@@ -54,9 +54,9 @@ public class InformError {
 
 	/**
 	 * サーバーに同名ロジックのアクセスが確認された際、処理が行われる
-	 * @return gameInfo エラーメッセージの入ったJSONObject
+	 * @return  エラーメッセージの入ったJSONObject
 	 */
-	public JSONObject sameLogicError(){
+	JSONObject sameLogicError(){
 		//JSONObject生成
 		JSONObject gameInfo=new JSONObject();
 
@@ -74,9 +74,9 @@ public class InformError {
 
 	/**
 	 * 指し手情報がゲームのルール違反をしたい際に、処理が行われる
-	 * @return	  gameInfo エラーメッセージの入ったJSONObject
+	 * @return  エラーメッセージの入ったJSONObject
 	 */
-	public JSONObject ruleError(){
+	JSONObject ruleError(){
 		//JSONObject生成
 		JSONObject gameInfo=new JSONObject();
 
@@ -92,7 +92,11 @@ public class InformError {
 		return gameInfo;
 	}
 
-	public JSONObject notExpectEventError(){
+	/**
+	 * クライアントから受信したメッセージのイベント情報が期待値ではなかった際に、処理が行われる
+	 * @return  エラーメッセージの入ったJSONObject
+	 */
+	JSONObject notExpectEventError(){
 
 		//JSONObject生成
 		JSONObject gameInfo=new JSONObject();

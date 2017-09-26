@@ -7,14 +7,17 @@ import java.util.Map;
  * ロジック情報加工クラス
  *@author kanayama
  */
-public class LogicAdmin {
+class LogicUtil {
 
 	/**
 	 * ロジック情報をロジックIDと紐付け・取得
+	 * @param battleId 試合ID
+	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
 	 * @return キー…IPアドレス 値…logicIdのMap
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public Map<String,Integer> attachId(DbInsert dbi,Map<String,LogicInfoBean> logicMap,
+	static Map<String,Integer> attachId(DbInsert dbi,Map<String,LogicInfoBean> logicMap,
 			ClientLogicBean clb) throws SQLException{
 
 		Map<String,Integer> logicRefIdMap=null;
@@ -40,15 +43,17 @@ public class LogicAdmin {
 	}
 
 	/**同名ロジック判定を行うメソッド
-	 *  @return 同名ロジックの場合true、それ以外の場合falseを返す
+	 * @return 同名ロジックの場合true、それ以外の場合falseを返す
 	 * @throws SameLogicException
 	 */
-	public void sameJudge(Map<String,Integer> logicRefIdMap,ClientLogicBean clb) throws SameLogicException{
+	static void sameJudge(Map<String,Integer> logicRefIdMap,ClientLogicBean clb) throws SameLogicException{
 
 		try{
 			//同名ロジック判定
 			if(logicRefIdMap.get(clb.getFirstLogic())==logicRefIdMap.get(clb.getSecondLogic())){
 				throw new SameLogicException();
+			}else{
+				return;
 			}
 		}catch(SameLogicException e){
 			throw e;

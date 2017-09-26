@@ -5,7 +5,7 @@ package server;
  * @author kanayama
  *
  */
-public class LocationAdmin {
+class LocationAdmin {
 	private String location[][];
 	private final int MAX_X;
 	private final int MAX_Y;
@@ -38,7 +38,7 @@ public class LocationAdmin {
 	 *
 	 * @return 現在状態の盤面
 	 */
-	public String[][] getLocation(){
+	String[][] getLocation(){
 		return this.location;
 	}
 
@@ -47,7 +47,7 @@ public class LocationAdmin {
 	 * @param lifb 指し手情報を格納したBean
 	 * @return 最新の状態に更新された盤面
 	 */
-	public String[][] updateLocation(LocationInfoBean lifb){
+	String[][] updateLocation(LocationInfoBean lifb){
 
 		if(lifb.getTurn()%2==1){
 			location[lifb.getLocationX()][lifb.getLocationY()]=FIRST_PLAYER;
