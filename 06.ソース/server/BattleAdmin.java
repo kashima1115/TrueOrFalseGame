@@ -649,6 +649,8 @@ class BattleAdmin {
 
 				//正しいイベント情報取得・ルール違反ありの場合
 				}else if(this.TURN_END.equals(event) && ruleJudge==false){
+					//試合終了時刻を取得
+					dbit.setEndTime(dbit.getPlayEndTime());
 					break;
 
 				//不正なイベント情報を取得した場合
