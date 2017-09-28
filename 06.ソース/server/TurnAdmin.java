@@ -9,9 +9,9 @@ import net.sf.json.JSONObject;
  */
 class TurnAdmin {
 	private int turn;
-	private final int FIRST_PLAYER;
-	private final int SECOND_PLAYER;
-	private final String INFORM_EVENT;
+	private static final int FIRST_PLAYER=1;
+	private static final int SECOND_PLAYER=0;
+	private static final String INFORM_EVENT="YourTurn";
 	private ClientLogicBean clb;
 
 	/**
@@ -21,9 +21,6 @@ class TurnAdmin {
 	 */
 	TurnAdmin(ClientLogicBean clb){
 		turn=1;
-		FIRST_PLAYER=1;
-		SECOND_PLAYER=0;
-		INFORM_EVENT="YourTurn";
 		this.clb=clb;
 	}
 
@@ -60,7 +57,7 @@ class TurnAdmin {
 	 * @param location 最新の状態の盤面
 	 * @return クライアントに送信するJSONObject
 	 */
-	JSONObject informTurn(String[][] location){
+	static JSONObject informTurn(String[][] location){
 		JSONObject gameInfo=new JSONObject();
 
 		gameInfo.accumulate("event", INFORM_EVENT);

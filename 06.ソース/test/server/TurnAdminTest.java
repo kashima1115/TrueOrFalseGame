@@ -103,11 +103,8 @@ public class TurnAdminTest {
 			expectGameInfo.accumulate("location", testLocation);
 			expectGameInfo.accumulate("event", EVENT);
 
-			//手番管理クラスをインスタンス化
-			TurnAdmin ta=new TurnAdmin(clb);
-
 			//テスト対象クラスのJSONObjectを取得
-			JSONObject actualGameInfo=ta.informTurn(testLocation);
+			JSONObject actualGameInfo=TurnAdmin.informTurn(testLocation);
 
 			//JSONObjectを比較
 			JSONAssert.assertEquals (expectGameInfo,actualGameInfo);

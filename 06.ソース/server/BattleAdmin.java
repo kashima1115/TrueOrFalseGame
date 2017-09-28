@@ -231,11 +231,10 @@ class BattleAdmin {
 	 */
 	private void sendPlayStart(DuringBattleInfoTrade dbit){
 
-		TurnAdmin ta=dbit.getTa();
 		LocationAdmin lca=dbit.getLca();
 
 		//手番通知オブジェクト作成
-		JSONObject gameInfo=ta.informTurn(lca.getLocation());
+		JSONObject gameInfo=TurnAdmin.informTurn(lca.getLocation());
 
 		//オブジェクト送信処理
 		this.samqm.sendMessage(gameInfo, this.logicMap.get(dbit.getTurnLogic()).getAddress());
@@ -260,7 +259,7 @@ class BattleAdmin {
 
 		//一番最初のターンのみ試合開始時刻をセット
 		if(ta.getTurn()==1){
-			dbit.setStartTime(playStartTime);
+			dbit.setBattleStartTime(playStartTime);
 		}
 
 		return dbit;
@@ -299,12 +298,12 @@ class BattleAdmin {
 	 * @return 指し手情報Beanを返す
 	 */
 	private LocationInfoBean setLocationInfo(DuringBattleInfoTrade dbit,Map<String,Integer> logicRefIdMap,
-			int battleId){
+			int battleId,JSONObject receiveGameInfo){
 		LocationInfoBean lifb=new LocationInfoBean();
 
 		//指し手情報を取得
-		int locationX=dbit.getReceiveGameInfo().getInt("xAxis");
-		int locationY=dbit.getReceiveGameInfo().getInt("yAxis");
+		int locationX=receiveGameInfo.getInt("xAxis");
+		int locationY=receiveGameInfo.getInt("yAxis");
 
 		lifb.setBattleId(battleId);
 		lifb.setLocationX(locationX);
@@ -325,7 +324,7 @@ class BattleAdmin {
 	private DuringBattleInfoTrade normalStopRoopCheck(DuringBattleInfoTrade dbit){
 
 		//ループを終了させるか否かを格納する変数
-		boolean stopRoop=false;
+		boolean stopLoop=false;
 
 		LocationAdmin lca=dbit.getLca();
 
@@ -335,12 +334,12 @@ class BattleAdmin {
 
 		//試合終了と継戦で条件分岐
 		if(result.equals(this.WIN)||result.equals(this.DRAW)){
-			stopRoop=true;
+			stopLoop=true;
 		}else if(result.equals(this.CONTINUE)){
-			stopRoop=false;
+			stopLoop=false;
 		}
 
-		dbit.setStopRoop(stopRoop);
+		dbit.setStopLoop(stopLoop);
 
 		return dbit;
 	}
@@ -376,12 +375,12 @@ class BattleAdmin {
 	 * 受信したイベント情報が期待値ではなかったときの処理
 	 * @param dbit 試合中・試合終了後に使用するオブジェクト
 	 */
-	private void notExpectEventDuringBattle(DuringBattleInfoTrade dbit){
+	private void notExpectEventDuringBattle(DuringBattleInfoTrade dbit,JSONObject receiveGameInfo){
 
 		JSONObject gameInfoErr=null;
 
 		//アクセス過多の場合
-		if(dbit.getReceiveGameInfo().get("event").equals(READY)){
+		if(receiveGameInfo.get("event").equals(READY)){
 
 			System.out.println("受信メッセージを受け付けられません");
 
@@ -389,7 +388,7 @@ class BattleAdmin {
 			gameInfoErr=ie.oversubscribedError();
 
 			//メッセージを送信してきたクライアントのIPアドレス取得
-			String ErrIPAddress=(dbit.getReceiveGameInfo().getString("address"));
+			String ErrIPAddress=(receiveGameInfo.getString("address"));
 
 			//通知オブジェクト送信
 			samqm.sendMessage(gameInfoErr,ErrIPAddress);
@@ -429,7 +428,7 @@ class BattleAdmin {
 			//先攻が勝利した場合
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 				//先攻の試合結果を登録
-				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId, dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						dbit.getResult(),logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
@@ -440,7 +439,7 @@ class BattleAdmin {
 			}else if(dbit.getResult().equals(this.DRAW)){
 
 				//先攻の試合結果を登録
-				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId,dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						dbit.getResult(),logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
@@ -451,7 +450,7 @@ class BattleAdmin {
 			}else if(!dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 
 				//先攻の試合結果を登録
-				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId,dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						this.LOSE,logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
@@ -481,7 +480,7 @@ class BattleAdmin {
 			//後攻が勝利した場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 				//後攻の試合結果を登録
-				dbi.resultInsert(battleId,dbit.getStartTime(), dbit.getEndTime(),
+				dbi.resultInsert(battleId,dbit.getBattleStartTime(), dbit.getBattleEndTime(),
 						dbit.getResult(),logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
@@ -492,7 +491,7 @@ class BattleAdmin {
 			}else if(dbit.getResult().equals(this.DRAW)){
 
 				//後攻の試合結果を登録
-				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
+				dbi.resultInsert(battleId, dbit.getBattleStartTime(), dbit.getBattleEndTime(),
 						dbit.getResult(),logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
@@ -503,7 +502,7 @@ class BattleAdmin {
 			}else if(!dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 
 				//後攻の試合結果を登録
-				dbi.resultInsert(battleId, dbit.getStartTime(), dbit.getEndTime(),
+				dbi.resultInsert(battleId, dbit.getBattleStartTime(), dbit.getBattleEndTime(),
 						this.LOSE,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
@@ -534,7 +533,7 @@ class BattleAdmin {
 			if(dbit.getTurnLogic().equals(this.clb.getFirstLogic())){
 
 			//先攻の試合結果を登録
-			dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
+			dbi.resultInsert(battleId, dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 							this.LOSE,logicRefIdMap.get(this.clb.getFirstLogic()),
 							dbit.getStartDate(),FIRST);
 
@@ -544,7 +543,7 @@ class BattleAdmin {
 				//相手による反則勝ちの場合
 			}else{
 				//先攻の試合結果を登録
-				dbi.resultInsert(battleId, dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId, dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						this.WIN,logicRefIdMap.get(this.clb.getFirstLogic()),
 						dbit.getStartDate(),FIRST);
 
@@ -573,7 +572,7 @@ class BattleAdmin {
 			//後攻反則負けした場合
 			if(dbit.getTurnLogic().equals(this.clb.getSecondLogic())){
 				//後攻の試合結果を登録
-				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId,dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						this.LOSE,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
@@ -583,7 +582,7 @@ class BattleAdmin {
 				//相手による反則勝ちの場合
 			}else{
 				//後攻の試合結果を登録
-				dbi.resultInsert(battleId,dbit.getStartTime(),dbit.getEndTime(),
+				dbi.resultInsert(battleId,dbit.getBattleStartTime(),dbit.getBattleEndTime(),
 						this.WIN,logicRefIdMap.get(this.clb.getSecondLogic()),
 						dbit.getStartDate(),SECOND);
 
@@ -617,6 +616,9 @@ class BattleAdmin {
 				//指し手情報格納用Bean
 				LocationInfoBean lifb=null;
 
+				//ループ停止フラグ
+				dbit.setStopLoop(false);
+
 				//クライアントに手番通知
 				sendPlayStart(dbit);
 
@@ -624,47 +626,41 @@ class BattleAdmin {
 				dbit=setTimeStart(dbit);
 
 				//受信メッセージ取得
-				dbit.setReceiveGameInfo(samqm.receiveMessage());
+				JSONObject receiveGameInfo=samqm.receiveMessage();
 
 				//クライアント処理終了時間取得
 				dbit=setTimeEnd(dbit);
 
 				//JSONObject内のイベント情報を取得
-				String event=dbit.getReceiveGameInfo().getString("event");
+				String event=receiveGameInfo.getString("event");
 
 				//指し手情報のルール判定を行う
-				boolean ruleJudge=JudgeMatch.ruleJudge(dbit.getLca().getLocation(),dbit.getReceiveGameInfo());
+				boolean ruleJudge=JudgeMatch.ruleJudge(dbit.getLca().getLocation(),receiveGameInfo);
 
 				//正しいイベント情報取得・ルール違反なしの場合
 				if(this.TURN_END.equals(event) && ruleJudge==true){
 
-				//指し手情報をBeanにセット
-				lifb=setLocationInfo(dbit, logicRefIdMap, battleId);
+					//指し手情報をBeanにセット
+					lifb=setLocationInfo(dbit, logicRefIdMap, battleId,receiveGameInfo);
 
-				//指し手情報登録
-				dbit=locationInsert(dbit, lifb);
+					//指し手情報登録
+					dbit=locationInsert(dbit, lifb);
 
-				//継戦・試合終了の判定をする
-				dbit=normalStopRoopCheck(dbit);
-
-				//正しいイベント情報取得・ルール違反ありの場合
-				}else if(this.TURN_END.equals(event) && ruleJudge==false){
-					//試合終了時刻を取得
-					dbit.setEndTime(dbit.getPlayEndTime());
-					break;
+					//継戦・試合終了の判定をする
+					dbit=normalStopRoopCheck(dbit);
 
 				//不正なイベント情報を取得した場合
-				}else{
+				}else if(!this.TURN_END.equals(event)){
 					//期待するイベント情報を得られなかったときの処理
-					notExpectEventDuringBattle(dbit);
+					notExpectEventDuringBattle(dbit,receiveGameInfo);
 
 					continue;
 				}
 
-				//通常の試合が終了条件に当てはまった場合の処理
-				if(dbit.isStopRoop()){
+				//通常の試合が終了条件に当てはまった場合、ルール違反ありの場合の処理
+				if(dbit.isStopLoop()==true || ruleJudge==false){
 					//試合終了時刻を取得
-					dbit.setEndTime(lifb.getPlayEnd());
+					dbit.setBattleEndTime(dbit.getPlayEndTime());
 
 					break;
 				//試合の終了条件に当てはまらない場合の処理

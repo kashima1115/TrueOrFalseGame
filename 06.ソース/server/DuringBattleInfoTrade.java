@@ -1,7 +1,5 @@
 package server;
 
-import net.sf.json.JSONObject;
-
 /**
  * 試合管理クラスのメソッド間の値を引き渡すためのbeanクラス
  * @author kanayama
@@ -13,10 +11,9 @@ class DuringBattleInfoTrade {
 	private String playEndTime;
 	private String turnLogic;
 	private String result;
-	private boolean stopRoop;
-	private String startTime;
-	private String endTime;
-	private JSONObject receiveGameInfo;
+	private boolean stopLoop;
+	private String battleStartTime;
+	private String battleEndTime;
 	private LocationAdmin lca;
 	private TurnAdmin ta;
 
@@ -51,29 +48,23 @@ class DuringBattleInfoTrade {
 	public void setResult(String result) {
 		this.result = result;
 	}
-	public boolean isStopRoop() {
-		return stopRoop;
+	public boolean isStopLoop() {
+		return stopLoop;
 	}
-	public void setStopRoop(boolean stopRoop) {
-		this.stopRoop = stopRoop;
+	public void setStopLoop(boolean stopLoop) {
+		this.stopLoop = stopLoop;
 	}
-	public String getStartTime() {
-		return startTime;
+	public String getBattleStartTime() {
+		return battleStartTime;
 	}
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
+	public void setBattleStartTime(String battleStartTime) {
+		this.battleStartTime = battleStartTime;
 	}
-	public String getEndTime() {
-		return endTime;
+	public String getBattleEndTime() {
+		return battleEndTime;
 	}
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
-	public JSONObject getReceiveGameInfo() {
-		return receiveGameInfo;
-	}
-	public void setReceiveGameInfo(JSONObject receiveGameInfo) {
-		this.receiveGameInfo = receiveGameInfo;
+	public void setBattleEndTime(String battleEndTime) {
+		this.battleEndTime = battleEndTime;
 	}
 	public LocationAdmin getLca() {
 		return lca;

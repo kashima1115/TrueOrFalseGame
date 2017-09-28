@@ -1,5 +1,6 @@
 package server;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.sql.ResultSet;
@@ -59,15 +60,19 @@ public class DbInsertTest {
 
 	@Test
 	public void testGetFormerId() throws SQLException {
+		//モック作成
+		int expect=5;
 		new MockUp<ResultSet>() {
 		      @Mock
-		      public int getInt() {
-		        return 5;
+		      int getInt(String maxBattleIdCulum) {
+		        return expect;
 		      }
 		};
 
 		//テスト対象メソッドの実行
-		dbi.getFormerId();
+		int formerId=dbi.getFormerId();
+
+		assertThat(formerId,is(expect));
 	}
 
 	@Test
