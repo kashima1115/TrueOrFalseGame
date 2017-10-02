@@ -5,7 +5,7 @@ package server;
  * @author kanayama
  *
  */
-class DuringBattleInfoTrade {
+class DuringBattleInfoTradeBean {
 	private String  startDate;
 	private String playStartTime;
 	private String playEndTime;

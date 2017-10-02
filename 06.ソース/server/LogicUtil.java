@@ -17,7 +17,7 @@ class LogicUtil {
 	 * @return キー…IPアドレス 値…logicIdのMap
 	 * @throws SQLException
 	 */
-	static Map<String,Integer> attachId(DbInsert dbi,Map<String,LogicInfoBean> logicMap,
+	static Map<String,Integer> attachId(DbOperation dbi,Map<String,LogicInfoBean> logicMap,
 			ClientLogicBean clb) throws SQLException{
 
 		Map<String,Integer> logicRefIdMap=null;

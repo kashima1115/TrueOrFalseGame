@@ -15,13 +15,13 @@ import org.junit.Test;
 import mockit.Mock;
 import mockit.MockUp;
 
-public class DbInsertTest {
-	private static DbInsert dbi;
+public class DbOperationTest {
+	private static DbOperation dbi;
 
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		dbi=new DbInsert();
+		dbi=new DbOperation();
 		dbi.connect();
 	}
 
@@ -64,7 +64,7 @@ public class DbInsertTest {
 		int expect=5;
 		new MockUp<ResultSet>() {
 		      @Mock
-		      int getInt(String maxBattleIdCulum) {
+		      int getInt(String maxBattleIdCulum)throws SQLException {
 		        return expect;
 		      }
 		};

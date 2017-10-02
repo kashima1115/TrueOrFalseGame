@@ -14,7 +14,7 @@ class BattleIdAdmin {
  * @return 採番した試合ID
  * @throws SQLException
  */
-	static int getBattleID(DbInsert dbi) throws SQLException{
+	static int getBattleID(DbOperation dbi) throws SQLException{
 		int battleId=0;
 		try{
 

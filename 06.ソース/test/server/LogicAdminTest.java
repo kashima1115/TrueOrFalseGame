@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Theories.class)
 public class LogicAdminTest {
-	private static DbInsert dbi;
+	private static DbOperation dbi;
 	private static final String FIRST_LOGIC_NAME="Alogic";
 	private static final String SECOND_LOGIC_NAME="Clogic";
 	private static final String FIRST_CREATOR="arahari";
@@ -53,7 +53,7 @@ public class LogicAdminTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		dbi=new DbInsert();
+		dbi=new DbOperation();
 		dbi.connect();
 	}
 

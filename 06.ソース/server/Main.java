@@ -12,7 +12,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		//試合管理クラスをインスタンス化
-		BattleAdmin ba=new BattleAdmin();
+		BattleFlow ba=new BattleFlow();
 
 		try{
 			//試合管理メソッドを呼び出し

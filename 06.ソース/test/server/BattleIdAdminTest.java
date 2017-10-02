@@ -13,14 +13,14 @@ import org.junit.Test;
  *
  */
 public class BattleIdAdminTest {
-	private static DbInsert dbi;
+	private static DbOperation dbi;
 	private static int formerId;
 	private static int expectId;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		//コネクション接続
-		BattleIdAdminTest.dbi=new DbInsert();
+		BattleIdAdminTest.dbi=new DbOperation();
 		BattleIdAdminTest.dbi.connect();
 		BattleIdAdminTest.formerId=dbi.getFormerId();
 		BattleIdAdminTest.expectId=++BattleIdAdminTest.formerId;

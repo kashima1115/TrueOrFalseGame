@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
  * @author kanayama
  *
  */
-class DbInsert {
+class DbOperation {
 	// プロファイル(パラメータ)読込み定義
 	// プロパティファイルバンドル
 	private final ResourceBundle bundle=ResourceBundle.getBundle("config");
@@ -42,7 +42,7 @@ class DbInsert {
 			"values (?,?,?)";
 
 	//DBに指し手情報を登録
-	private final static String locationInsertSql="insert into location "+
+	private final static String insertLocationSql="insert into location "+
 			"(battle_id,logic_id,location_x,location_y,turn,play_start,play_end) value "+
 			"(?,?,?,?,?,?,?)";
 
@@ -65,7 +65,7 @@ class DbInsert {
 	 *  @throws SQLException
 	 *  @return なし
 	 */
-	void logicInsert(LogicInfoBean lib) throws SQLException {
+	void insertLogic(LogicInfoBean lib) throws SQLException {
 		// データベースへの検索処理*****************************************************/
 		ResultSet rset=null;
 
@@ -79,7 +79,7 @@ class DbInsert {
 
 			//1度もプリコンパイルされていないならば、プリコンパイルを行う
 			if(this.logicPstateLook==null){
-				this.logicPstateLook=this.con.prepareStatement(DbInsert.logicLookSql);
+				this.logicPstateLook=this.con.prepareStatement(DbOperation.logicLookSql);
 			}
 
 			//プリペアドステートメントの？の値をセット
@@ -103,7 +103,7 @@ class DbInsert {
 
 			//1度もプリコンパイルされてなければ、プリコンパイルを行う
 			if(this.logicPstate==null){
-				this.logicPstate=this.con.prepareStatement(DbInsert.logicInsertSql);
+				this.logicPstate=this.con.prepareStatement(DbOperation.logicInsertSql);
 			}
 
 			//プリペアドステートメントの？の値をセット
@@ -137,7 +137,7 @@ class DbInsert {
 	 * @param lcib 指し手情報のBean
 	 * @throws SQLException
 	 */
-	 void locationInsert(LocationInfoBean lcib) throws SQLException{
+	 void insertLocation(LocationInfoBean lcib) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 		try{
 
@@ -147,7 +147,7 @@ class DbInsert {
 
 			//1度もプリコンパイルされていなければ、プリコンパイル
 			if(this.locationPstate==null){
-				this.locationPstate=this.con.prepareStatement(DbInsert.locationInsertSql);
+				this.locationPstate=this.con.prepareStatement(DbOperation.insertLocationSql);
 			}
 
 			//登録値の入力
@@ -188,7 +188,7 @@ class DbInsert {
 	 * @throws SQLException
 	 *
 	 */
-	 void resultInsert(int battleId,String startTime,String endTime,String result,
+	 void insertResult(int battleId,String startTime,String endTime,String result,
 			int logicId,String startDate,String firstSecond) throws SQLException{
 		// データベースへの検索処理*****************************************************/
 
@@ -198,7 +198,7 @@ class DbInsert {
 
 			//1度もプリコンパイルされていないのなら、プリコンパイル
 			if(this.resultPstate==null){
-				this.resultPstate=this.con.prepareStatement(DbInsert.resultInsertSql);
+				this.resultPstate=this.con.prepareStatement(DbOperation.resultInsertSql);
 			}
 
 			//値の入力
@@ -245,7 +245,7 @@ class DbInsert {
 
 			//1度もプリコンパイルが為されていないのなら、プリコンパイル
 			if(this.logicIdPstate==null){
-				this.logicIdPstate=this.con.prepareStatement(DbInsert.logicIdGetSql);
+				this.logicIdPstate=this.con.prepareStatement(DbOperation.logicIdGetSql);
 			}
 
 			//検索条件のセット
@@ -288,7 +288,7 @@ class DbInsert {
 
 		try{
 			if(this.formerIdPstate==null){
-				this.formerIdPstate=this.con.prepareStatement(DbInsert.formerIdGetSql);
+				this.formerIdPstate=this.con.prepareStatement(DbOperation.formerIdGetSql);
 			}
 
 
