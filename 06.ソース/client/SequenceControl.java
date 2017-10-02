@@ -90,11 +90,9 @@ public class SequenceControl{
 			//例外条件分岐
 			if(et.isError()){
 				//サーバーからのエラーメッセージを表示する
-				String errors[]=bib.getError();
+				String errors=bib.getError();
 				logger.warn("以下のエラーが発生");
-				for(int error = 0;error <= errors.length - 1;error++){
-					logger.warn(errors[error]);
-				}
+				logger.warn(errors);
 				break;
 			//終了条件分岐
 			}else if(et.isFinish()){

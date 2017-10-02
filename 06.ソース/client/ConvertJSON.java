@@ -41,15 +41,10 @@ public class ConvertJSON {
 	 */
 	public BattleInfoBean convertFromJSON(JSONObject rcvmsg){
 		//エラー条件や終了条件がメッセージ中に含まれていた場合にeventにその旨を格納します。
-		if(rcvmsg.containsKey("error[]")){
+		if(rcvmsg.containsKey("error")){
 			bib.setEvent("error");
 			//エラーメッセージを格納します
-			JSONArray ary = rcvmsg.getJSONArray("error[]");
-			String[] sary = new String[ary.size()];
-			for(int i=0;i<=ary.size()-1;i++){
-				sary[i]=ary.getString(i);
-			}
-			bib.setError(sary);
+			bib.setError(rcvmsg.getString("error"));
 		}
 		//試合終了のメッセージを格納します
 		if(rcvmsg.containsKey("event")){

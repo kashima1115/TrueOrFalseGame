@@ -16,7 +16,7 @@ public class BattleInfoBean implements Serializable{
 	/**
 	 * エラーメッセージを格納します.
 	 */
-	private String[] error;
+	private String error;
 	/**
 	 * 盤面全体の情報を格納します.
 	 */
@@ -36,10 +36,10 @@ public class BattleInfoBean implements Serializable{
 	public void setEvent(String event) {
 		this.event = event;
 	}
-	public String[] getError() {
+	public String getError() {
 		return error;
 	}
-	public void setError(String[] error) {
+	public void setError(String error) {
 		this.error = error;
 	}
 	public String[][] getLocation() {

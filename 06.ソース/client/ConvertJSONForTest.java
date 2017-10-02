@@ -33,14 +33,13 @@ public class ConvertJSONForTest {
 	public BattleInfoBean convertFromJSON(JSONObject rcvmsg){
 		BattleInfoBean bib = new BattleInfoBean();
 		//エラー条件や終了条件がメッセージ中に含まれていた場合にeventにその旨を格納します。
-		if(rcvmsg.containsKey("error[]")){
+		if(rcvmsg.containsKey("error")){
 			bib.setEvent("error");
-			JSONArray ary = rcvmsg.getJSONArray("error[]");
-			String[] sary = new String[ary.size()];
-			for(int i=0;i<=ary.size()-1;i++){
-				sary[i]=ary.getString(i);
-			}
-			bib.setError(sary);
+			bib.setError(rcvmsg.getString("error"));
+		//JSONにeventの情報が無かった場合
+		}else if(!rcvmsg.containsKey("event")){
+			bib.setEvent("blank");
+		//試合終了のメッセージを格納します
 		}else if(rcvmsg.getString("event").equals("win")||rcvmsg.getString("event").equals("lose")||rcvmsg.getString("event").equals("draw")){
 			bib.setEvent(rcvmsg.getString("event"));
 		//問題が無ければ盤面の情報を格納します。

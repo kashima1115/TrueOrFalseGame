@@ -17,8 +17,8 @@ public class CreateGameInfo {
 	JSONObject gameInfo = new JSONObject();
 
 	public JSONObject ready(){
-		gameInfo.put("logicName", "manual");
-		gameInfo.put("logicVersion", "1.0");
+		gameInfo.put("logicName", "jyuunisai");
+		gameInfo.put("logicVersion", "0.1");
 		gameInfo.put("logicWriter", "初谷惇志");
 		gameInfo.put("address", SequenceControlForTest.myIP());
 		gameInfo.put("event", "ready");
@@ -39,15 +39,26 @@ public class CreateGameInfo {
 	}
 
 	public JSONObject win(){
+		JSONObject gameInfo = new JSONObject();
 		gameInfo.put("event", "win");
 		return gameInfo;
 	}
 
+	public JSONObject finish(){
+		gameInfo.put("event", "finish");
+		return gameInfo;
+	}
+
+	public JSONObject turnEnd(){
+		gameInfo.put("xAxis", "1");
+		gameInfo.put("yAxis", "1");
+		gameInfo.put("event", "TurnEnd");
+		return gameInfo;
+	}
+
 	public JSONObject error(){
-		String[] error = new String[2];
-		error[0]= "oversubscribed";
-		error[1]="sameLogic";
-		gameInfo.put("error[]", error);
+		String error = "oversubscribed";
+		gameInfo.put("error", error);
 		return gameInfo;
 	}
 

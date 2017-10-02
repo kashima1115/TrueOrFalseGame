@@ -3,6 +3,11 @@ package client;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.jms.JMSException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import brain.BrainBean;
 import net.sf.json.JSONObject;
 /**
@@ -15,6 +20,9 @@ public class SequenceControlForTest{
 	static ConvertJSON cj = new ConvertJSON();
 	static messageQueue.ActiveMQMessaging amq = new messageQueue.ActiveMQMessaging();
 	static BattleInfoBean bib;
+	//Log用
+	static Logger logger = Logger.getLogger(SequenceControl.class.getName());
+
 
 	/**
 	 * 試合開始時の動作です.
@@ -60,6 +68,7 @@ public class SequenceControlForTest{
 					IPAdress = host.getHostAddress();
 				}catch(UnknownHostException e){
 					e.printStackTrace();
+					logger.fatal("IPアドレス取得失敗");
 				}
 		return IPAdress;
 	}
@@ -68,35 +77,39 @@ public class SequenceControlForTest{
 	 * 自分のターンごとに状況に応じた処理を行います.
 	 */
 	public static String myTurn(BattleInfoBean bib){
+		//Log用
+		logger.setLevel(Level.DEBUG);
 		//変数eventの宣言
 		String event = "blank";
 		//Brainのインスタンス化
 		ab.createBrain();
-		//TODO ○×ゲームは最大5回+最後のメッセージ受信の1回でこの条件にしています。
-		for(int turn=0;turn<5;turn++){
+		while(true){
 			//event情報だけbeanから取り出す
 			event = bib.getEvent();
 			EventType et = EventType.getEventType(event);
 
 			//例外条件分岐
-			if(et.equals(EventType.ERROR)){
+			if(et.isError()){
 				//エラーメッセージを表示する
-				String errors[]=bib.getError();
-				for(int error = 0;error<=errors.length-1;error++){
-					System.out.println(errors[error]);
-				}
+				String errors=bib.getError();
+				logger.warn("以下のエラーが発生");
+				logger.info(errors);
 				break;
 			//終了条件分岐
-			}else if(et.equals(EventType.FINISH)){
+			}else if(et.isFinish()){
 				System.out.println("試合が終了しました。");
+				logger.info("試合が終了しました。");
+				logger.debug("You "+event);
 				System.out.println("You "+event);
 				break;
 			//差し手選択
-			}else if(et.equals(EventType.YOURTURN)){
+			}else if(et.isTurn()){
 				//brainに送るための盤面情報の変数locationを宣言
 				String[][]location = null;
 				//BattleInfoBeanから盤面情報を取得する
 				location = bib.getLocation();
+				logger.info("yourturn");
+				logger.debug("あなたの番です。");
 				//Brainから指し手情報を取得する
 				bib = getLocation(location);
 				//eventに座標を追加(本来はサーバーに送信する）
@@ -106,6 +119,7 @@ public class SequenceControlForTest{
 			//eventに何も入っていない場合（その他）
 			}else{
 				System.out.println("イベント情報の取得に失敗しました。");
+				logger.error("eventの取得に失敗");
 				break;
 			}
 		}
@@ -117,8 +131,9 @@ public class SequenceControlForTest{
 	/**
 	 * ActiveMQからのメッセージを受信します.
 	 * @return 盤面情報やイベント情報を格納したBattleInfoBeanです
+	 * @throws JMSException
 	 */
-	public static BattleInfoBean receive() {
+	public static BattleInfoBean receive() throws JMSException {
 		//ActiveMQからメッセージを受信する
 		JSONObject obj2 = amq.receiveMessage();
 		//JSONから変換
@@ -140,8 +155,9 @@ public class SequenceControlForTest{
 	/**
 	 * サーバーにメッセージを送信します.
 	 * @param bib 盤面情報を格納したBattleInfoBeanです
+	 * @throws JMSException
 	 */
-	public static void send(BattleInfoBean bib){
+	public static void send(BattleInfoBean bib) throws JMSException{
 		//JSONに変換
 		JSONObject jo2 = cj.convertToJSONS(bib);
 		//ActiveMQを通してサーバープログラムに送信する

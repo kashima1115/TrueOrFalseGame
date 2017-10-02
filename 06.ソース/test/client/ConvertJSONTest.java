@@ -13,7 +13,8 @@ import net.sf.json.JSONObject;
 
 public class ConvertJSONTest {
 
-	ConvertJSONForTest cj = new ConvertJSONForTest();
+	//ConvertJSONForTest cj = new ConvertJSONForTest();
+	ConvertJSON cj = new ConvertJSON();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -89,12 +90,9 @@ public class ConvertJSONTest {
 		obj = cgi.error();
 		BattleInfoBean bib = cj.convertFromJSON(obj);
 		System.out.println(obj);
-		String[] error;
-		error = new String[bib.getError().length];
 		assertEquals("error",bib.getEvent());
-		error = bib.getError();
-		String[]errorichiran={"oversubscribed","sameLogic"};
-		assertArrayEquals(errorichiran,error);
+		String expectError = "oversubscribed";
+		assertEquals(expectError,bib.getError());
 	}
 
 	@Test
@@ -114,6 +112,15 @@ public class ConvertJSONTest {
 		assertEquals(xa,obj.get("xAxis"));
 		assertEquals(ya,obj.get("yAxis"));
 		assertEquals("TurnEnd",obj.get("event"));
+	}
+	@Test
+	public void testConvertFromJSON空白(){
+		JSONObject obj = new JSONObject();
+		obj.put("blank", "blank");
+		BattleInfoBean bib = cj.convertFromJSON(obj);
+		System.out.println(obj);
+		System.out.println("Eventは"+bib.getEvent());
+		assertEquals("blank",bib.getEvent());
 	}
 
 }
