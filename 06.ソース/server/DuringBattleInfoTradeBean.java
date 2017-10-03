@@ -16,6 +16,7 @@ class DuringBattleInfoTradeBean {
 	private String battleEndTime;
 	private LocationAdmin lca;
 	private TurnAdmin ta;
+	private boolean matchEnd;
 
 
 	public String getStartDate() {
@@ -77,5 +78,11 @@ class DuringBattleInfoTradeBean {
 	}
 	public void setTa(TurnAdmin ta) {
 		this.ta = ta;
+	}
+	public boolean isMatchEnd() {
+		return matchEnd;
+	}
+	public void setMatchEnd(boolean matchEnd) {
+		this.matchEnd = matchEnd;
 	}
 }

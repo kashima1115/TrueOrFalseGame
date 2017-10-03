@@ -317,10 +317,10 @@ class BattleFlow {
  * @param dbit 試合中・試合終了後に使用するオブジェクト
  * @return 試合中・試合終了後に使用するオブジェクト
  */
-	private DuringBattleInfoTradeBean normalStopRoopCheck(DuringBattleInfoTradeBean dbit){
+	private DuringBattleInfoTradeBean checkMatchEnd(DuringBattleInfoTradeBean dbit){
 
 		//ループを終了させるか否かを格納する変数
-		boolean stopLoop=false;
+		boolean matchEnd=false;
 
 		LocationAdmin lca=dbit.getLca();
 
@@ -330,12 +330,12 @@ class BattleFlow {
 
 		//試合終了と継戦で条件分岐
 		if(result.equals(this.WIN)||result.equals(this.DRAW)){
-			stopLoop=true;
+			matchEnd=true;
 		}else if(result.equals(this.CONTINUE)){
-			stopLoop=false;
+			matchEnd=false;
 		}
 
-		dbit.setStopLoop(stopLoop);
+		dbit.setMatchEnd(matchEnd);
 
 		return dbit;
 	}
@@ -361,10 +361,10 @@ class BattleFlow {
 	}
 
 	private DuringBattleInfoTradeBean checkContinueOrbreak(DuringBattleInfoTradeBean dbit,
-			String event,JSONObject receiveGameInfo){
+			String event,JSONObject receiveGameInfo,boolean ruleJudge){
 
 		//継戦・試合終了の判定をする
-		dbit=normalStopRoopCheck(dbit);
+		dbit=checkMatchEnd(dbit);
 
 		//不正なイベント情報を取得した場合
 		if(!this.TURN_END.equals(event)){
@@ -375,15 +375,20 @@ class BattleFlow {
 			dbit.setStopLoop(false);
 
 		//通常の試合が終了条件に当てはまった場合
-		}else if(dbit.isStopLoop()==true){
+		}else if(ruleJudge==false || (ruleJudge==true && dbit.isMatchEnd()==true)){
 			//試合終了時刻を取得
 			dbit.setBattleEndTime(dbit.getPlayEndTime());
+
+			//breakと同義
+			dbit.setStopLoop(true);
 
 		//試合の終了条件に当てはまらない場合の処理
 		}else{
 			//次手番のクライアントのIPアドレスを取得
 			dbit.setTurnLogic(dbit.getTa().judgeTurn());
 
+			//continueと同義
+			dbit.setStopLoop(false);
 		}
 		return dbit;
 	}
@@ -657,9 +662,6 @@ class BattleFlow {
 		try{
 			//試合終了までループを繰り返す
 			while(true){
-				//ループ停止フラグ
-				dbit.setStopLoop(false);
-
 				//クライアントに手番通知
 				sendPlayStart(dbit);
 
@@ -686,7 +688,7 @@ class BattleFlow {
 				}
 
 				//試合継戦・終了判定
-				dbit=checkContinueOrbreak(dbit, event, receiveGameInfo);
+				dbit=checkContinueOrbreak(dbit, event, receiveGameInfo, ruleJudge);
 
 				if(dbit.isStopLoop()){
 					break;
