@@ -65,7 +65,7 @@ public class ConvertJSON {
 			}
 		}
 		//JSONにeventの情報が無かった場合
-		if(!rcvmsg.containsKey("event")&&!rcvmsg.containsKey("error[]")){
+		if(!rcvmsg.containsKey("event")&&!rcvmsg.containsKey("error")){
 			bib.setEvent("blank");
 		}
 		return bib;
