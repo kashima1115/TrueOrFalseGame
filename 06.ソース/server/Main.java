@@ -8,6 +8,7 @@ public class Main {
 	/**
 	 * サーバー機能を実行するメソッド
 	 * @param args
+	 * @exception Exception
 	 */
 	public static void main(String[] args) {
 

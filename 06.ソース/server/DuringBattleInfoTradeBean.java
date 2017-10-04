@@ -17,6 +17,7 @@ class DuringBattleInfoTradeBean {
 	private LocationAdmin lca;
 	private TurnAdmin ta;
 	private boolean matchEnd;
+	private boolean preventDoubleTransmissionFlag;
 
 
 	public String getStartDate() {
@@ -84,5 +85,11 @@ class DuringBattleInfoTradeBean {
 	}
 	public void setMatchEnd(boolean matchEnd) {
 		this.matchEnd = matchEnd;
+	}
+	public boolean isPreventDoubleTransmissionFlag() {
+		return preventDoubleTransmissionFlag;
+	}
+	public void setPreventDoubleTransmissionFlag(boolean preventDoubleTransmissionFlag) {
+		this.preventDoubleTransmissionFlag = preventDoubleTransmissionFlag;
 	}
 }

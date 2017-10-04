@@ -44,7 +44,7 @@ class InformError {
 	}
 
 	/**
-	 * 指し手情報がゲームのルール違反をしたい際に、処理が行われる
+	 * 指し手情報がゲームのルール違反をした際に、処理が行われる
 	 * @return  エラーメッセージの入ったJSONObject
 	 */
 	static JSONObject ruleError(){

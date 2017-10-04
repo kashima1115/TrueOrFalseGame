@@ -55,7 +55,7 @@ class DbOperation {
 			"where logic_name=? and logic_writer=? and logic_ver=?";
 
 	//直近試合IDを検索
-	private final static String formerIdGetSql="select max(battle_id) from battle_result";
+	private final static String formerIdGetSql="select max(battle_id) from battle_result limit 1";
 
 
 

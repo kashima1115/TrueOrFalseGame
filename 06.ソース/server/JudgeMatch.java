@@ -13,13 +13,18 @@ class JudgeMatch {
 	 * @param turn ターン数
 	 * @param location 盤面
 	 * @param gameInfo 受信した指し手情報
-	 * @return 盤面と指し手に被りがある場合false、ない場合trueを返す
+	 * @return 盤面と指し手に被りがあるor存在しない盤面をしていた場合false、それ以外trueを返す
 	 */
 	static boolean ruleJudge(String[][] location,JSONObject gameInfo){
 
 		//指し手情報を取得
 		int locationX=gameInfo.getInt("xAxis");
 		int locationY=gameInfo.getInt("yAxis");
+
+		//適正値判定
+		if(locationX<0 || locationX>2 || locationY<0 || locationY>2){
+			return false;
+		}
 
 		//被り判定
 		if(!location[locationX][locationY].equals("-")){

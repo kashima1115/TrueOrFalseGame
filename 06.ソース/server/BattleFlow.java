@@ -129,22 +129,31 @@ class BattleFlow {
 	 */
 	private boolean logicEventCheck(JSONObject logicInfo){
 
-		boolean eventJudge=true;
+		//イベント情報格納用変数
+		String event="";
 
-		//イベント情報取得
-		String event=logicInfo.getString("event");
+		//受信したイベント情報が正しい構成か否かで条件分岐
+		//正しい構成の場合
+		if(CheckJsonKey.checkLogicStructure(logicInfo)){
+			//イベント情報取得
+			event=logicInfo.getString("event");
+
+		//不正な構成の場合
+		}else{
+			return false;
+		}
+
 
 		//受信メッセージ振り分け
 		//期待していたメッセージを受信できた場合
 		if(this.READY.equals(event)){
-			eventJudge=true;
+			return true;
 
 		//期待していたメッセージ受信できなかった場合
-		}else if(!this.READY.equals(event)){
-			eventJudge=false;
+		}else{
+			return false;
 		}
 
-		return eventJudge;
 	}
 
 	/**
@@ -217,6 +226,9 @@ class BattleFlow {
 
 		//試合判定結果格納用変数の用意
 		dbit.setResult(this.CONTINUE);
+
+		//手番通知二重送信防止フラグ
+		dbit.setPreventDoubleTransmissionFlag(true);
 
 		return dbit;
 	}
@@ -361,7 +373,7 @@ class BattleFlow {
 	}
 
 	private DuringBattleInfoTradeBean checkContinueOrbreak(DuringBattleInfoTradeBean dbit,
-			String event,JSONObject receiveGameInfo,boolean ruleJudge){
+			String event,JSONObject receiveGameInfo,boolean ruleJudge) throws ClientMulfunctionException{
 
 		//継戦・試合終了の判定をする
 		dbit=checkMatchEnd(dbit);
@@ -384,7 +396,7 @@ class BattleFlow {
 
 		//試合の終了条件に当てはまらない場合の処理
 		}else{
-			//次手番のクライアントのIPアドレスを取得
+			//次手番のクライアントのMapキーを取得
 			dbit.setTurnLogic(dbit.getTa().judgeTurn());
 
 			//continueと同義
@@ -423,8 +435,10 @@ class BattleFlow {
 	/**
 	 * 受信したイベント情報が期待値ではなかったときの処理
 	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @throws ClientMulfunctionException
 	 */
-	private void notExpectEventDuringBattle(DuringBattleInfoTradeBean dbit,JSONObject receiveGameInfo){
+	private DuringBattleInfoTradeBean notExpectEventDuringBattle(DuringBattleInfoTradeBean dbit,
+			JSONObject receiveGameInfo) throws ClientMulfunctionException {
 
 		JSONObject gameInfoErr=null;
 
@@ -442,23 +456,20 @@ class BattleFlow {
 			//通知オブジェクト送信
 			samqm.sendMessage(gameInfoErr,errIPAddress);
 
+			//手番通知誤送信防止フラグ
+			dbit.setPreventDoubleTransmissionFlag(false);
+
 			System.out.println("アクセス過多のため受け付けられません");
 			System.out.println("再度メッセージを受信します");
 
 			//その他イベント情報を取得した場合
 		}else{
 
-			System.out.println("受信メッセージを受け付けられません");
+			throw new ClientMulfunctionException();
 
-			//エラー通知オブジェクトの取得
-			gameInfoErr=InformError.notExpectEventError();
-
-			//通知オブジェクト送信
-			samqm.sendMessage(gameInfoErr,this.logicMap.get(dbit.getTurnLogic()).getAddress());
-
-			System.out.println("指し手情報を送信してください");
-			System.out.println("再度メッセージを受信します");
 		}
+
+		return dbit;
 	}
 
 	/**
@@ -656,17 +667,32 @@ class BattleFlow {
 	 * @param dbit 試合中・試合終了後に使用するオブジェクト
 	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
 	 * @return 試合中・試合終了後に使用するオブジェクト
+	 * @throws ClientMulfunctionException
 	 */
 	private DuringBattleInfoTradeBean gameLater(Map<String,Integer> logicRefIdMap,DuringBattleInfoTradeBean dbit,
-			int battleId) throws Exception{
+			int battleId) throws ClientMulfunctionException{
+
 		try{
+
 			//試合終了までループを繰り返す
 			while(true){
-				//クライアントに手番通知
-				sendPlayStart(dbit);
+				//ルール判定フラグ
+				boolean ruleJudge=false;
+				//イベント情報格納用変数
+				String event="";
 
-				//クライアント処理開始時間を取得
-				dbit=setTimeStart(dbit);
+				//クライアントへの手番通知二重送信防止
+				if(dbit.isPreventDoubleTransmissionFlag()){
+
+					//クライアントに手番通知
+					sendPlayStart(dbit);
+
+					//クライアント処理開始時間を取得
+					dbit=setTimeStart(dbit);
+				}
+
+				//手番通知二重送信防止フラグ
+				dbit.setPreventDoubleTransmissionFlag(true);
 
 				//受信メッセージ取得
 				JSONObject receiveGameInfo=samqm.receiveMessage();
@@ -674,16 +700,30 @@ class BattleFlow {
 				//クライアント処理終了時間取得
 				dbit=setTimeEnd(dbit);
 
-				//JSONObject内のイベント情報を取得
-				String event=receiveGameInfo.getString("event");
+				//イベント情報のキー名が存在する場合に条件分岐
+				if(CheckJsonKey.checkExitenceOfEvent(receiveGameInfo)){
 
-				//指し手情報のルール判定を行う
-				boolean ruleJudge=JudgeMatch.ruleJudge(dbit.getLca().getLocation(),receiveGameInfo);
+					//JSONObject内のイベント情報を取得
+					event=receiveGameInfo.getString("event");
+				}
 
-				//正しいイベント情報取得・ルール違反なしの場合
-				if(this.TURN_END.equals(event) && ruleJudge==true){
-					//指し手情報登録
-					insertLocationUnderRule(dbit, logicRefIdMap, battleId, receiveGameInfo);
+
+				//正しいイベント情報取得
+				if(this.TURN_END.equals(event)){
+
+					//メッセージの不正なキー名構成の場合に条件分岐
+					if(CheckJsonKey.checkLocationSturcture(receiveGameInfo)==false){
+						throw new ClientMulfunctionException();
+					}
+
+					//指し手情報のルール判定を行う
+					ruleJudge=JudgeMatch.ruleJudge(dbit.getLca().getLocation(),receiveGameInfo);
+
+					//ルール違反なし
+					if(ruleJudge){
+						//指し手情報登録
+						insertLocationUnderRule(dbit, logicRefIdMap, battleId, receiveGameInfo);
+					}
 
 				}
 
@@ -695,11 +735,8 @@ class BattleFlow {
 				}else{
 					continue;
 				}
-
 			}
-
-		}catch(Exception e){
-			e.printStackTrace();
+		}catch(ClientMulfunctionException e){
 			throw e;
 		}
 		return dbit;
@@ -788,6 +825,21 @@ class BattleFlow {
 			samqm.sendMessage(gameInfo,this.logicMap.get(this.clb.getFirstLogic()).getAddress());
 
 			samqm.sendMessage(gameInfo,this.logicMap.get(this.clb.getSecondLogic()).getAddress());
+
+			throw e;
+
+		}catch(ClientMulfunctionException e){
+			System.out.println("受信メッセージを受け付けられません");
+
+			System.out.println("プログラム終了処理を行います");
+
+			//エラー通知オブジェクトの取得
+			JSONObject gameInfoErr=InformError.notExpectEventError();
+
+			//通知オブジェクト送信
+			samqm.sendMessage(gameInfoErr,this.logicMap.get(this.clb.getFirstLogic()).getAddress());
+
+			samqm.sendMessage(gameInfoErr,this.logicMap.get(this.clb.getSecondLogic()).getAddress());
 
 			throw e;
 
