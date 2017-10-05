@@ -53,14 +53,14 @@ public class ActiveMQMessaging implements MessageQueueController {
             //Senderの作成（メッセージ配信モードをclientモードに設定）
             sessionS = connectionS.createQueueSession(false,QueueSession.CLIENT_ACKNOWLEDGE);
             //送り先はサーバー
-            Queue queueS = sessionS.createQueue(serverIP);
+            Queue queueS = sessionS.createQueue("server");
             sender= sessionS.createSender(queueS);
 
             //メッセージの送信
-            TextMessage msg = sessionS.createTextMessage(gameInfo.toString());
-            //TODO 動作確認用に付き
-            System.out.println(msg);
-            sender.send(msg);
+            TextMessage msgS = sessionS.createTextMessage(gameInfo.toString());
+            //TODO 動作確認用としてメッセージが見えるようにしています。
+            System.out.println(msgS.getText());
+            sender.send(msgS);
         } catch (JMSException e) {
         	logger.fatal("送信失敗", e);
         	throw e;
@@ -88,11 +88,13 @@ public class ActiveMQMessaging implements MessageQueueController {
 		try {
             //メッセージの受信
             System.out.println("サーバーからの通信待ち");
-            TextMessage msg = (TextMessage)receiver.receive();
-            JSONObject gameInfo = JSONObject.fromObject(msg.getText());
+            TextMessage msgR = (TextMessage)receiver.receive();
+            //TODO 動作確認用としてメッセージが見えるようにしています。
+            System.out.println(msgR.getText());
+            JSONObject gameInfo = JSONObject.fromObject(msgR.getText());
             System.out.println("データ受信");
             //受信確認メッセージ送信
-            msg.acknowledge();
+            msgR.acknowledge();
             return gameInfo;
         } catch (JMSException e) {
         	logger.fatal("受信失敗",e);
@@ -134,8 +136,7 @@ public class ActiveMQMessaging implements MessageQueueController {
 				connectionR.close();
 			}
         } catch (JMSException e) {
-            logger.fatal("キュー終了失敗");
-        	e.printStackTrace();
+            logger.fatal("キュー終了失敗",e);
         }
 
 	}
