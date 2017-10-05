@@ -18,7 +18,7 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 @RunWith(Theories.class)
-public class LogicAdminTest {
+public class LogicUtilTest {
 	private static DbOperation dbi;
 	private static final String FIRST_LOGIC_NAME="Alogic";
 	private static final String SECOND_LOGIC_NAME="Clogic";

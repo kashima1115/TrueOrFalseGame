@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jms.JMSException;
+
 import messageQueue.ServerActiveMQMessaging;
 import net.sf.json.JSONObject;
 
@@ -58,8 +60,9 @@ class BattleFlow {
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 * @throws UnknownHostException
+	 * @throws JMSException
 	 */
-	private void mqDbAccess() throws SQLException, ClassNotFoundException, UnknownHostException{
+	private void mqDbAccess() throws SQLException, ClassNotFoundException, UnknownHostException, JMSException{
 		//MQクラスをインスタンス化
 		this.samqm=new ServerActiveMQMessaging();
 
@@ -97,8 +100,9 @@ class BattleFlow {
 
 	/**
 	 * ロジック情報受信管理
+	 * @throws JMSException
 	 */
-	private void stayReady(){
+	private void stayReady() throws JMSException{
 		//ロジック情報を2つ受け取るまで、ループ
 		int readyConut=0;
 		while(readyConut<2){
@@ -236,8 +240,9 @@ class BattleFlow {
 	/**
 	 * クライアントに手番通知オブジェクトを送信
 	 * @param dbit 試合中・試合終了後に使用するオブジェクト
+	 * @throws JMSException
 	 */
-	private void sendPlayStart(DuringBattleInfoTradeBean dbit){
+	private void sendPlayStart(DuringBattleInfoTradeBean dbit) throws JMSException{
 
 		LocationAdmin lca=dbit.getLca();
 
@@ -373,7 +378,7 @@ class BattleFlow {
 	}
 
 	private DuringBattleInfoTradeBean checkContinueOrbreak(DuringBattleInfoTradeBean dbit,
-			String event,JSONObject receiveGameInfo,boolean ruleJudge) throws ClientMulfunctionException{
+			String event,JSONObject receiveGameInfo,boolean ruleJudge) throws ClientMulfunctionException, JMSException{
 
 		//継戦・試合終了の判定をする
 		dbit=checkMatchEnd(dbit);
@@ -436,9 +441,10 @@ class BattleFlow {
 	 * 受信したイベント情報が期待値ではなかったときの処理
 	 * @param dbit 試合中・試合終了後に使用するオブジェクト
 	 * @throws ClientMulfunctionException
+	 * @throws JMSException
 	 */
 	private DuringBattleInfoTradeBean notExpectEventDuringBattle(DuringBattleInfoTradeBean dbit,
-			JSONObject receiveGameInfo) throws ClientMulfunctionException {
+			JSONObject receiveGameInfo) throws ClientMulfunctionException, JMSException {
 
 		JSONObject gameInfoErr=null;
 
@@ -668,9 +674,10 @@ class BattleFlow {
 	 * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
 	 * @return 試合中・試合終了後に使用するオブジェクト
 	 * @throws ClientMulfunctionException
+	 * @throws JMSException
 	 */
 	private DuringBattleInfoTradeBean gameLater(Map<String,Integer> logicRefIdMap,DuringBattleInfoTradeBean dbit,
-			int battleId) throws ClientMulfunctionException{
+			int battleId) throws ClientMulfunctionException, JMSException{
 
 		try{
 
@@ -706,7 +713,6 @@ class BattleFlow {
 					//JSONObject内のイベント情報を取得
 					event=receiveGameInfo.getString("event");
 				}
-
 
 				//正しいイベント情報取得
 				if(this.TURN_END.equals(event)){
@@ -747,8 +753,9 @@ class BattleFlow {
  * @param battleId 試合ID
  * @param dbit 試合中・試合終了後に使用するオブジェクト
  * @param logicRefIdMap ロジック情報キーとロジックIDを関連付けたMap
+ * @throws JMSException
  */
-	private void gameEnd(int battleId,Map<String,Integer> logicRefIdMap,DuringBattleInfoTradeBean dbit){
+	private void gameEnd(int battleId,Map<String,Integer> logicRefIdMap,DuringBattleInfoTradeBean dbit) throws JMSException{
 		//試合結果DB登録作業・勝敗オブジェクト作成
 		JSONObject firstPlayerGameInfo=null;
 		JSONObject secondPlayerGameInfo=null;

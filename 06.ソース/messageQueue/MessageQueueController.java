@@ -35,6 +35,6 @@ public interface MessageQueueController {
 	 * @param gameInfo 試合に関わる情報が入っています（JSONObject方式です)
 	 * @param IPAdress メッセージの送信先IPアドレス
 	 */
-	public void sendMessage(JSONObject gameInfo,String IPAdress);
+	public void sendMessage(JSONObject gameInfo,String IPAdress) throws JMSException;
 
 }

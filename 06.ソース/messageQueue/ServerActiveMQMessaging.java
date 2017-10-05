@@ -36,7 +36,7 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 	}
 
 	@Override
-	public JSONObject receiveMessage() {
+	public JSONObject receiveMessage() throws JMSException{
 		//
 		try {
 			// メッセージの受信
@@ -47,12 +47,12 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 		} catch (JMSException e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
+				throw e;
 		}
-		return null;
 	}
 
 	@Override
-	public void createQueue(String IPAddress) {
+	public void createQueue(String IPAddress) throws JMSException {
 		mypcip = IPAddress;
 		// Queueの作成
 		try {
@@ -63,11 +63,12 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 
 			// Receiverの作成
 			sessionR = connectionR.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
-			Queue queue = sessionR.createQueue(IPAddress);// キュー名はとりあえず自分のPCのIPアドレス
+			Queue queue = sessionR.createQueue("server");// キュー名はとりあえず自分のPCのIPアドレス
 			receiver = sessionR.createReceiver(queue);
-		} catch (Exception e) {
+		} catch (JMSException e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
+			throw e;
 		}
 	}
 
@@ -81,12 +82,17 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 		} catch (JMSException e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
+			try {
+				throw e;
+			} catch (JMSException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 	}
 
 	@Override
-	public void sendMessage(JSONObject gameInfo, String IPAdress) {
+	public void sendMessage(JSONObject gameInfo, String IPAdress) throws JMSException {
 		try {
 			/*
 			 * クライアントから受信したロジック情報を元にIPアドレスを取得 Connectionを作成
@@ -102,12 +108,14 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 			Queue queue = sessionS.createQueue(IPAdress);
 			sender = sessionS.createSender(queue);
 			// メッセージの送信
-			TextMessage msg = sessionS.createTextMessage(gameInfo.toString());
-			sender.send(msg);
+			TextMessage smsg = sessionS.createTextMessage(gameInfo.toString());
+			sender.send(smsg);
 
 		} catch (JMSException e) {
 			e.printStackTrace();
 			System.out.println("通信に問題が発生しました。");
+				throw e;
+
 		}finally{
 			try{
 				if(sender!=null){

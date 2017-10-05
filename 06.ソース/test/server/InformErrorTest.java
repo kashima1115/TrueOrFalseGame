@@ -1,5 +1,6 @@
 package server;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -7,7 +8,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
+/**
+ * エラー通知オブジェクト作成クラスのテストクラス
+ * @author kanayama
+ *
+ */
 public class InformErrorTest {
 
 	@BeforeClass
@@ -27,28 +32,23 @@ public class InformErrorTest {
 	}
 
 	@Test
-	public void testInformError() {
-		fail("まだ実装されていません");
-	}
-
-	@Test
 	public void testOversubscribedError() {
-		fail("まだ実装されていません");
+		assertThat(InformError.oversubscribedError().toString(),is("{\"error\":\"oversubscribed\"}"));
 	}
 
 	@Test
 	public void testSameLogicError() {
-		fail("まだ実装されていません");
+		assertThat(InformError.sameLogicError().toString(),is("{\"error\":\"sameLogic\"}"));
 	}
 
 	@Test
 	public void testRuleError() {
-		fail("まだ実装されていません");
+		assertThat(InformError.ruleError().toString(),is("{\"error\":\"notBlank\"}"));
 	}
 
 	@Test
 	public void testNotExpectEventError() {
-		fail("まだ実装されていません");
+		assertThat(InformError.notExpectEventError().toString(),is("{\"error\":\"notExpectEvent\"}"));
 	}
 
 }
