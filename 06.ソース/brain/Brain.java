@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 public class Brain implements BrainControl{
 	//ロジックの名前やバージョン、作者をここで定義します。
 	private String logicName = "manual";
-	private String logicVersion = "1.0";
+	private String logicVersion = "1.2";
 	private String writer ="初谷惇志";
 
 	BufferedReader br;
@@ -35,12 +35,26 @@ public class Brain implements BrainControl{
 		 *
 		 */
 		String[][] board = location;
+		int blank = 0;
+		String turn = null;
+		for(int x = 0;x<=2;x++){
+			for(int y = 0;y<=2;y++){
+				if("-".equals(board[x][y])){
+					blank++;
+				}
+			}
+		}
+		if((blank%2)==1){
+			turn = "○";
+		}else{
+			turn = "×";
+		}
+		System.out.println("あなたの駒は"+turn+"です。");
 		//現在の盤面を表示
-		System.out.println(" |0|1|2|");
-		System.out.println("0|"+board[0][0]+"|"+board[1][0]+"|"+board[2][0]+"|");
-		System.out.println("1|"+board[0][1]+"|"+board[1][1]+"|"+board[2][1]+"|");
-		System.out.println("2|"+board[0][2]+"|"+board[1][2]+"|"+board[2][2]+"|");
-		System.out.println("YourTurn");
+		System.out.println("　|０|１|２|");
+		System.out.println("０|"+board[0][0]+"|"+board[1][0]+"|"+board[2][0]+"|");
+		System.out.println("１|"+board[0][1]+"|"+board[1][1]+"|"+board[2][1]+"|");
+		System.out.println("２|"+board[0][2]+"|"+board[1][2]+"|"+board[2][2]+"|");
 		System.out.println("行番号(横)を数字で入力してエンターキーを押してください。");
 		//行を入力
 		br = new BufferedReader(new InputStreamReader(System.in));
