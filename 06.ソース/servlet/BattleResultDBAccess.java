@@ -87,6 +87,7 @@ public class BattleResultDBAccess {
 	            resultBn.setMonth(sp.month);
 	            resultBn.setDay(sp.day);
 				resultBn.setFirst_second(rs.getString("first_second"));
+				resultBn.setResult(rs.getString("result"));
 				resultList.add(resultBn);
 			}
 
