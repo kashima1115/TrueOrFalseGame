@@ -17,9 +17,13 @@ import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import mockit.Expectations;
+import mockit.Mocked;
+
 @RunWith(Theories.class)
 public class LogicUtilTest {
-	private static DbOperation dbi;
+	@Mocked
+	private DbOperation dbi=null;
 	private static final String FIRST_LOGIC_NAME="Alogic";
 	private static final String SECOND_LOGIC_NAME="Clogic";
 	private static final String FIRST_CREATOR="arahari";
@@ -53,13 +57,10 @@ public class LogicUtilTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		dbi=new DbOperation();
-		dbi.connect();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		dbi.disconnect();
 	}
 
 	@Before
@@ -72,6 +73,8 @@ public class LogicUtilTest {
 
 	@Theory
 	public void testAttachId(LogicFixture logicFixture) throws SQLException {
+
+
 
 		//テスト用のロジック情報を格納するMapを生成
 		Map<String,LogicInfoBean> testLogicMap=new HashMap<String,LogicInfoBean>();
@@ -88,6 +91,15 @@ public class LogicUtilTest {
 
 		testClb.setFirstLogic(FIRST_KEY);
 		testClb.setSecondLogic(SECOND_KEY);
+
+		//Mock期待値
+		new Expectations(){
+			{
+				dbi.getLogicId((LogicInfoBean) any);
+				result=1;
+				result=3;
+			}
+		};
 
 		//比較
 		assertThat(LogicUtil.attachId(dbi, testLogicMap, testClb),
