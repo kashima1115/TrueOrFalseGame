@@ -7,29 +7,22 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import mockit.Expectations;
+import mockit.Mocked;
 /**
  * 試合管理クラスのテストクラス
  * @author kanayama
  *
  */
 public class BattleIdAdminTest {
-	private static DbOperation dbi;
-	private static int formerId;
-	private static int expectId;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		//コネクション接続
-		BattleIdAdminTest.dbi=new DbOperation();
-		BattleIdAdminTest.dbi.connect();
-		BattleIdAdminTest.formerId=dbi.getFormerId();
-		BattleIdAdminTest.expectId=++BattleIdAdminTest.formerId;
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		//コネクション切断
-		BattleIdAdminTest.dbi.disconnect();
 	}
 
 	@Before
@@ -41,9 +34,19 @@ public class BattleIdAdminTest {
 	}
 
 	@Test
-	public void testGetBattleId() throws Exception {
+	public void testGetBattleId(@Mocked DbOperation dbi) throws Exception {
+		//期待値
+		int expectId=51;
+
+		//モックDBからの返り値
+		new Expectations(){
+			{
+				dbi.getFormerId();
+				result=expectId-1;
+			}
+		};
 		//試合ID取得
-		int battleId=BattleIdAdmin.getBattleID(BattleIdAdminTest.dbi);
+		int battleId=BattleIdAdmin.getBattleID(dbi);
 
 		assertEquals(expectId,battleId);
 

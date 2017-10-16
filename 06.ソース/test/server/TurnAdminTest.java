@@ -3,15 +3,22 @@ package server;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
 import net.sf.json.JSONObject;
 import net.sf.json.test.JSONAssert;
 
+@RunWith(Theories.class)
 public class TurnAdminTest {
 	private ClientLogicBean clb;
 
@@ -51,6 +58,9 @@ public class TurnAdminTest {
 	public void tearDown() throws Exception {
 	}
 
+	@DataPoints
+	public static int[] patternTurn={2,3,4,5,6,7,8,9};
+
 	@Test
 	public void decideFirstTest() {
 		//手番管理クラスをインスタンス化
@@ -63,8 +73,8 @@ public class TurnAdminTest {
 		assertEquals(this.clb.getFirstLogic(),turnLogic);
 	}
 
-	@Test
-	public void judgeTurnTest() {
+	@Theory
+	public void judgeTurnTest(int patternTurn) {
 		//手番管理クラスをインスタンス化
 		TurnAdmin ta=new TurnAdmin(clb);
 
@@ -72,12 +82,17 @@ public class TurnAdminTest {
 		String nextLogic=null;
 
 		//次手番のクライアントを判定・取得
-		for(int turn=1;turn<4;turn++){
+		for(int turn=1;turn<patternTurn;turn++){
 			nextLogic=ta.judgeTurn();
 		}
 
 		//比較
-		assertEquals(this.clb.getSecondLogic(),nextLogic);
+		if(patternTurn%2==1){
+			assertEquals(this.clb.getFirstLogic(),nextLogic);
+		}else{
+			assertEquals(this.clb.getSecondLogic(),nextLogic);
+		}
+
 	}
 
 	@Test
@@ -111,23 +126,27 @@ public class TurnAdminTest {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
-	public void getTurnTest() {
-
+	public void getTurnTest() throws NoSuchFieldException, SecurityException,
+	IllegalArgumentException, IllegalAccessException{
 		//手番管理クラスをインスタンス化
 		TurnAdmin ta=new TurnAdmin(this.clb);
 
+		//リフレクション、フィールド変数turnを書き換え
+		Class<TurnAdmin> cta=(Class<TurnAdmin>) ta.getClass();
+		Field taTurn=cta.getDeclaredField("turn");
+
+		//アクセス権限付与
+		taTurn.setAccessible(true);
+
 		//期待ターン数
-		int expectTurn=1;
+		int expectTurn=3;
 
-		while(expectTurn<4){
+		//turn数を3に書き換え
+		taTurn.set(ta, expectTurn);
 
-			expectTurn++;
-
-			ta.judgeTurn();
-
-			//テスト対象のクラスと比較
-			assertThat(expectTurn,is(ta.getTurn()));
-		}
+		//テスト対象のクラスと比較
+		assertThat(expectTurn,is(ta.getTurn()));
 	}
 }

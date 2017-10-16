@@ -15,6 +15,7 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import net.sf.json.JSONObject;
+import net.sf.json.test.JSONAssert;
 
 @RunWith(Theories.class)
 public class JudgeMatchTest {
@@ -23,6 +24,17 @@ public class JudgeMatchTest {
 	private final String FIRST="○";
 	private final String SECOND="×";
 	private static String[][] testLocation;
+
+	//内部クラス
+	public static class OutOfRangeLocationFixture{
+		private final int INPUT_X;
+		private final int INPUT_Y;
+
+		private OutOfRangeLocationFixture(int inputX,int inputY){
+			this.INPUT_X=inputX;
+			this.INPUT_Y=inputY;
+		}
+	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -56,6 +68,16 @@ public class JudgeMatchTest {
 	@DataPoints
 	public static int[] patternKey={0,1,2,3,4,5,6,7,8,9};
 
+	@DataPoints
+	public static OutOfRangeLocationFixture[] getParameters(){
+		return new OutOfRangeLocationFixture[]{
+			new OutOfRangeLocationFixture(-1,0),
+			new OutOfRangeLocationFixture(3,0),
+			new OutOfRangeLocationFixture(0,-1),
+			new OutOfRangeLocationFixture(0,3)
+		};
+	}
+
 	@Test
 	public void testRuleJudgeTrue() {
 
@@ -80,6 +102,19 @@ public class JudgeMatchTest {
 
 		//盤面情報変更
 		decideLocation(1);
+
+		boolean ruleJudge=JudgeMatch.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
+
+		//比較
+		assertThat(ruleJudge,is(false));
+	}
+
+	@Theory
+	public void testOutOfRangeRuleJudgeFalse(OutOfRangeLocationFixture oorlf){
+		//JSONObject生成
+		JSONObject testGameInfo=new JSONObject();
+		testGameInfo.accumulate("xAxis", oorlf.INPUT_X);
+		testGameInfo.accumulate("yAxis", oorlf.INPUT_Y);
 
 		boolean ruleJudge=JudgeMatch.ruleJudge(JudgeMatchTest.testLocation, testGameInfo);
 
@@ -120,7 +155,7 @@ public class JudgeMatchTest {
 
 		testGameInfo.accumulate("event", result);
 
-		assertThat(JudgeMatch.informResult(result),is(testGameInfo));
+		JSONAssert.assertEquals(JudgeMatch.informResult(result),testGameInfo);
 	}
 /**
  * 継戦状態の盤面を作成
