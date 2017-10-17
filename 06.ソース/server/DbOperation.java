@@ -55,7 +55,7 @@ class DbOperation {
 			"where logic_name=? and logic_writer=? and logic_ver=?";
 
 	//直近試合IDを検索
-	private final static String formerIdGetSql="select max(battle_id) from battle_result limit 1";
+	private final static String formerIdGetSql="select ifnull(max(battle_id),0) from battle_result limit 1";
 
 
 
@@ -297,7 +297,7 @@ class DbOperation {
 
 			//直近試合ID取得
 			while(rset.next()){
-				battleId=rset.getInt("max(battle_id)");
+				battleId=rset.getInt("ifnull(max(battle_id),0)");
 			}
 		}catch(SQLException e){
 

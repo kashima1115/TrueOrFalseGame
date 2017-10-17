@@ -40,6 +40,10 @@ public class DbOperationTest {
 	private static PreparedStatement pStateLogicSelect=null;
 	private static PreparedStatement pStateLocationSelect=null;
 	private static PreparedStatement pStateLocationDelete=null;
+	private static PreparedStatement pStateLocationCorrectMaxIdSelect=null;
+	private static PreparedStatement pStateLogicCorrectMaxIdSelect=null;
+	private static PreparedStatement pStateLocationCorrectMaxIdAlter=null;
+	private static PreparedStatement pStateLogicCorrectMaxIdAlter=null;
 
 	//SQL文
 	private static final String BATTLE_RESULT_INSERT_SQL="insert into battle_result value "+
@@ -60,11 +64,20 @@ public class DbOperationTest {
 	private static final String LOGIC_SELECT_SQL="select count(*) from logic where "+
 			"logic_name=? and logic_writer=? and logic_ver=?";
 
+	private static final String LOGIC_SELECT_MAX_ID_SQL="select ifnull(max(logic_id),0) from logic";
+
+	private static final String LOGIC_ALTER_MAX_ID_SQL="alter table logic auto_increment=?";
+
 	private static final String LOCATION_DELITE_SQL="delete from location where battle_id=? and logic_id=?";
 
 	private static final String LOCATION_SELECT_SQL="select count(*) from location where "+
 			"battle_id=? and logic_id=? and location_x=? and location_y=? and turn=? and "+
 			"play_start=? and play_end=?";
+
+	private static final String LOCATION_SELECT_MAX_ID_SQL="select ifnull(max(location_id),0) from location";
+
+	private static final String LOCATION_ALTER_MAX_ID_SQL="alter table location auto_increment=?";
+
 
 	//登録期待値
 	private static final int EXPECT_BATTLE_ID=1100;
@@ -73,6 +86,10 @@ public class DbOperationTest {
 	private static LogicInfoBean testLib;
 	private static LogicInfoBean testNotRecordLib;
 	private static LocationInfoBean testLcib;
+
+	//auto_increment
+	private static int logicAutoIncrement=0;
+	private static int locationAutoIncrement=0;
 
 
 	@BeforeClass
@@ -85,6 +102,9 @@ public class DbOperationTest {
 		//DB接続
 		createConection();
 
+		//logic_idとlocation_idの最大値を取得
+		getMaxIdToCorrectAutoIncrement();
+
 		//テスト用ロジック情報格納Bean作成
 		beanSetter();
 
@@ -96,6 +116,9 @@ public class DbOperationTest {
 	public static void tearDownAfterClass() throws Exception {
 		//テストデータ削除
 		deleteTestDataFromDb();
+
+		//auto_incrementの値を復元
+		correctAutoIncrement();
 
 		//DB切断
 		closeConnection();
@@ -307,7 +330,7 @@ public class DbOperationTest {
 
 	@Test
 	public void testHaveNoRecordGetFormerId() throws SQLException{
-		fail("まだ実装されていません");
+		fail("未実装");
 	}
 
 	/**
@@ -365,6 +388,22 @@ public class DbOperationTest {
 
 		if(pStateLocationDelete!=null){
 			pStateLocationDelete.close();
+		}
+
+		if(pStateLocationCorrectMaxIdSelect!=null){
+			pStateLocationCorrectMaxIdSelect.close();
+		}
+
+		if(pStateLocationCorrectMaxIdAlter!=null){
+			pStateLocationCorrectMaxIdAlter.close();
+		}
+
+		if(pStateLogicCorrectMaxIdSelect!=null){
+			pStateLogicCorrectMaxIdSelect.close();
+		}
+
+		if(pStateLogicCorrectMaxIdAlter!=null){
+			pStateLogicCorrectMaxIdAlter.close();
 		}
 	}
 
@@ -508,6 +547,60 @@ public class DbOperationTest {
 		testLcib.setPlayStart("10:10:10");
 		testLcib.setPlayEnd("10:10:11");
 
+
+	}
+
+	private static void correctAutoIncrement() throws SQLException{
+
+		//location_idのauto_incrementの値を復元
+		pStateLocationCorrectMaxIdAlter=testCon.prepareStatement(LOCATION_ALTER_MAX_ID_SQL);
+
+		pStateLocationCorrectMaxIdAlter.setInt(1,++locationAutoIncrement);
+
+		pStateLocationCorrectMaxIdAlter.executeUpdate();
+
+		//logic_idのauto_incrementの値を復元
+		pStateLogicCorrectMaxIdAlter=testCon.prepareStatement(LOGIC_ALTER_MAX_ID_SQL);
+
+		pStateLogicCorrectMaxIdAlter.setInt(1,++logicAutoIncrement);
+
+		pStateLogicCorrectMaxIdAlter.executeUpdate();
+	}
+
+	private static void getMaxIdToCorrectAutoIncrement() throws SQLException{
+		ResultSet rsetLocation=null;
+		ResultSet rsetLogic=null;
+
+		try{
+			//location_idの最大値を取得する
+			pStateLocationCorrectMaxIdSelect=testCon.prepareStatement(LOCATION_SELECT_MAX_ID_SQL);
+
+			rsetLocation=pStateLocationCorrectMaxIdSelect.executeQuery();
+
+			while(rsetLocation.next()){
+
+				locationAutoIncrement=rsetLocation.getInt("ifnull(max(location_id),0)");
+			}
+
+			//logic_idの最大値を取得する
+			pStateLogicCorrectMaxIdSelect=testCon.prepareStatement(LOGIC_SELECT_MAX_ID_SQL);
+
+			rsetLogic=pStateLogicCorrectMaxIdSelect.executeQuery();
+
+			while(rsetLogic.next()){
+				logicAutoIncrement=rsetLogic.getInt("ifnull(max(logic_id),0)");
+			}
+
+		}finally{
+			//クローズ処理
+			if(rsetLocation!=null){
+				rsetLocation.close();
+			}
+
+			if(rsetLogic!=null){
+				rsetLogic.close();
+			}
+		}
 
 	}
 }
