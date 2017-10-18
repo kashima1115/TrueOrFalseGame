@@ -94,7 +94,6 @@ public class DbOperationTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-
 		//DbOperationクラスDB接続
 		dbi=new DbOperation();
 		dbi.connect();
@@ -107,16 +106,10 @@ public class DbOperationTest {
 
 		//テスト用ロジック情報格納Bean作成
 		beanSetter();
-
-		//テストデータDB投入
-		insertTestDataToDb();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		//テストデータ削除
-		deleteTestDataFromDb();
-
 		//auto_incrementの値を復元
 		correctAutoIncrement();
 
@@ -129,10 +122,18 @@ public class DbOperationTest {
 
 	@Before
 	public void setUp() throws Exception {
+
+		//テストデータDB投入
+		insertTestDataToDb();
+
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		//テストデータ削除
+		deleteTestDataFromDb();
+
+
 	}
 
 	@Test
@@ -285,7 +286,6 @@ public class DbOperationTest {
 
 		try{
 
-
 			if(pStateBattleResultSelect==null){
 				//プリコンパイル
 				pStateBattleResultSelect=testCon.prepareStatement(BATTLE_RESULT_SELECT_SQL);
@@ -326,12 +326,6 @@ public class DbOperationTest {
 		assertThat(dbi.getLogicId(testLib),is(EXPECT_LOGIC_ID));
 	}
 
-
-
-	@Test
-	public void testHaveNoRecordGetFormerId() throws SQLException{
-		fail("未実装");
-	}
 
 	/**
 	 * DB接続メソッド
