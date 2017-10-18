@@ -101,8 +101,9 @@ class BattleFlow {
 	/**
 	 * ロジック情報受信管理
 	 * @throws JMSException
+	 * @throws TimeOutException
 	 */
-	private void stayReady() throws JMSException{
+	private void stayReady() throws JMSException, TimeOutException{
 		//ロジック情報を2つ受け取るまで、ループ
 		int readyConut=0;
 		while(readyConut<2){
@@ -384,7 +385,7 @@ class BattleFlow {
 		dbit=checkMatchEnd(dbit);
 
 		//不正なイベント情報を取得した場合
-		if(!this.TURN_END.equals(event)){
+		if(!this.TURN_END.equals(event)&&event!=null){
 			//期待するイベント情報を得られなかったときの処理
 			notExpectEventDuringBattle(dbit,receiveGameInfo);
 
@@ -675,9 +676,10 @@ class BattleFlow {
 	 * @return 試合中・試合終了後に使用するオブジェクト
 	 * @throws ClientMulfunctionException
 	 * @throws JMSException
+	 * @throws TimeOutException
 	 */
 	private DuringBattleInfoTradeBean gameLater(Map<String,Integer> logicRefIdMap,DuringBattleInfoTradeBean dbit,
-			int battleId) throws ClientMulfunctionException, JMSException{
+			int battleId) throws ClientMulfunctionException, JMSException, TimeOutException{
 
 		try{
 
@@ -804,7 +806,6 @@ class BattleFlow {
 
 			//試合ID取得
 			int battleId=BattleIdAdmin.getBattleID(dbi);
-
 			//メソッド間、値引渡し用Bean
 			DuringBattleInfoTradeBean dbit=dbitSetObject();
 
@@ -813,6 +814,7 @@ class BattleFlow {
 
 			//試合中の処理に移行
 			dbit=gameLater(logicRefIdMap,dbit,battleId);
+
 
 			//試合終了後の処理に移行
 			gameEnd(battleId, logicRefIdMap, dbit);
@@ -850,7 +852,12 @@ class BattleFlow {
 
 			throw e;
 
+		}catch(TimeOutException e){
+			e.printStackTrace();
+			int battleId=BattleIdAdmin.getBattleID(dbi);
+			dbi.deleteLocation(battleId);
 		}finally{
+
 			//Queueの終了
 			if(samqm!=null){
 				samqm.quitQueue();

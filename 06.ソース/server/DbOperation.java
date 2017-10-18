@@ -30,6 +30,8 @@ class DbOperation {
 	private PreparedStatement resultPstate=null;
 	private PreparedStatement logicIdPstate=null;
 	private PreparedStatement formerIdPstate=null;
+	private PreparedStatement deleteLocationPstate=null;
+
 
 	//sql文
 	//DBにクライアントのロジック情報が登録されているか否かを検索
@@ -56,6 +58,9 @@ class DbOperation {
 
 	//直近試合IDを検索
 	private final static String formerIdGetSql="select ifnull(max(battle_id),0) from battle_result limit 1";
+
+	//時間外エラー時レコード削除
+	private final static String DELETE_LOCATION_SQL ="delete from location where battle_id = ?";
 
 
 
@@ -374,11 +379,50 @@ class DbOperation {
 			if(this.formerIdPstate!=null){
 				this.formerIdPstate.close();
 			}
+
+			if(this.deleteLocationPstate!=null){
+				this.deleteLocationPstate.close();
+			}
 		}catch(SQLException e){
 			e.printStackTrace();
 			throw e;
 		}
 
+	}
+
+
+	void deleteLocation(int battleId) throws SQLException {
+
+		try{
+
+			//オートコミット解除
+			this.con.setAutoCommit(false);
+
+			//1度もプリコンパイルされていないならば、プリコンパイルを行う
+			if(this.deleteLocationPstate==null){
+				this.deleteLocationPstate=this.con.prepareStatement(DbOperation.DELETE_LOCATION_SQL);
+			}
+
+			//プリペアドステートメントの？の値をセット
+			this.deleteLocationPstate.setInt(1, battleId);
+
+
+			//sql文実行
+			this.deleteLocationPstate.executeUpdate();
+
+
+			//コミット
+			this.con.commit();
+
+		}catch(SQLException e){
+			e.printStackTrace();
+
+			//例外発生時ロールバック
+			if(this.con!=null){
+				this.con.rollback();
+			}
+			throw e;
+		}
 	}
 
 

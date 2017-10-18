@@ -13,6 +13,7 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import net.sf.json.JSONObject;
+import server.TimeOutException;
 
 /**
  * サーバー側でのActiveMQの操作を行うクラスです.
@@ -36,11 +37,14 @@ public class ServerActiveMQMessaging implements MessageQueueController {
 	}
 
 	@Override
-	public JSONObject receiveMessage() throws JMSException{
+	public JSONObject receiveMessage() throws JMSException,TimeOutException{
 		//
 		try {
 			// メッセージの受信
-			TextMessage msg = (TextMessage)receiver.receive();
+			TextMessage msg = (TextMessage)receiver.receive(30000);
+			if(msg == null){
+				throw new TimeOutException();
+			}
 			JSONObject obj = JSONObject.fromObject(msg.getText());
 			msg.acknowledge();
 			return obj;

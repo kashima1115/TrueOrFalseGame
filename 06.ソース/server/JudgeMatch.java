@@ -16,6 +16,9 @@ class JudgeMatch {
 	 * @return 盤面と指し手に被りがあるor存在しない盤面をしていた場合false、それ以外trueを返す
 	 */
 	static boolean ruleJudge(String[][] location,JSONObject gameInfo){
+		if(gameInfo == null){
+			return false;
+		}
 
 		//指し手情報を取得
 		int locationX=gameInfo.getInt("xAxis");

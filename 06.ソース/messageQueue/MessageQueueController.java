@@ -3,6 +3,7 @@ package messageQueue;
 import javax.jms.JMSException;
 
 import net.sf.json.JSONObject;
+import server.TimeOutException;
 /**
  * MQの制御のためのインターフェース.
  * @author hatsugai
@@ -20,7 +21,7 @@ public interface MessageQueueController {
 	 * @return 受信したメッセージです（JSONObject方式です)
 	 * @throws JMSException
 	 */
-	public JSONObject receiveMessage() throws JMSException;
+	public JSONObject receiveMessage() throws JMSException,TimeOutException;
 	/**
 	 * 受信用Queueを作成します.
 	 * @param IPAdress 自身のマシンのIPアドレスです
