@@ -2,20 +2,26 @@ package client;
 
 import static org.junit.Assert.*;
 
+import java.net.UnknownHostException;
+
+import javax.jms.JMSException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import messageQueue.DummyActiveMQMessaging;
 import messageQueue.MessageQueueControllerFactory;
 import net.sf.json.JSONObject;
+import server.TimeOutException;
 
 public class SequenceControlUnitTest {
 	CreateGameInfo cgi = new CreateGameInfo();
 	BattleInfoBean bib = new BattleInfoBean();
-	JSONObject obj = new JSONObject();
-	ConvertJSONForTest cj = new ConvertJSONForTest();
+	ConvertJSON cj = new ConvertJSON();
+	DummyActiveMQMessaging amq = new DummyActiveMQMessaging();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -37,33 +43,46 @@ public class SequenceControlUnitTest {
 
 	@Test
 	public void testStartGame() {
+		try {
+			SequenceControl.startGame();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (JMSException e) {
+			System.exit(1);
+		}
+		assertEquals(cgi.ready(),amq.receiveMessage());
+		System.out.println("startgame");
+	}
+
+	@Test
+	public void testMyTurnエラー() throws JMSException, TimeOutException {
 		JSONObject obj = new JSONObject();
-		obj = SequenceControlForTest.startGame();
-		assertEquals(cgi.ready().toString(),obj.toString());
-	}
-
-	@Test
-	public void testMyTurnノーマル() {
-		obj = cgi.yourturn();
-		BattleInfoBean bib = cj.convertFromJSON(obj);
-		String returns = SequenceControlForTest.myTurn(bib);
-		assertEquals("YourTurn11", returns);
-	}
-
-	@Test
-	public void testMyTurnウィン() {
-		obj = cgi.win();
-		BattleInfoBean bib = cj.convertFromJSON(obj);
-		String returns = SequenceControlForTest.myTurn(bib);
-		assertEquals("win", returns);
-	}
-
-	@Test
-	public void testMyTurnエラー() {
 		obj = cgi.error();
-		BattleInfoBean bib = cj.convertFromJSON(obj);
-		String returns = SequenceControlForTest.myTurn(bib);
-		assertEquals("error", returns);
+		amq.sendMessage(obj);
+		SequenceControl.myTurn();
+		CreateGameInfo cgi2 = new CreateGameInfo();
+		assertEquals(cgi2.error(),amq.receiveMessage());
+		System.out.println("error");
+	}
+
+	@Test
+	public void testMyTurnノーマルエンド() throws JMSException, TimeOutException{
+		JSONObject obj = new JSONObject();
+		obj = cgi.yourturn();
+		amq.sendMessage(obj);
+		SequenceControl.myTurn();
+		assertEquals(cgi.win(),amq.receiveMessage());
+		System.out.println("normal");
+	}
+
+	@Test
+	public void testMyTurnblank() throws JMSException, TimeOutException{
+		JSONObject obj = new JSONObject();
+		obj.put("blank", "blank");
+		amq.sendMessage(obj);
+		SequenceControl.myTurn();
+		assertEquals(obj,amq.receiveMessage());
+		System.out.println("blank");
 	}
 
 }

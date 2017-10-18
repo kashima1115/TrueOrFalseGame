@@ -11,6 +11,7 @@ import brain.BrainBean;
 import messageQueue.MessageQueueController;
 import messageQueue.MessageQueueControllerFactory;
 import net.sf.json.JSONObject;
+import server.TimeOutException;
 /**
  * クライアント機能の動作をコントロールするクラスです.
  * @author hatsugai
@@ -72,8 +73,9 @@ public class SequenceControl{
 	/**
 	 * 自分のターンごとに状況に応じた処理を行います.
 	 * @throws JMSException
+	 * @throws TimeOutException
 	 */
-	public static void myTurn() throws JMSException{
+	public static void myTurn() throws JMSException, TimeOutException{
 		//変数eventの宣言
 		String event = "blank";
 		//Brainのインスタンス化
@@ -127,8 +129,9 @@ public class SequenceControl{
 	 * ActiveMQからのメッセージを受信します.
 	 * @return 盤面情報やイベント情報を格納したBattleInfoBeanです
 	 * @throws JMSException
+	 * @throws TimeOutException
 	 */
-	private static BattleInfoBean receive() throws JMSException {
+	private static BattleInfoBean receive() throws JMSException, TimeOutException {
 		//ActiveMQからメッセージを受信する
 		JSONObject obj2 = amq.receiveMessage();
 		//JSONから変換

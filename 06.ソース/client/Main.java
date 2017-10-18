@@ -6,6 +6,8 @@ import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
 
+import server.TimeOutException;
+
 /**
  * メインクラスです。クライアントプログラムを起動させるにはこのクラスを実行してください.
  * @author hatsugai
@@ -24,9 +26,13 @@ public class Main {
 		} catch (UnknownHostException e) {
 			Logger logger = Logger.getLogger(SequenceControl.class.getName());
 			logger.fatal("IPアドレスの取得に失敗しました。",e);
-			System.exit(0);
+			System.exit(1);
 		} catch (JMSException e) {
-			System.exit(0);
+			//例外が発生した箇所にてログに書き込んでいます。
+			System.exit(1);
+		} catch (TimeOutException e) {
+			// TODO 自動生成された catch ブロック
+			System.exit(1);
 		}
 	}
 

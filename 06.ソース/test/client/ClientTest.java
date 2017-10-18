@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import messageQueue.MessageQueueControllerFactory;
+import server.TimeOutException;
 
 public class ClientTest {
 
@@ -20,13 +21,8 @@ public class ClientTest {
 	}
 
 	@Test
-	public void mainTest() {
-		try {
-			SequenceControl.myTurn();
-		} catch (JMSException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
+	public void mainTest() throws JMSException, TimeOutException {
+		SequenceControl.myTurn();
 	}
 
 }
