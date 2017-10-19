@@ -38,7 +38,9 @@ public class DbOperationTest {
 	private static PreparedStatement pStateLogicInsert=null;
 	private static PreparedStatement pStateLogicDelete=null;
 	private static PreparedStatement pStateLogicSelect=null;
-	private static PreparedStatement pStateLocationSelect=null;
+	private static PreparedStatement pStateLocationInsertCheckSelect=null;
+	private static PreparedStatement pStateLocationDeleteCheckSelect=null;
+	private static PreparedStatement pStateLocationInsert=null;
 	private static PreparedStatement pStateLocationDelete=null;
 	private static PreparedStatement pStateLocationCorrectMaxIdSelect=null;
 	private static PreparedStatement pStateLogicCorrectMaxIdSelect=null;
@@ -70,9 +72,16 @@ public class DbOperationTest {
 
 	private static final String LOCATION_DELITE_SQL="delete from location where battle_id=? and logic_id=?";
 
-	private static final String LOCATION_SELECT_SQL="select count(*) from location where "+
+	private static final String LOCATION_INSERT_SQL="insert into location "+
+			"(battle_id,logic_id,location_x,location_y,turn,play_start,play_end) "+
+			"value (?,?,?,?,?,?,?)";
+
+	private static final String LOCATION_INSERT_CHECK_SELECT_SQL="select count(*) from location where "+
 			"battle_id=? and logic_id=? and location_x=? and location_y=? and turn=? and "+
 			"play_start=? and play_end=?";
+
+	private static final String LOCATION_DELITE_CHECK_SELECT_SQL="select count(*) from location where "+
+			"battle_id=?";
 
 	private static final String LOCATION_SELECT_MAX_ID_SQL="select ifnull(max(location_id),0) from location";
 
@@ -224,23 +233,23 @@ public class DbOperationTest {
 
 		try{
 
-			if(pStateLocationSelect==null){
+			if(pStateLocationInsertCheckSelect==null){
 				//プリコンパイル
-				pStateLocationSelect=testCon.prepareStatement(LOCATION_SELECT_SQL);
+				pStateLocationInsertCheckSelect=testCon.prepareStatement(LOCATION_INSERT_CHECK_SELECT_SQL);
 			}
 
 
 			//検索条件セット
-			pStateLocationSelect.setInt(1, testLcib.getBattleId());
-			pStateLocationSelect.setInt(2, testLcib.getLogicId());
-			pStateLocationSelect.setInt(3, testLcib.getLocationX());
-			pStateLocationSelect.setInt(4, testLcib.getLocationY());
-			pStateLocationSelect.setInt(5, testLcib.getTurn());
-			pStateLocationSelect.setString(6, testLcib.getPlayStart());
-			pStateLocationSelect.setString(7, testLcib.getPlayEnd());
+			pStateLocationInsertCheckSelect.setInt(1, testLcib.getBattleId());
+			pStateLocationInsertCheckSelect.setInt(2, testLcib.getLogicId());
+			pStateLocationInsertCheckSelect.setInt(3, testLcib.getLocationX());
+			pStateLocationInsertCheckSelect.setInt(4, testLcib.getLocationY());
+			pStateLocationInsertCheckSelect.setInt(5, testLcib.getTurn());
+			pStateLocationInsertCheckSelect.setString(6, testLcib.getPlayStart());
+			pStateLocationInsertCheckSelect.setString(7, testLcib.getPlayEnd());
 
 			//SQL実行
-			rset=pStateLocationSelect.executeQuery();
+			rset=pStateLocationInsertCheckSelect.executeQuery();
 
 			//値取得
 			int insertRecord=0;
@@ -326,6 +335,61 @@ public class DbOperationTest {
 		assertThat(dbi.getLogicId(testLib),is(EXPECT_LOGIC_ID));
 	}
 
+	@Test
+	public void testDeleteLocation() throws SQLException{
+		ResultSet rset=null;
+
+		try{
+			//削除するテストデータを挿入
+			if(pStateLocationInsert==null){
+				//プリコンパイル
+				pStateLocationInsert=testCon.prepareStatement(LOCATION_INSERT_SQL);
+			}
+			//挿入するデータ
+			pStateLocationInsert.setInt(1, testLcib.getBattleId());
+			pStateLocationInsert.setInt(2, testLcib.getLogicId());
+			pStateLocationInsert.setInt(3, testLcib.getLocationX());
+			pStateLocationInsert.setInt(4, testLcib.getLocationY());
+			pStateLocationInsert.setInt(5, testLcib.getTurn());
+			pStateLocationInsert.setString(6,testLcib.getPlayStart());
+			pStateLocationInsert.setString(7,testLcib.getPlayEnd());
+
+			//SQL実行
+			pStateLocationInsert.executeUpdate();
+
+			//コミット
+			testCon.commit();
+
+			//テスト対象メソッド実行
+			dbi.deleteLocation(testLcib.getBattleId());
+
+			//レコードが削除されたか否かをカウント
+			if(pStateLocationDeleteCheckSelect==null){
+				pStateLocationDeleteCheckSelect=testCon.prepareStatement(LOCATION_DELITE_CHECK_SELECT_SQL);
+			}
+
+			//削除条件指定
+			pStateLocationDeleteCheckSelect.setInt(1, testLcib.getBattleId());
+
+			//SQL実行
+			rset=pStateLocationDeleteCheckSelect.executeQuery();
+
+			//値取得
+			int record=1;
+
+			while(rset.next()){
+				record=rset.getInt("count(*)");
+			}
+
+			assertThat(record,is(0));
+
+		}finally{
+			if(rset!=null){
+				rset.close();
+			}
+		}
+
+	}
 
 	/**
 	 * DB接続メソッド
@@ -376,8 +440,16 @@ public class DbOperationTest {
 			pStateLogicSelect.close();
 		}
 
-		if(pStateLocationSelect!=null){
-			pStateLocationSelect.close();
+		if(pStateLocationInsertCheckSelect!=null){
+			pStateLocationInsertCheckSelect.close();
+		}
+
+		if(pStateLocationDeleteCheckSelect!=null){
+			pStateLocationDeleteCheckSelect.close();
+		}
+
+		if(pStateLocationInsert!=null){
+			pStateLocationInsert.close();
 		}
 
 		if(pStateLocationDelete!=null){
