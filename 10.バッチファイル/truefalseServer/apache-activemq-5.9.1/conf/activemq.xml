@@ -62,7 +62,7 @@
             http://activemq.apache.org/jmx.html
         -->
         <managementContext>
-            <managementContext createConnector="true"/>
+            <managementContext createConnector="false"/>
         </managementContext>
 
         <!--
