@@ -1,0 +1,1 @@
+jar u clientProgram.jar config.properties

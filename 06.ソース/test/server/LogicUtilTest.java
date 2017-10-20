@@ -1,0 +1,180 @@
+package server;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
+
+import mockit.Expectations;
+import mockit.Mocked;
+
+@RunWith(Theories.class)
+public class LogicUtilTest {
+	@Mocked
+	private DbOperation dbi=null;
+	private static final String FIRST_LOGIC_NAME="Alogic";
+	private static final String SECOND_LOGIC_NAME="Clogic";
+	private static final String FIRST_CREATOR="arahari";
+	private static final String SECOND_CREATOR="kanayama";
+	private static final String FIRST_VERSION="0.1";
+	private static final String SECOND_VERSION="0.1";
+	private static final String FIRST_ADDRESS="1";
+	private static final String SECOND_ADDRESS="2";
+	private static final String FIRST_KEY=FIRST_LOGIC_NAME+FIRST_CREATOR+FIRST_VERSION+FIRST_ADDRESS;
+	private static final String SECOND_KEY=SECOND_LOGIC_NAME+SECOND_CREATOR+SECOND_VERSION+SECOND_ADDRESS;
+
+	public static class LogicFixture{
+		private final String exepectMapKey;
+		private final int expectMapValue;
+
+		private LogicFixture(String expectKey,int expectMapValue){
+			this.exepectMapKey=expectKey;
+			this.expectMapValue=expectMapValue;
+		}
+
+	}
+
+	@DataPoints
+	public static LogicFixture[] getParameters() {
+		return new LogicFixture[] {
+				new LogicFixture(FIRST_KEY,1),
+				new LogicFixture(SECOND_KEY,3)
+		};
+
+	}
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Theory
+	public void testAttachId(LogicFixture logicFixture) throws SQLException {
+
+
+
+		//テスト用のロジック情報を格納するMapを生成
+		Map<String,LogicInfoBean> testLogicMap=new HashMap<String,LogicInfoBean>();
+
+		//生成したロジック情報を格納するBeanをMapに格納
+		testLogicMap.put(FIRST_KEY, createLogicInfoBean(FIRST_LOGIC_NAME,FIRST_CREATOR,
+				FIRST_VERSION,FIRST_ADDRESS));
+
+		testLogicMap.put(SECOND_KEY, createLogicInfoBean(SECOND_LOGIC_NAME,SECOND_CREATOR,
+				SECOND_VERSION,SECOND_ADDRESS));
+
+		//テスト用ロジック情報Mapのキーを保管するBeanを生成
+		ClientLogicBean testClb=new ClientLogicBean();
+
+		testClb.setFirstLogic(FIRST_KEY);
+		testClb.setSecondLogic(SECOND_KEY);
+
+		//Mock期待値
+		new Expectations(){
+			{
+				dbi.getLogicId((LogicInfoBean) any);
+				result=1;
+				result=3;
+			}
+		};
+
+		//比較
+		assertThat(LogicUtil.attachId(dbi, testLogicMap, testClb),
+				hasEntry(logicFixture.exepectMapKey,logicFixture.expectMapValue));
+	}
+
+
+	@Test(expected=SameLogicException.class)
+	public void testSameJudge() throws SameLogicException {
+
+		Map<String,Integer> logicRefIdMap=new HashMap<String,Integer>();
+		//キー名・値
+		final String FIRST_KEY="1111";
+		final String SECOND_KEY="1112";
+		final int SAME_VALUE=1;
+
+		//同じロジックID（同名ロジック）のロジック情報をMapに格納
+		logicRefIdMap.put(FIRST_KEY, SAME_VALUE);
+		logicRefIdMap.put(SECOND_KEY, SAME_VALUE);
+
+		//キー名を保管するBeanを保管
+		ClientLogicBean clb=new ClientLogicBean();
+		clb.setFirstLogic(FIRST_KEY);
+		clb.setSecondLogic(SECOND_KEY);
+
+		//テスト対象メソッドの実行（同名ロジック判定）
+		LogicUtil.sameJudge(logicRefIdMap, clb);
+
+	}
+
+	@Test
+	public void testNonSameJudge(){
+		Map<String,Integer> logicRefIdMap=new HashMap<String,Integer>();
+		//キー名・値
+		final String FIRST_KEY="1111";
+		final String SECOND_KEY="2222";
+		final int FIRST_VALUE=1;
+		final int SECOND_VALUE=2;
+
+		//同じロジックID（同名ロジック）のロジック情報をMapに格納
+		logicRefIdMap.put(FIRST_KEY, FIRST_VALUE);
+		logicRefIdMap.put(SECOND_KEY, SECOND_VALUE);
+
+		//キー名を保管するBeanを保管
+		ClientLogicBean clb=new ClientLogicBean();
+		clb.setFirstLogic(FIRST_KEY);
+		clb.setSecondLogic(SECOND_KEY);
+
+		try{
+
+			//同名ロジック判定
+			LogicUtil.sameJudge(logicRefIdMap, clb);
+
+		}catch(SameLogicException e){
+
+			//例外が発生したら失敗
+			fail("同名ロジックエラーが発生しました");
+		}
+
+	}
+
+	/**
+	 * Beanの生成を行う
+	 */
+	private LogicInfoBean createLogicInfoBean(String logicName,String writer,
+			String version,String address){
+		//Beanの生成
+		LogicInfoBean testLib=new LogicInfoBean();
+
+		testLib.setLogicName(logicName);
+		testLib.setWriter(writer);
+		testLib.setVersion(version);
+		testLib.setAddress(address);
+
+		return testLib;
+	}
+
+}
