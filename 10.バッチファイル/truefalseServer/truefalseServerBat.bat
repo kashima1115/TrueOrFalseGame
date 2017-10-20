@@ -12,9 +12,6 @@ start activemq.bat
 rem 元のディレクトリに戻る
 popd
 
-rem プロパティファイルをクラスパスに追加
-java -cp . server.Main
-
 rem ○×プログラムのjarファイルを実行
 java -jar truefalseServer.jar
 
